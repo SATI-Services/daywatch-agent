@@ -1,0 +1,65 @@
+{
+    "name": "daywatch/agent",
+    "description": "Daywatch telemetry collector for Laravel apps — sensors observe framework events into a bounded buffer, digest over framed TCP to a local ReactPHP daemon, which batches and POSTs to the central Daywatch ingest.",
+    "keywords": [
+        "laravel",
+        "daywatch",
+        "telemetry",
+        "apm",
+        "monitoring",
+        "observability"
+    ],
+    "homepage": "https://github.com/daywatch/agent",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "ext-zlib": "*",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "react/event-loop": "^1.5",
+        "react/promise": "^3.2",
+        "react/socket": "^1.16",
+        "react/stream": "^1.4"
+    },
+    "suggest": {
+        "react/http": "Not required and intentionally excluded: reactphp/http (every release, incl. 3.x-dev) hard-pins psr/http-message ^1.0, which downgrades/conflicts with a Laravel 13 host on psr/http-message ^2.0. The daywatch:agent daemon therefore POSTs batches over react/socket (raw HTTP/1.1), which carries no psr/http-message dependency."
+    },
+    "require-dev": {
+        "laravel/pint": "~1.29.3",
+        "orchestra/testbench": "~11.1.0",
+        "pestphp/pest": "~4.7.4",
+        "pestphp/pest-plugin-laravel": "~4.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Daywatch\\Agent\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Daywatch\\Agent\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Daywatch\\Agent\\AgentServiceProvider"
+            ],
+            "aliases": {
+                "Daywatch": "Daywatch\\Agent\\Facades\\Daywatch"
+            }
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

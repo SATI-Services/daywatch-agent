@@ -32,4 +32,21 @@ abstract class TestCase extends Orchestra
             'Daywatch' => Daywatch::class,
         ];
     }
+
+    /**
+     * Pin the test database to an in-memory SQLite connection so the suite
+     * runs with zero external services — no MySQL/Postgres "testing" database
+     * to provision. Nothing here persists; sensors observe events, not rows.
+     *
+     * @param  Application  $app
+     */
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+    }
 }

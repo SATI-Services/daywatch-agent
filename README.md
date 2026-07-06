@@ -6,16 +6,15 @@
     <a href="https://packagist.org/packages/daywatch/agent"><img src="https://img.shields.io/packagist/l/daywatch/agent" alt="License"></a>
 </p>
 
-Daywatch is a telemetry collector for Laravel applications. Sensors observe
-requests, database queries, exceptions, jobs, commands, and scheduled tasks into
-a bounded per-execution buffer, digest them over a local framed-TCP daemon
-(built on [ReactPHP](https://reactphp.org/)), which batches, gzips, and POSTs to
-your central Daywatch ingest.
+Telemetry collector for Laravel. Sensors observe requests, queries, exceptions,
+jobs, commands, and scheduled tasks into a bounded per-execution buffer, then
+digest them over framed TCP to a local [ReactPHP](https://reactphp.org/) daemon
+that batches, gzips, and POSTs to your central Daywatch ingest.
 
-The package is designed to be **un-crashable**: every event hook, socket write,
-and encode is wrapped and failures are swallowed. Worst case with a dead daemon
-is a sub-second digest timeout — never a user-visible exception. Telemetry loss
-is acceptable; host-application impact never is.
+The package is **un-crashable**: every hook, socket write, and encode is wrapped
+and failures are swallowed. Worst case with a dead daemon is a sub-second digest
+timeout — never a user-visible exception. Telemetry loss is acceptable;
+host-application impact never is.
 
 ## Requirements
 
@@ -25,17 +24,12 @@ is acceptable; host-application impact never is.
 
 ## Installation
 
-Install via Composer:
-
 ```bash
 composer require daywatch/agent
 ```
 
-The service provider and `Daywatch` facade are registered automatically via
-[package discovery](https://laravel.com/docs/13.x/packages#package-discovery) —
-no manual wiring required.
-
-Optionally publish the configuration file:
+The service provider and `Daywatch` facade auto-register via package discovery.
+Optionally publish the config:
 
 ```bash
 php artisan vendor:publish --tag=daywatch-config
@@ -44,7 +38,7 @@ php artisan vendor:publish --tag=daywatch-config
 ## Configuration
 
 `DAYWATCH_TOKEN` and `DAYWATCH_BASE_URL` are required to transmit telemetry.
-Without them the application runs normally and simply collects nothing.
+Without them the app runs normally and simply collects nothing.
 
 ```dotenv
 DAYWATCH_ENABLED=true
@@ -66,19 +60,15 @@ The full option table lives in the published `config/daywatch.php`.
 
 ## Running the daemon
 
-Run one long-running daemon per application, supervised by systemd, Supervisor,
-or Docker. It accepts digests over TCP, batches and gzips them, and POSTs to the
+Run one long-running daemon per application under systemd, Supervisor, or
+Docker. It accepts digests over TCP, batches and gzips them, and POSTs to the
 ingest:
 
 ```bash
-php artisan daywatch:agent
-```
+php artisan daywatch:agent            # add --plain for non-TTY / log files
 
-Check that the daemon is alive and moving records:
-
-```bash
-php artisan daywatch:status          # human-readable table
-php artisan daywatch:status --json   # machine-readable; exit 1 when down
+php artisan daywatch:status           # is it alive and moving records?
+php artisan daywatch:status --json    # machine-readable; exit 1 when down
 ```
 
 ## Runtime API
@@ -99,13 +89,7 @@ Daywatch::resume();                    // resume after a pause()
 Daywatch::digest();                    // flush the buffer to the daemon now
 ```
 
-## Inspecting the install
-
-Daywatch contributes a section to Laravel's `about` command:
-
-```bash
-php artisan about
-```
+Daywatch also contributes a section to `php artisan about`.
 
 ## Testing
 
@@ -113,10 +97,13 @@ php artisan about
 composer test
 ```
 
-The suite runs against the Laravel 11, 12, and 13 lines in CI. A "hostile host"
-suite proves nothing throws when the daemon is down, the token is wrong, or
-payloads are oversized.
+The suite is fully self-contained — it runs against an in-memory SQLite database
+and needs no external services (no daemon, ingest, MySQL, or Redis). A "hostile
+host" suite proves nothing throws when the daemon is down, the token is wrong, or
+payloads are oversized. CI runs it across the Laravel 11, 12, and 13 lines.
 
 ## License
 
 Daywatch Agent is open-sourced software licensed under the [MIT license](LICENSE).
+</content>
+</invoke>

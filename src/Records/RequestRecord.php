@@ -9,7 +9,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `request` record (docs/data-model.md §2). The request IS the execution
+ * The `request` record (apps/daywatch/docs/data-model.md §2). The request IS the execution
  * root, so it carries `trace_id` + `user` but no `execution_*` duplication.
  * `duration` == the sum of the seven stage durations.
  *

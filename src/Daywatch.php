@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * The public runtime API behind the {@see Facades\Daywatch} facade
- * (docs/agent-protocol.md §7). A thin, un-crashable delegator over {@see Core}
+ * (services/daywatch-mcp/docs/agent-protocol.md §7). A thin, un-crashable delegator over {@see Core}
  * and {@see ExceptionSensor} — every method swallows failures and returns $this.
  */
 class Daywatch
@@ -54,7 +54,7 @@ class Daywatch
 
     /**
      * Record an exception, re-rolling sampling so errors escape sampled-out traces
-     * (docs/agent-protocol.md §3, `sampling.exceptions`).
+     * (services/daywatch-mcp/docs/agent-protocol.md §3, `sampling.exceptions`).
      */
     public function report(Throwable $e): static
     {

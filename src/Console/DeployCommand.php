@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Throwable;
 
 /**
- * Record a deploy marker (docs/agent-protocol.md §6, "Deploy markers"). POSTs to
+ * Record a deploy marker (services/daywatch-mcp/docs/agent-protocol.md §6, "Deploy markers"). POSTs to
  * {base_url}/api/deploys via the Laravel HTTP client with a Bearer token. Runs on
  * release so dashboards can annotate metrics and resolve-on-deploy issues fire.
  */

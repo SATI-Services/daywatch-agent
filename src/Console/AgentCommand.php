@@ -22,7 +22,7 @@ use React\Socket\TcpServer;
 use Throwable;
 
 /**
- * The local telemetry daemon (docs/agent-protocol.md §4–§6). Boots a ReactPHP
+ * The local telemetry daemon (services/daywatch-mcp/docs/agent-protocol.md §4–§6). Boots a ReactPHP
  * StreamSelectLoop + TcpServer that accepts framed digests, string-level batches
  * them ({@see BatchBuffer}), gzips, and POSTs to {base_url}/api/ingest — the POST
  * transport is raw HTTP/1.1 over react/socket ({@see SocketHttpSender}), not
@@ -53,7 +53,7 @@ class AgentCommand extends Command
             $scheduler = new LoopScheduler($loop);
             $clock = new SystemClock;
 
-            // Operator-facing ingest counters (docs/agent-protocol.md §4 STATS, §5 stats log).
+            // Operator-facing ingest counters (services/daywatch-mcp/docs/agent-protocol.md §4 STATS, §5 stats log).
             $stats = new DaemonStats(rtrim($baseUrl, '/'), $clock);
 
             $sender = new SocketHttpSender(

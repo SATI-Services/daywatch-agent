@@ -16,7 +16,7 @@ use Throwable;
 
 /**
  * Per-execution state + the digest/flush decision engine
- * (docs/agent-protocol.md §3). One instance per app process; its mutable state
+ * (services/daywatch-mcp/docs/agent-protocol.md §3). One instance per app process; its mutable state
  * is RESET between executions so worker/Octane loops never bleed telemetry.
  *
  * CARDINAL RULE: every public entry point here is reached from a sensor hook and
@@ -390,7 +390,7 @@ class Core
 
     /**
      * Record an exception and re-roll sampling at the exception rate so errors
-     * escape sampled-out traces (docs/agent-protocol.md §3).
+     * escape sampled-out traces (services/daywatch-mcp/docs/agent-protocol.md §3).
      */
     public function recordException(array $record, string $preview): void
     {

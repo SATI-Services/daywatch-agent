@@ -11,10 +11,15 @@ function sampleRecords(): ?array
     $dir = __DIR__;
 
     for ($i = 0; $i < 6; $i++) {
-        $candidate = $dir.'/docs/samples/records.v1.json';
+        // The sample lives in the daywatch-mcp system docs (in the monorepo:
+        // services/daywatch-mcp/docs/samples/); a plain docs/samples/ copy is
+        // also honoured for standalone checkouts.
+        foreach (['/services/daywatch-mcp/docs/samples/records.v1.json', '/docs/samples/records.v1.json'] as $relative) {
+            $candidate = $dir.$relative;
 
-        if (is_file($candidate)) {
-            return json_decode((string) file_get_contents($candidate), true)['records'] ?? null;
+            if (is_file($candidate)) {
+                return json_decode((string) file_get_contents($candidate), true)['records'] ?? null;
+            }
         }
 
         $dir = dirname($dir);
@@ -44,7 +49,7 @@ it('emits request fields in the exact order of the canonical sample', function (
     $expected = sampleKeysFor('request');
 
     if ($expected === []) {
-        $this->markTestSkipped('docs/samples/records.v1.json not reachable from this checkout');
+        $this->markTestSkipped('services/daywatch-mcp/docs/samples/records.v1.json not reachable from this checkout');
     }
 
     $keys = array_keys(makeRequestRecord()->toArray());

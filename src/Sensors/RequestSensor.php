@@ -12,7 +12,7 @@ use Throwable;
 
 /**
  * RequestSensor — captures the request lifecycle into a `request` record
- * (docs/data-model.md §2). Stage boundaries are marked by the global middleware
+ * (apps/daywatch/docs/data-model.md §2). Stage boundaries are marked by the global middleware
  * + routing/response events; the record is assembled at request end (the kernel
  * lifecycle handler / RequestHandled) and the execution is digested or flushed.
  */

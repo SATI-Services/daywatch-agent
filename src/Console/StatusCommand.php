@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /**
- * Daemon status probe (docs/agent-protocol.md §4–§5). Sends a `STATS` frame over
+ * Daemon status probe (services/daywatch-mcp/docs/agent-protocol.md §4–§5). Sends a `STATS` frame over
  * the local socket via the bound {@see Client} and renders the daemon's ingest
  * counters as a table (or raw JSON with --json); falls back to a `PING` for a
  * daemon that predates STATS. Never throws — an unreachable daemon is a clear

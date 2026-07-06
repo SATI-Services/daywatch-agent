@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `exception` record (docs/data-model.md §2). `_group` (the Issue key) is
+ * The `exception` record (apps/daywatch/docs/data-model.md §2). `_group` (the Issue key) is
  * xxh128(class|code|file|line). `trace` is a JSON string of source-inlined
  * frames. `code` is a string.
  *

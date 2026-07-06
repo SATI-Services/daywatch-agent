@@ -1,6 +1,6 @@
 <?php
 
-// Daywatch agent configuration. The full contract lives in docs/agent-protocol.md §7.
+// Daywatch agent configuration. The full contract lives in services/daywatch-mcp/docs/agent-protocol.md §7.
 // Publish into your app with:  php artisan vendor:publish --tag=daywatch-config
 // Every key is env-backed, so you rarely need to publish this file to tune it.
 
@@ -33,7 +33,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Head sampling (decided once per execution — docs/agent-protocol.md §3)
+    | Head sampling (decided once per execution — services/daywatch-mcp/docs/agent-protocol.md §3)
     |--------------------------------------------------------------------------
     */
 
@@ -69,7 +69,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Local ingest (app → daemon, framed TCP — docs/agent-protocol.md §4)
+    | Local ingest (app → daemon, framed TCP — services/daywatch-mcp/docs/agent-protocol.md §4)
     |--------------------------------------------------------------------------
     */
 

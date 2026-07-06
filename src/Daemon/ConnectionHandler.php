@@ -9,7 +9,7 @@ use Daywatch\Agent\Ingest\Payload;
 use Throwable;
 
 /**
- * Per-connection frame processing (docs/agent-protocol.md §4). Feeds raw bytes
+ * Per-connection frame processing (services/daywatch-mcp/docs/agent-protocol.md §4). Feeds raw bytes
  * through a {@see FrameParser}; for each complete frame it ACKs `2:OK` the moment
  * the declared length is satisfied, then processes: unknown version → graceful
  * final digest + shutdown; token mismatch → log + drop; PING → ack only; STATS →
@@ -105,7 +105,7 @@ final class ConnectionHandler
 
     /**
      * Write the STATS counters reply as one `{length}:{json}` mini-frame — the
-     * same shape as the ack (docs/agent-protocol.md §4). Guarded: a responder or
+     * same shape as the ack (services/daywatch-mcp/docs/agent-protocol.md §4). Guarded: a responder or
      * write failure is logged and swallowed, never thrown into the loop.
      */
     private function respondWithStats(): void

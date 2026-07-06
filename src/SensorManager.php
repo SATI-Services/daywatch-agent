@@ -95,7 +95,7 @@ final class SensorManager
     }
 
     /**
-     * Queue-hop propagation plumbing (docs/agent-protocol.md §3). trace/sampling/
+     * Queue-hop propagation plumbing (services/daywatch-mcp/docs/agent-protocol.md §3). trace/sampling/
      * user ride to jobs via the hidden Context keys written in Core; here we inject
      * a stable job_id into the payload and adopt the trace when a job runs. Full
      * job-attempt records are M4.

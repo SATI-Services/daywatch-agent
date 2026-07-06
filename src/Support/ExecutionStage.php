@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Support;
 
 /**
- * Execution stages (docs/agent-protocol.md §1). Requests walk the seven timed
+ * Execution stages (services/daywatch-mcp/docs/agent-protocol.md §1). Requests walk the seven timed
  * stages plus a terminal `end`; the current stage is stamped onto every
  * sub-record emitted during the request.
  */

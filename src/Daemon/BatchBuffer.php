@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Daemon;
 use Daywatch\Agent\Support\Clock;
 
 /**
- * String-level batch accumulator for the daemon (services/daywatch-mcp/docs/agent-protocol.md §5).
+ * String-level batch accumulator for the daemon (daywatch-mcp/docs/agent-protocol.md §5).
  *
  * Incoming digests are JSON arrays `[{...},{...}]`; this buffer strips the outer
  * brackets and comma-joins the inner objects into one growing string — the record

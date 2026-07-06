@@ -12,7 +12,7 @@ use Throwable;
 
 /**
  * ExceptionSensor — the framework `reportable` hook and Daywatch::report() both
- * funnel here to emit an `exception` record (apps/daywatch/docs/data-model.md §2). Recording an
+ * funnel here to emit an `exception` record (daywatch/docs/data-model.md §2). Recording an
  * exception re-rolls sampling at the exception rate (handled in Core) so errors
  * escape sampled-out traces. `ViewException` is unwrapped to its cause.
  */

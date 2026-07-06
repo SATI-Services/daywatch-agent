@@ -12,7 +12,7 @@ use Throwable;
  * Builds the exception `trace` field: a JSON array of frames
  *   {file:"path:line", source:"Class->method(argTypes)", code:{lineNo:"src"}|null}
  * with ≤10 source-inlined frames, ±5 context lines, app files only, gated by
- * `capture_exception_source_code` (services/daywatch-mcp/docs/agent-protocol.md §2). Never throws.
+ * `capture_exception_source_code` (daywatch-mcp/docs/agent-protocol.md §2). Never throws.
  */
 final class ExceptionTrace
 {

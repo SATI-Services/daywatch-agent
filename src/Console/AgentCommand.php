@@ -6,23 +6,27 @@ namespace Daywatch\Agent\Console;
 
 use Daywatch\Agent\Daemon\BatchBuffer;
 use Daywatch\Agent\Daemon\ConnectionHandler;
+use Daywatch\Agent\Daemon\ConsoleDashboard;
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\IngestDispatcher;
 use Daywatch\Agent\Daemon\IngestServer;
 use Daywatch\Agent\Daemon\LoopScheduler;
+use Daywatch\Agent\Daemon\RecentLog;
 use Daywatch\Agent\Daemon\SocketHttpSender;
 use Daywatch\Agent\Daemon\StatsReporter;
 use Daywatch\Agent\Ingest\Payload;
+use Daywatch\Agent\Support\Clock;
 use Daywatch\Agent\Support\SystemClock;
 use Illuminate\Console\Command;
 use React\EventLoop\Loop;
+use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\Connector;
 use React\Socket\TcpServer;
 use Throwable;
 
 /**
- * The local telemetry daemon (services/daywatch-mcp/docs/agent-protocol.md §4–§6). Boots a ReactPHP
+ * The local telemetry daemon (daywatch-mcp/docs/agent-protocol.md §4–§6). Boots a ReactPHP
  * StreamSelectLoop + TcpServer that accepts framed digests, string-level batches
  * them ({@see BatchBuffer}), gzips, and POSTs to {base_url}/api/ingest — the POST
  * transport is raw HTTP/1.1 over react/socket ({@see SocketHttpSender}), not
@@ -30,7 +34,9 @@ use Throwable;
  */
 class AgentCommand extends Command
 {
-    protected $signature = 'daywatch:agent {--listen= : Override the listen address (host:port)}';
+    protected $signature = 'daywatch:agent
+        {--listen= : Override the listen address (host:port)}
+        {--plain : Disable the live dashboard — scroll plain log lines (for supervisors/log files)}';
 
     protected $description = 'Run the Daywatch local TCP ingest daemon (ReactPHP).';
 
@@ -49,11 +55,21 @@ class AgentCommand extends Command
             $token = config('daywatch.token');
 
             $loop = Loop::get();
-            $logger = fn (string $message) => $this->line($message);
             $scheduler = new LoopScheduler($loop);
             $clock = new SystemClock;
 
-            // Operator-facing ingest counters (services/daywatch-mcp/docs/agent-protocol.md §4 STATS, §5 stats log).
+            // Live dashboard when attached to a TTY (unless --plain / refresh 0):
+            // the daemon's logger feeds a bounded ring buffer that the dashboard
+            // shows as the last N lines, instead of scrolling stdout forever.
+            $refresh = (int) config('daywatch.daemon.console_refresh', 3);
+            $dashboardMode = ! $this->option('plain') && $refresh > 0 && $this->attachedToTty();
+            $recent = new RecentLog((int) config('daywatch.daemon.console_lines', 10));
+
+            $logger = $dashboardMode
+                ? fn (string $message) => $recent->push($message)
+                : fn (string $message) => $this->line($message);
+
+            // Operator-facing ingest counters (daywatch-mcp/docs/agent-protocol.md §4 STATS, §5 stats log).
             $stats = new DaemonStats(rtrim($baseUrl, '/'), $clock);
 
             $sender = new SocketHttpSender(
@@ -88,12 +104,15 @@ class AgentCommand extends Command
 
             $tcp = new TcpServer($listen, $loop);
 
-            $tcp->on('connection', function (ConnectionInterface $conn) use ($server, $tokenHash, $logger, $loop, $stats): void {
+            $shuttingDown = false;
+
+            $tcp->on('connection', function (ConnectionInterface $conn) use ($server, $tokenHash, $logger, $loop, $stats, &$shuttingDown): void {
                 $handler = new ConnectionHandler(
                     expectedTokenHash: $tokenHash,
                     server: $server,
                     ackWriter: static fn (string $ack) => $conn->write($ack),
-                    onUnknownVersion: static function () use ($server, $loop): void {
+                    onUnknownVersion: static function () use ($server, $loop, &$shuttingDown): void {
+                        $shuttingDown = true;
                         $server->finalDigest();
                         $loop->stop();
                     },
@@ -111,18 +130,35 @@ class AgentCommand extends Command
             // Age-based (10 s) flush drain.
             $loop->addPeriodicTimer(1.0, static fn () => $server->tick());
 
-            // Periodic operator stats line on stdout (0 disables). Fully guarded —
-            // a logging failure can never crash the loop.
-            (new StatsReporter(
-                $stats,
-                $scheduler,
-                $logger,
-                (int) config('daywatch.daemon.stats_interval', 60),
-            ))->start();
+            if ($dashboardMode) {
+                // The dashboard owns the screen: it already renders the ingest
+                // counters, so the scrolling stats line would corrupt the redraw.
+                (new ConsoleDashboard(
+                    $stats,
+                    $recent,
+                    $clock,
+                    $scheduler,
+                    fn (string $s) => $this->output->write($s, false),
+                    $listen,
+                    $refresh,
+                ))->start();
+            } else {
+                // Periodic operator stats line on stdout (0 disables). Fully guarded —
+                // a logging failure can never crash the loop.
+                (new StatsReporter(
+                    $stats,
+                    $scheduler,
+                    $logger,
+                    (int) config('daywatch.daemon.stats_interval', 60),
+                ))->start();
 
-            $this->info('Daywatch agent listening on '.$listen.' → '.rtrim($baseUrl, '/').'/api/ingest');
+                $this->info('Daywatch agent listening on '.$listen.' → '.rtrim($baseUrl, '/').'/api/ingest');
+            }
 
-            $loop->run();
+            // CARDINAL RULE: the daemon must never die on an escaped error. If an
+            // exception ever propagates out of a ReactPHP callback, log it and
+            // re-enter the loop (listeners/timers stay armed) rather than exit.
+            $this->runResiliently($loop, $clock, $recent, $shuttingDown);
 
             return self::SUCCESS;
         } catch (Throwable $e) {
@@ -130,6 +166,55 @@ class AgentCommand extends Command
 
             return self::FAILURE;
         }
+    }
+
+    /**
+     * Run the event loop and keep it alive across escaped exceptions. A clean
+     * return means a deliberate shutdown (final digest already flushed); a throw
+     * means a callback leaked — we record it and re-enter the loop. Rapid repeat
+     * failures are bounded so a pathological callback can't pin the CPU.
+     */
+    private function runResiliently(LoopInterface $loop, Clock $clock, RecentLog $recent, bool &$shuttingDown): void
+    {
+        $consecutive = 0;
+        $lastErrorAt = 0.0;
+
+        while (true) {
+            try {
+                $loop->run();
+
+                return; // loop stopped: deliberate shutdown or nothing left to serve
+            } catch (Throwable $e) {
+                if ($shuttingDown) {
+                    return;
+                }
+
+                $now = $clock->microtime();
+
+                if ($now - $lastErrorAt > 5.0) {
+                    $consecutive = 0; // recovered and ran healthily for a while — reset
+                }
+
+                $lastErrorAt = $now;
+                $consecutive++;
+
+                try {
+                    $recent->push('[daywatch:agent] recovered from loop error: '.$e->getMessage());
+                } catch (Throwable) {
+                }
+
+                if ($consecutive > 50) {
+                    // Immediate re-throws with no progress: bail rather than hot-loop.
+                    return;
+                }
+            }
+        }
+    }
+
+    /** True only when stdout is an interactive terminal (never in tests/pipes). */
+    private function attachedToTty(): bool
+    {
+        return defined('STDOUT') && function_exists('stream_isatty') && @stream_isatty(STDOUT);
     }
 
     private function packageVersion(): string

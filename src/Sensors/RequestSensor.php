@@ -12,19 +12,27 @@ use Throwable;
 
 /**
  * RequestSensor — captures the request lifecycle into a `request` record
- * (apps/daywatch/docs/data-model.md §2). Stage boundaries are marked by the global middleware
+ * (daywatch/docs/data-model.md §2). Stage boundaries are marked by the global middleware
  * + routing/response events; the record is assembled at request end (the kernel
  * lifecycle handler / RequestHandled) and the execution is digested or flushed.
  */
 final class RequestSensor
 {
-    public function __construct(private Core $core) {}
+    private StageSensor $stages;
+
+    private UserSensor $users;
+
+    public function __construct(private Core $core, ?StageSensor $stages = null, ?UserSensor $users = null)
+    {
+        $this->stages = $stages ?? new StageSensor($core);
+        $this->users = $users ?? new UserSensor($core);
+    }
 
     /** Global middleware entry: prepare the execution and close the bootstrap stage. */
     public function start(?float $startedAt = null): void
     {
         $this->core->prepareForRequest($startedAt);
-        $this->core->beginStage(ExecutionStage::BOOTSTRAP);
+        $this->stages->advance(ExecutionStage::BOOTSTRAP);
     }
 
     /** RouteMatched: set the execution preview and close before_middleware. */
@@ -42,22 +50,22 @@ final class RequestSensor
         } catch (Throwable) {
         }
 
-        $this->core->beginStage(ExecutionStage::BEFORE_MIDDLEWARE);
+        $this->stages->advance(ExecutionStage::BEFORE_MIDDLEWARE);
     }
 
     public function preparingResponse(): void
     {
-        $this->core->beginStage(ExecutionStage::ACTION);
+        $this->stages->advance(ExecutionStage::ACTION);
     }
 
     public function responsePrepared(): void
     {
-        $this->core->beginStage(ExecutionStage::RENDER);
+        $this->stages->advance(ExecutionStage::RENDER);
     }
 
     public function requestHandled(): void
     {
-        $this->core->beginStage(ExecutionStage::AFTER_MIDDLEWARE);
+        $this->stages->advance(ExecutionStage::AFTER_MIDDLEWARE);
     }
 
     /** Request end: close remaining stages, build the record, digest/flush. */
@@ -98,6 +106,7 @@ final class RequestSensor
             $stages = $core->stages();
             $record->stages = $stages;
 
+            $this->users->capture();
             $core->write($record->toArray());
             $core->finishExecution();
         } catch (Throwable) {

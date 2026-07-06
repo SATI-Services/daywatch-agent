@@ -132,6 +132,17 @@ it('counts a non-2xx response as a send failure', function () {
     ]);
 });
 
+it('tracks 401 auth failures separately from the STATS wire contract', function () {
+    $sender = new FakeHttpSender([new HttpResponse(401, '{"message":"bad token"}')]);
+    [$server, $stats] = makeStatsRig($sender);
+
+    $server->ingest('[{"a":1}]');
+    $server->finalDigest(); // 401 → dropped
+
+    expect($stats->authFailures())->toBe(1)
+        ->and($stats->toArray())->not->toHaveKey('auth_failures'); // stays off the wire contract
+});
+
 it('exposes the exact STATS reply field names (wire contract)', function () {
     $stats = new DaemonStats('https://daywatch.example.com', new FrozenClock(1.0));
 

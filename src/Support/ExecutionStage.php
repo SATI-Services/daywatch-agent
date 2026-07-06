@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Support;
 
 /**
- * Execution stages (services/daywatch-mcp/docs/agent-protocol.md §1). Requests walk the seven timed
+ * Execution stages (daywatch-mcp/docs/agent-protocol.md §1). Requests walk the seven timed
  * stages plus a terminal `end`; the current stage is stamped onto every
  * sub-record emitted during the request.
  */
@@ -35,6 +35,13 @@ final class ExecutionStage
         self::RENDER,
         self::AFTER_MIDDLEWARE,
         self::SENDING,
+        self::TERMINATING,
+    ];
+
+    /** The three timed command stages, in order — the command record's µs columns. */
+    public const COMMAND_STAGES = [
+        self::BOOTSTRAP,
+        self::ACTION,
         self::TERMINATING,
     ];
 }

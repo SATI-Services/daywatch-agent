@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Support;
 
 /**
- * Byte-cap truncation tiers (services/daywatch-mcp/docs/agent-protocol.md §1). Caps are enforced
+ * Byte-cap truncation tiers (daywatch-mcp/docs/agent-protocol.md §1). Caps are enforced
  * app-side, before buffering, in BYTES not characters. Any multibyte sequence
  * split by truncation is repaired at encode time by JSON_INVALID_UTF8_SUBSTITUTE.
  */

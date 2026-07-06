@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Daemon;
 use Daywatch\Agent\Support\Clock;
 
 /**
- * O(1) ingest bookkeeping for the daywatch:agent daemon (services/daywatch-mcp/docs/agent-protocol.md
+ * O(1) ingest bookkeeping for the daywatch:agent daemon (daywatch-mcp/docs/agent-protocol.md
  * §4 STATS reply / §5 stats log line). Every mutator is a plain integer bump on a
  * path the daemon already executes — record JSON is never re-parsed to maintain
  * these: records are counted once per digest at the frame boundary
@@ -32,6 +32,8 @@ final class DaemonStats
     private int $sendFailures = 0;
 
     private int $retries = 0;
+
+    private int $authFailures = 0;
 
     private ?float $lastFlushAt = null;
 
@@ -82,8 +84,24 @@ final class DaemonStats
         $this->retries++;
     }
 
+    /** A batch POST was rejected with 401 — a bad/expired token. */
+    public function authFailed(): void
+    {
+        $this->authFailures++;
+    }
+
     /**
-     * The STATS reply payload — field names are contract (services/daywatch-mcp/docs/agent-protocol.md §4).
+     * Count of 401 rejections. Surfaced by the live {@see ConsoleDashboard}; kept
+     * out of {@see toArray()} deliberately — that array is the frozen STATS wire
+     * contract (daywatch-mcp/docs/agent-protocol.md §4).
+     */
+    public function authFailures(): int
+    {
+        return $this->authFailures;
+    }
+
+    /**
+     * The STATS reply payload — field names are contract (daywatch-mcp/docs/agent-protocol.md §4).
      *
      * @return array<string, string|int|float|null>
      */
@@ -108,7 +126,7 @@ final class DaemonStats
         return json_encode($this->toArray(), JSON_UNESCAPED_SLASHES) ?: '{}';
     }
 
-    /** One supervisor-visible stdout line (services/daywatch-mcp/docs/agent-protocol.md §5). */
+    /** One supervisor-visible stdout line (daywatch-mcp/docs/agent-protocol.md §5). */
     public function toLogLine(): string
     {
         $lastFlush = $this->lastFlushAt === null

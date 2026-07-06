@@ -16,7 +16,7 @@ use Throwable;
 
 /**
  * Per-execution state + the digest/flush decision engine
- * (services/daywatch-mcp/docs/agent-protocol.md §3). One instance per app process; its mutable state
+ * (daywatch-mcp/docs/agent-protocol.md §3). One instance per app process; its mutable state
  * is RESET between executions so worker/Octane loops never bleed telemetry.
  *
  * CARDINAL RULE: every public entry point here is reached from a sensor hook and
@@ -25,16 +25,6 @@ use Throwable;
  */
 class Core
 {
-    private const NEXT_STAGE = [
-        ExecutionStage::BOOTSTRAP => ExecutionStage::BEFORE_MIDDLEWARE,
-        ExecutionStage::BEFORE_MIDDLEWARE => ExecutionStage::ACTION,
-        ExecutionStage::ACTION => ExecutionStage::RENDER,
-        ExecutionStage::RENDER => ExecutionStage::AFTER_MIDDLEWARE,
-        ExecutionStage::AFTER_MIDDLEWARE => ExecutionStage::SENDING,
-        ExecutionStage::SENDING => ExecutionStage::TERMINATING,
-        ExecutionStage::TERMINATING => ExecutionStage::END,
-    ];
-
     public string $traceId;
 
     public string $executionId;
@@ -50,6 +40,9 @@ class Core
 
     /** @var array<string, int> */
     private array $stages;
+
+    /** @var array<int, string> ordered timed stages for the current execution kind */
+    private array $stageOrder = ExecutionStage::REQUEST_STAGES;
 
     private float $stageStartedAt = 0.0;
 
@@ -68,7 +61,7 @@ class Core
     /** @var (callable(mixed): (string|int|null))|null */
     private $userResolver = null;
 
-    /** @var array<int, string> classes/objects to suppress from exception recording */
+    /** @var array<string, true> set of object hashes to suppress from exception recording */
     private array $ignored = [];
 
     public function __construct(
@@ -82,6 +75,7 @@ class Core
         private float $commandSampleRate = 1.0,
         private float $exceptionSampleRate = 1.0,
         private bool $captureExceptionSourceCode = true,
+        private float $scheduledTaskSampleRate = 1.0,
     ) {
         $this->traceId = Uuid::v4();
         $this->executionId = $this->traceId;
@@ -170,6 +164,56 @@ class Core
     }
 
     /**
+     * Begin a console command execution. The command is its own execution root
+     * (execution_id == trace_id) and walks the three command stages
+     * (bootstrap → action → terminating). Sampled at the command rate.
+     */
+    public function prepareForCommand(string $name = ''): void
+    {
+        try {
+            $this->reset();
+
+            $this->executionSource = 'command';
+            $this->executionId = $this->traceId;
+            $this->executionPreview = $name;
+            $this->stageOrder = ExecutionStage::COMMAND_STAGES;
+            $this->stages = array_fill_keys(ExecutionStage::COMMAND_STAGES, 0);
+            $this->executionStage = ExecutionStage::BOOTSTRAP;
+            $this->requestStartedAt = $this->clock->microtime();
+            $this->stageStartedAt = $this->requestStartedAt;
+
+            $this->sampleDecision = $this->decideSampling($this->commandSampleRate);
+
+            $this->propagate();
+        } catch (Throwable) {
+        }
+    }
+
+    /**
+     * Begin a scheduled-task execution. Each task is its own execution
+     * (new execution_id) under a fresh trace; sampled at the scheduled-task rate.
+     * Scheduled tasks carry a flat duration (no per-stage columns).
+     */
+    public function prepareForScheduledTask(string $name = ''): void
+    {
+        try {
+            $this->reset();
+
+            $this->executionSource = 'schedule';
+            $this->executionId = Uuid::v4();
+            $this->executionPreview = $name;
+            $this->executionStage = ExecutionStage::ACTION;
+            $this->requestStartedAt = $this->clock->microtime();
+            $this->stageStartedAt = $this->requestStartedAt;
+
+            $this->sampleDecision = $this->decideSampling($this->scheduledTaskSampleRate);
+
+            $this->propagate();
+        } catch (Throwable) {
+        }
+    }
+
+    /**
      * Reset all mutable per-execution state (worker/Octane boundary). Fresh ids
      * and counters, peak-memory baseline reset, buffer discarded, sampling forced
      * off so worker-loop noise is never transmitted until a real execution starts.
@@ -183,6 +227,7 @@ class Core
             $this->executionPreview = '';
             $this->executionStage = ExecutionStage::BOOTSTRAP;
             $this->counters = Counters::zeroed();
+            $this->stageOrder = ExecutionStage::REQUEST_STAGES;
             $this->stages = array_fill_keys(ExecutionStage::REQUEST_STAGES, 0);
             $this->stageStartedAt = 0.0;
             $this->requestStartedAt = 0.0;
@@ -191,6 +236,8 @@ class Core
             $this->paused = false;
             $this->exceptionPreview = '';
             $this->userId = null;
+            $this->userResolver = null;
+            $this->ignored = [];
 
             $this->buffer->flush();
 
@@ -201,7 +248,11 @@ class Core
         }
     }
 
-    /** Close the given stage and advance the running stage to the next one. */
+    /**
+     * Close the given stage and advance the running stage to the next one in the
+     * current execution's stage order (request vs command). The order is purely
+     * sequential, so the next stage is the successor in {@see $stageOrder}.
+     */
     public function beginStage(string $closingStage): void
     {
         try {
@@ -212,7 +263,11 @@ class Core
             }
 
             $this->stageStartedAt = $now;
-            $this->executionStage = self::NEXT_STAGE[$closingStage] ?? ExecutionStage::END;
+
+            $index = array_search($closingStage, $this->stageOrder, true);
+            $this->executionStage = ($index !== false && isset($this->stageOrder[$index + 1]))
+                ? $this->stageOrder[$index + 1]
+                : ExecutionStage::END;
         } catch (Throwable) {
         }
     }
@@ -388,9 +443,51 @@ class Core
         $this->write($record);
     }
 
+    public function recordCacheEvent(array $record): void
+    {
+        $this->increment('cache_events');
+        $this->write($record);
+    }
+
+    public function recordOutgoingRequest(array $record): void
+    {
+        $this->increment('outgoing_requests');
+        $this->write($record);
+    }
+
+    public function recordLog(array $record): void
+    {
+        $this->increment('logs');
+        $this->write($record);
+    }
+
+    public function recordMail(array $record): void
+    {
+        $this->increment('mail');
+        $this->write($record);
+    }
+
+    public function recordNotification(array $record): void
+    {
+        $this->increment('notifications');
+        $this->write($record);
+    }
+
+    public function recordQueuedJob(array $record): void
+    {
+        $this->increment('jobs_queued');
+        $this->write($record);
+    }
+
+    /** Write a record that carries no execution counter of its own (e.g. `user`). */
+    public function record(array $record): void
+    {
+        $this->write($record);
+    }
+
     /**
      * Record an exception and re-roll sampling at the exception rate so errors
-     * escape sampled-out traces (services/daywatch-mcp/docs/agent-protocol.md §3).
+     * escape sampled-out traces (daywatch-mcp/docs/agent-protocol.md §3).
      */
     public function recordException(array $record, string $preview): void
     {
@@ -407,12 +504,12 @@ class Core
 
     public function markIgnored(Throwable $e): void
     {
-        $this->ignored[] = spl_object_hash($e);
+        $this->ignored[spl_object_hash($e)] = true;
     }
 
     public function isIgnored(Throwable $e): bool
     {
-        return in_array(spl_object_hash($e), $this->ignored, true);
+        return isset($this->ignored[spl_object_hash($e)]);
     }
 
     // ── digest / flush ────────────────────────────────────────────────────

@@ -35,6 +35,12 @@ it('registers the console commands', function () {
     $commands = array_keys(app(Kernel::class)->all());
 
     expect($commands)->toContain('daywatch:agent')
-        ->toContain('daywatch:status')
-        ->toContain('daywatch:deploy');
+        ->toContain('daywatch:status');
+});
+
+it('contributes a Daywatch section to the about command', function () {
+    $this->artisan('about', ['--only' => 'daywatch'])
+        ->assertExitCode(0)
+        ->expectsOutputToContain('Daywatch')
+        ->expectsOutputToContain(Daywatch::VERSION);
 });

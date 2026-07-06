@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Support;
 
 /**
- * `_group` fingerprint recipes (services/daywatch-mcp/docs/agent-protocol.md §2). Every record type's
+ * `_group` fingerprint recipes (daywatch-mcp/docs/agent-protocol.md §2). Every record type's
  * grouping hash is an xxh128 hex digest computed client-side so grouping is
  * deterministic and cheap for the ingest/ClickHouse GROUP BYs. These recipes
  * are WIRE CONTRACT — see the `daywatch-payloads` skill before changing one.
@@ -28,6 +28,34 @@ final class Group
     public static function exception(string $class, string $code, string $file, int|string $line): string
     {
         return self::hash($class.'|'.$code.'|'.$file.'|'.$line);
+    }
+
+    /**
+     * Single-string recipe: xxh128( value ). The grouping key for
+     * `command`/`queued-job`/`job-attempt` (by job/command name) and
+     * `mail`/`notification` (by class).
+     */
+    public static function name(string $value): string
+    {
+        return self::hash($value);
+    }
+
+    /** cache-event: xxh128( store . '|' . key ) */
+    public static function cache(string $store, string $key): string
+    {
+        return self::hash($store.'|'.$key);
+    }
+
+    /** outgoing-request: xxh128( host ) */
+    public static function host(string $host): string
+    {
+        return self::hash($host);
+    }
+
+    /** scheduled-task: xxh128( name . '|' . cron . '|' . timezone ) */
+    public static function scheduledTask(string $name, string $cron, string $timezone): string
+    {
+        return self::hash($name.'|'.$cron.'|'.$timezone);
     }
 
     public static function hash(string $value): string

@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * Emits the daemon's one-line stats log every `daemon.stats_interval` seconds
- * (services/daywatch-mcp/docs/agent-protocol.md §5) so an operator watching the supervisor's stdout can
+ * (daywatch-mcp/docs/agent-protocol.md §5) so an operator watching the supervisor's stdout can
  * see the daemon is alive and moving records. Self-reschedules through the
  * injected {@see Scheduler} (the ReactPHP loop in production, a fake in tests).
  *

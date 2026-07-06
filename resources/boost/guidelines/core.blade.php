@@ -48,15 +48,6 @@ Check reachability:
 php artisan daywatch:status
 ```
 
-## Mark deploys
-
-Send a deploy marker on each release so charts get annotated:
-
-```bash
-php artisan daywatch:deploy "$(git rev-parse --short HEAD)" \
-    --ref="$(git rev-parse HEAD)" --name="v1.4.0"
-```
-
 ## Runtime API (`Daywatch` facade)
 
 Use inside a request / job / command to steer collection. All calls are safe —

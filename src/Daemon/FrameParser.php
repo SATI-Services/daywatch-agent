@@ -6,7 +6,7 @@ namespace Daywatch\Agent\Daemon;
 
 /**
  * Incremental, per-connection parser for the length-prefixed local socket frame
- * (services/daywatch-mcp/docs/agent-protocol.md §4):
+ * (daywatch-mcp/docs/agent-protocol.md §4):
  *
  *   {length}:{version}:{token_hash}:{payload}
  *

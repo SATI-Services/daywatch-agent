@@ -11,7 +11,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Throwable;
 
 /**
- * QuerySensor — QueryExecuted → `query` record (apps/daywatch/docs/data-model.md §2).
+ * QuerySensor — QueryExecuted → `query` record (daywatch/docs/data-model.md §2).
  * SQL is transmitted raw (bindings never substituted); origin file/line comes
  * from a bounded backtrace; `_group` uses the normalized SQL.
  */

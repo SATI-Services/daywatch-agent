@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `query` record (apps/daywatch/docs/data-model.md §2). `timestamp` is the query START
+ * The `query` record (daywatch/docs/data-model.md §2). `timestamp` is the query START
  * (now − duration). `sql` is transmitted RAW with `?` placeholders — bindings
  * are NEVER substituted. `_group` uses the normalized SQL.
  *

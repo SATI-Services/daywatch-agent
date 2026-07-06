@@ -1,4 +1,4 @@
-# packages/daywatch-agent — the collector package
+# daywatch-agent — the collector package
 
 The composer package (`daywatch/agent`) installed into monitored Laravel apps:
 sensors observe framework events into a bounded buffer, executions digest the
@@ -6,34 +6,37 @@ buffer over framed TCP to the local `php artisan daywatch:agent` daemon
 (ReactPHP), which batches, gzips, and POSTs to the central `/api/ingest`.
 This mirrors `laravel/nightwatch`'s proven internals — the full teardown is
 served by the `daywatch-docs` MCP server as
-`system/research/nightwatch-internals.md` (monorepo:
-`../../services/daywatch-mcp/docs/research/nightwatch-internals.md`); the
-contract this package implements is `system/agent-protocol.md` (monorepo:
-`../../services/daywatch-mcp/docs/agent-protocol.md`) — read it before
-touching anything here. `docs/README.md` maps what documents live locally vs
-in the system corpus and has the `.mcp.json` snippets to connect the server.
+`system/research/nightwatch-internals.md` (sibling checkout:
+`../daywatch-mcp/docs/research/nightwatch-internals.md`); the
+contract this package implements is `system/agent-protocol.md` (sibling
+checkout: `../daywatch-mcp/docs/agent-protocol.md`) — read it before
+touching anything here. The `daywatch-docs` MCP server (configured in
+`.mcp.json`) serves the full corpus — use `list_docs`/`read_doc`/`search_docs`;
+the sibling `../daywatch-mcp/docs/` checkout is the same content on disk.
 
-Shared workflows, coding standards, and commit flow live in the repo-root
-`CLAUDE.md` (`../../CLAUDE.md`, monorepo checkouts only); this file is
-package-specific and mirrored verbatim across `CLAUDE.md`/`AGENTS.md`
-(`CLAUDE.md` is the editing source — re-copy to `AGENTS.md` after edits).
-The package-local `.claude/agents/agent-package-engineer.md` and
-`.claude/skills/daywatch-payloads/` are copies of the monorepo root versions,
-canonical after the repo split — keep them in sync until then.
+This repo is one of four sibling checkouts inside the `daywatch-project`
+parent folder — `../daywatch` (central Laravel app), `../daywatch-ingest`
+(Java relay), `../daywatch-mcp` (docs server + system corpus). There is no
+shared parent-level `CLAUDE.md`; this file is the engineering guide,
+mirrored verbatim across `CLAUDE.md`/`AGENTS.md` (`CLAUDE.md` is the editing
+source — re-copy to `AGENTS.md` after edits). The package-local
+`.claude/agents/agent-package-engineer.md` and
+`.claude/skills/daywatch-payloads/` are canonical in this repo.
 
 ## Sibling components (linked, but this package runs alone)
 
 - The daemon POSTs to **either** ingest implementation — the Laravel app
-  (`apps/daywatch`, default + reference, `POST /api/ingest`) or the Java relay
-  (`services/daywatch-ingest`, high-throughput alternative) — selected purely
+  (`../daywatch`, default + reference, `POST /api/ingest`) or the Java relay
+  (`../daywatch-ingest`, high-throughput alternative) — selected purely
   by `DAYWATCH_BASE_URL`. The package never knows or cares which; the only
-  coupling is the wire contract (`../../services/daywatch-mcp/docs/agent-protocol.md`), changed docs-first
+  coupling is the wire contract (`../daywatch-mcp/docs/agent-protocol.md`), changed docs-first
   via the `daywatch-payloads` skill.
 - **Independent development:** `composer install && composer test` needs no
-  monorepo service — no ClickHouse, Redis, MySQL, or running server. The
+  sibling service — no ClickHouse, Redis, MySQL, or running server. The
   "hostile host" suite explicitly proves the package works (silently) with no
   server at all. To exercise it against a real stack, symlink it into a host
-  app (see the root-level install notes) and point it at a running ingest.
+  app (composer path repository pointing at this checkout) and point it at a
+  running ingest.
 
 ## The cardinal rule
 
@@ -47,7 +50,8 @@ the host app is a P0 bug.
 ## Status & constraints
 
 Scaffolded + M2 **complete** (sensors, records, socket client, ReactPHP daemon +
-stats/STATS surface; 186 tests, non-flaky; `composer test` green). Pinned
+stats/STATS surface; all 14 sensors; 241 tests, non-flaky; `composer test` green — CI matrix
+runs the suite green on Laravel 11/12/13). Pinned
 constraints (don't drift): `illuminate/support ^11|^12|^13`, PHP `^8.2`,
 `ext-zlib`; daemon deps `react/{event-loop ^1.5, socket ^1.16, promise ^3.2,
 stream ^1.4}` — the outbound POST is raw HTTP/1.1 over `react/socket`, NOT
@@ -68,16 +72,15 @@ does) while consumers keep `^8.2` — dev deps never ship to hosts.
 
 ```
 src/
-  AgentServiceProvider.php   # spatie PackageServiceProvider; register-only wiring
+  AgentServiceProvider.php   # plain Illuminate ServiceProvider; register-only wiring + `about` section
   Core.php                   # per-execution state: trace/execution ids, stage, sampling decision
   SensorManager.php
   Buffer/RecordsBuffer.php   # ≤500 records; auto-digest when full; ring-drop if disabled
-  Sensors/                   # RequestSensor, QuerySensor, ExceptionSensor (M2); more in M4
+  Sensors/                   # 14 sensors: Request, Query, Exception, Cache, Command, JobAttempt, Log, Mail, Notification, OutgoingRequest, QueuedJob, ScheduledTask, Stage, User
   Records/                   # one DTO per record type; _group hashing; byte-cap truncation
   Ingest/SocketClient.php    # stream_socket_client, 0.5s timeouts, {len}:v1:{hash}:{json} frame, 2:OK ack, stats()
-  Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter
+  Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop
   Console/StatusCommand.php  # daywatch:status — STATS counters (table / --json), PING fallback, exit 1 when down
-  Console/DeployCommand.php  # daywatch:deploy — POST /api/deploys
   Facades/Daywatch.php       # user(), sample(), dontSample(), report(), ignore(), pause(), resume(), digest()
 config/daywatch.php          # full option table in agent-protocol.md §7 (daywatch-mcp system docs)
 ```
@@ -94,16 +97,16 @@ config/daywatch.php          # full option table in agent-protocol.md §7 (daywa
   in-app (the privacy boundary), never downstream.
 - The daemon never re-parses record JSON — string-level buffer concatenation;
   flush ≥ 6 MB or 10 s; ≤ 5 in-flight POSTs; retry ladder + 503 `stop`
-  NullBuffer pause contract per `../../services/daywatch-mcp/docs/agent-protocol.md` §6.
+  NullBuffer pause contract per `../daywatch-mcp/docs/agent-protocol.md` §6.
 - Worker/Octane state resets between executions (fresh ids, counters,
   `memory_reset_peak_usage()`); worker-loop noise is never sampled.
 
 ## Daemon observability (STATS / stats log)
 
-Decision recorded here (2026-07) because `../../services/daywatch-mcp/docs/decisions.md`
+Decision recorded here (2026-07) because `../daywatch-mcp/docs/decisions.md`
 is owned by concurrent agents: the local framing gained an **additive `STATS` payload
 literal** (frame version stays `v1`, documented like `PING` in
-`../../services/daywatch-mcp/docs/agent-protocol.md` §4) so operators can see the daemon is alive and moving
+`../daywatch-mcp/docs/agent-protocol.md` §4) so operators can see the daemon is alive and moving
 records. The daemon keeps O(1) counters (`Daemon/DaemonStats`): records
 received/buffered, buffered bytes, batches/records sent, send failures, retries,
 last flush time/size, plus the configured base URL — reported verbatim since the
@@ -117,14 +120,29 @@ can never crash the loop), and `daywatch:status` (STATS frame → ack +
 `{len}:{json}` reply, token-gated; human table or `--json`; daemon down = clear
 "daemon unreachable" message + exit 1, never an exception).
 
+When `daywatch:agent` runs attached to a **TTY** it renders a live in-place
+dashboard instead of scrolling lines (`Daemon/ConsoleDashboard`, self-rescheduling
++ guarded like `StatsReporter`): memory/uptime, ingest throughput, auth errors
+(401s tracked via `DaemonStats::authFailed()`, kept off the frozen STATS
+`toArray()` contract), and the last N log lines — the daemon's logger feeds a
+bounded `Daemon/RecentLog` ring buffer in this mode. Repaints every
+`daywatch.daemon.console_refresh` s (env `DAYWATCH_DAEMON_CONSOLE_REFRESH`,
+default 3, `0` disables), keeping `daywatch.daemon.console_lines`
+(`DAYWATCH_DAEMON_CONSOLE_LINES`, default 10) lines. `--plain`, a non-TTY
+(supervisor/log file), or refresh 0 falls back to plain-line logging + the
+periodic stats line. Resilience: `AgentCommand::runResiliently()` re-enters the
+event loop if any callback ever lets an exception escape `Loop::run()` (bounded
+against a hot re-throw loop), so the daemon never dies on an internal error —
+only a deliberate shutdown frame stops it.
+
 ## Ship Laravel Boost guidance for consumer apps
 
 This is a package, not an app — it doesn't install Boost, but it **ships Boost
 guidelines** so any host app that runs `boost:install` auto-loads how to use
 Daywatch. Add `resources/boost/guidelines/core.blade.php`: publish
 `config/daywatch.php`, set `DAYWATCH_TOKEN` / `DAYWATCH_BASE_URL` /
-`DAYWATCH_INGEST_URI`, run the `daywatch:agent` daemon + `daywatch:deploy` on
-release, and the `Daywatch::user()/sample()/report()/ignore()` API. Keep it a
+`DAYWATCH_INGEST_URI`, run the `daywatch:agent` daemon, and the
+`Daywatch::user()/sample()/report()/ignore()` API. Keep it a
 short, example-driven overview per agentskills.io — consumer-facing, distinct from
 this dev guide.
 

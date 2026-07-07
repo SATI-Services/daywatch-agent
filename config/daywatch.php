@@ -1,8 +1,5 @@
 <?php
 
-// Daywatch agent configuration. The full contract lives in daywatch-mcp/docs/agent-protocol.md §7.
-// Publish into your app with:  php artisan vendor:publish --tag=daywatch-config
-
 return [
 
     /*
@@ -12,15 +9,10 @@ return [
     */
 
     'enabled' => env('DAYWATCH_ENABLED', true),
-
     'token' => env('DAYWATCH_TOKEN'),
-
     'base_url' => env('DAYWATCH_BASE_URL'),
-
     'deployment' => env('DAYWATCH_DEPLOY'),
-
     'server' => env('DAYWATCH_SERVER', gethostname() ?: null),
-
     'capture_exception_source_code' => env('DAYWATCH_CAPTURE_EXCEPTION_SOURCE_CODE', true),
 
     /*
@@ -52,6 +44,7 @@ return [
     'redact_headers' => [
         // e.g. 'authorization', 'cookie', 'set-cookie', 'x-xsrf-token'
     ],
+
     'redact_payload_fields' => [
         // e.g. 'password', 'password_confirmation', 'token'
     ],
@@ -67,6 +60,7 @@ return [
         'timeout' => env('DAYWATCH_INGEST_TIMEOUT', 0.5),
         'connection_timeout' => env('DAYWATCH_INGEST_CONNECTION_TIMEOUT', 0.5),
         'event_buffer' => env('DAYWATCH_INGEST_EVENT_BUFFER', 500),
+
         // Circuit breaker: after a failed digest, skip further socket attempts for
         // this many seconds (0 disables). Bounds host-request cost when the daemon
         // is persistently down/hung; a healthy digest closes it immediately.

@@ -52,16 +52,26 @@ the host app is a P0 bug.
 Scaffolded + M2 **complete** (sensors, records, socket client, ReactPHP daemon +
 stats/STATS surface; all 14 sensors; 241 tests, non-flaky; `composer test` green — CI matrix
 runs the suite green on Laravel 11/12/13). Pinned
-constraints (don't drift): `illuminate/support ^11|^12|^13`, PHP `^8.2`,
-`ext-zlib`; daemon deps `react/{event-loop ^1.5, socket ^1.16, promise ^3.2,
-stream ^1.4}` — the outbound POST is raw HTTP/1.1 over `react/socket`, NOT
-`react/http` (it pins `psr/http-message ^1.0`, incompatible with a Laravel 13
+constraints (don't drift): `illuminate/support ^11|^12|^13`, PHP `^8.2`; daemon
+deps are tilde-to-locked `react/{event-loop ~1.6.0, socket ~1.17.0, promise
+~3.3.0, stream ~1.4.0}` — the outbound POST is raw HTTP/1.1 over `react/socket`,
+NOT `react/http` (it pins `psr/http-message ^1.0`, incompatible with a Laravel 13
 host's `^2.0`); plain deps, no phar/scoper in v1. Keep the package
 **headless**: no Livewire/Tailwind/UI dependencies ever.
 
-**Dependency policy:** the `require` block stays permissive (illuminate
-`^11|^12|^13`, php `^8.2`) — that IS the package's compatibility contract with
-host apps; never tighten it for tooling's sake. `require-dev` is pinned
+**Dependency policy:** the `require` block stays permissive **only** for the two
+constraints that ARE the package's host-compatibility contract — illuminate
+`^11|^12|^13` and php `^8.2`; never tighten those for tooling's sake. Everything
+else in `require` is deliberately locked: the `react/*` daemon deps are pinned
+tilde-to-lock to their installed minors (patch drift only), matching the
+`require-dev` idiom. **`ext-zlib` is a `suggest`, not a `require`** — zlib is
+near-universal but not guaranteed, so a host missing it still installs and runs
+(sensors/buffer/socket never touch zlib); only the daemon's gzip upload is
+affected, and `IngestDispatcher` guards `gzencode` with `function_exists` so a
+missing extension pauses upload (drop + log) instead of fatalling. The gzip wire
+format itself is unchanged — dropping compression would be a cross-repo contract
+change (docs-first via the `daywatch-payloads` skill), not a package-local one.
+`require-dev` is pinned
 tilde-to-lock for reproducible dev installs (testbench `~11.1.0`, pest `~4.7.4`,
 pest-plugin-laravel `~4.1.0`, pint `~1.29.3`); the CI matrix swaps the testbench
 constraint per Laravel line (`^9.2`/`^10`/`^11`) before `composer update`, so

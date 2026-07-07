@@ -74,6 +74,15 @@ final class IngestDispatcher
                 return;
             }
 
+            // ext-zlib is a soft suggestion, not a hard require: if it is absent
+            // gzencode() is undefined and calling it would fatal. Guard so a
+            // missing extension pauses upload (drop + log) rather than crashing.
+            if (! function_exists('gzencode')) {
+                $this->log('ext-zlib unavailable — dropping batch (install/enable zlib to enable ingest)');
+
+                return;
+            }
+
             $gzip = @gzencode($body, 6);
 
             if ($gzip === false) {

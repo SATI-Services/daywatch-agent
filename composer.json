@@ -13,14 +13,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "ext-zlib": "*",
         "illuminate/support": "^11.0|^12.0|^13.0",
-        "react/event-loop": "^1.5",
-        "react/promise": "^3.2",
-        "react/socket": "^1.16",
-        "react/stream": "^1.4"
+        "react/event-loop": "1.6.0",
+        "react/promise": "3.3.0",
+        "react/socket": "1.17.0",
+        "react/stream": "1.4.0"
     },
     "suggest": {
+        "ext-zlib": "Enables gzip compression of the daemon's outbound ingest POSTs (Content-Encoding: gzip), as the wire contract expects. zlib ships enabled in virtually all PHP builds; it is only a soft suggestion so a host missing it can still install and run the package — the sensor/buffer/socket path never touches zlib. If gzencode() is unavailable the daemon drops each batch with a log line rather than fatalling (the package stays un-crashable), so telemetry upload simply pauses until the extension is present.",
         "react/http": "Not required and intentionally excluded: reactphp/http (every release, incl. 3.x-dev) hard-pins psr/http-message ^1.0, which downgrades/conflicts with a Laravel 13 host on psr/http-message ^2.0. The daywatch:agent daemon therefore POSTs batches over react/socket (raw HTTP/1.1), which carries no psr/http-message dependency."
     },
     "require-dev": {

@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `queued-job` record (daywatch-mcp/docs/agent-protocol.md §2) — a job being dispatched
+ * The `queued-job` record (agent protocol §2) — a job being dispatched
  * onto a queue (JobQueueing→JobQueued). `sync` connection jobs are skipped by the
  * sensor. `_group = xxh128(name)`.
  *

@@ -12,8 +12,7 @@ use Throwable;
 /**
  * QueuedJobSensor — pairs `Illuminate\Queue\Events\JobQueueing` and
  * `Illuminate\Queue\Events\JobQueued` into a `queued-job` record
- * (daywatch-mcp/docs/agent-protocol.md §2), mirroring laravel/nightwatch's
- * QueuedJobSensor.
+ * (agent protocol §2).
  *
  * The `JobQueueing` timestamp is stashed so the `JobQueued` handler can compute
  * the enqueue duration (integer microseconds; unpaired → 0). `sync` connection

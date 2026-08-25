@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Ingest;
 use Throwable;
 
 /**
- * Short-lived blocking TCP client used once per digest (daywatch-mcp/docs/agent-protocol.md
+ * Short-lived blocking TCP client used once per digest (agent protocol
  * §4). Connects with a 0.5 s connect timeout, writes one frame, awaits the
  * `2:OK` ack under a 0.5 s read timeout, closes.
  *

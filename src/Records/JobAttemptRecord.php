@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `job-attempt` record (daywatch-mcp/docs/agent-protocol.md §2) — one execution of a
+ * The `job-attempt` record (agent protocol §2) — one execution of a
  * queued job in a worker. The attempt IS its own execution (`attempt_id` is the
  * execution id) under the inherited `trace_id`, so it carries no `execution_*`
  * duplication. Carries the full counters block. `_group = xxh128(name)`.

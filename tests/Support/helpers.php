@@ -45,7 +45,7 @@ if (! function_exists('makeCore')) {
 }
 
 if (! function_exists('makeRequestRecord')) {
-    /** The canonical request record fixture (mirrors daywatch-mcp/docs/samples/records.v1.json). */
+    /** The canonical request record fixture (mirrors the canonical samples/records.v1.json batch). */
     function makeRequestRecord(): RequestRecord
     {
         return new RequestRecord(

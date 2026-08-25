@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * ScheduledTaskSensor — captures one run of a scheduled task into a
- * `scheduled-task` record (daywatch-mcp/docs/agent-protocol.md §2). Each task run is its own
+ * `scheduled-task` record (agent protocol §2). Each task run is its own
  * execution under a fresh trace. Only wired in the scheduler process.
  */
 final class ScheduledTaskSensor

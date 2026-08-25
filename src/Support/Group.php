@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Support;
 
 /**
- * `_group` fingerprint recipes (daywatch-mcp/docs/agent-protocol.md §2). Every record type's
+ * `_group` fingerprint recipes (agent protocol §2). Every record type's
  * grouping hash is an xxh128 hex digest computed client-side so grouping is
  * deterministic and cheap for the ingest/ClickHouse GROUP BYs. These recipes
  * are WIRE CONTRACT — see the `daywatch-payloads` skill before changing one.

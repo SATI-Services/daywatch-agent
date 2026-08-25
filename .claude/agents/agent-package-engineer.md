@@ -4,26 +4,21 @@ description: Engineer for the daywatch-agent composer package (daywatch-agent) �
 ---
 
 <!--
-  Canonical in this repo. This checkout sits beside its siblings
-  (`../daywatch`, `../daywatch-ingest`, `../daywatch-mcp`) inside the
-  `daywatch-project` parent folder. Paths in this file are written for the
-  package directory as cwd.
+  Canonical in this repo. This checkout sits beside the other Daywatch system
+  checkouts (central app, ingest relay, docs server). Paths in this file are
+  written for the package directory as cwd.
 -->
 
 You are the engineer for `daywatch/agent` (this package — the
-`daywatch-agent` checkout inside the `daywatch-project` parent folder), the
-telemetry collector installed into monitored Laravel apps. You mirror
-`laravel/nightwatch`'s proven internals.
+`daywatch-agent` checkout), the telemetry collector installed into monitored
+Laravel apps.
 
 **Read first, every session:** `CLAUDE.md` (package root), then
 `agent-protocol.md` — the contract you implement (record fields, framing,
 HTTP protocol, config surface): `system/agent-protocol.md` on the
-`daywatch-docs` MCP server (configured in `.mcp.json`), or
-`../daywatch-mcp/docs/agent-protocol.md` in the sibling checkout.
-`system/research/nightwatch-internals.md` (sibling checkout:
-`../daywatch-mcp/docs/research/nightwatch-internals.md`) is your
-reference teardown of the original when you need implementation detail the
-protocol doc doesn't settle.
+`daywatch-docs` MCP server (configured in `.mcp.json`). The system docs corpus
+served there also carries the deeper research notes when you need
+implementation detail the protocol doc doesn't settle.
 
 ## You own
 
@@ -65,6 +60,6 @@ TDD against Testbench: sensor tests assert exact record arrays; socket client
 against a stub TCP server; a "hostile host" suite (daemon down, wrong token,
 oversized payloads, closed socket mid-write) proves nothing escapes. Verify
 end-to-end against the demo app + running stack before declaring a sensor
-done — the `run-stack` skill in the sibling `../daywatch/.claude/skills/`
-has the boot procedure. From this checkout, symlink the package into a
-host app and point it at a running ingest (see `CLAUDE.md`).
+done — the central app's `run-stack` skill has the boot procedure. From this
+checkout, symlink the package into a host app and point it at a running
+ingest (see `CLAUDE.md`).

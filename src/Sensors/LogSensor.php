@@ -11,9 +11,9 @@ use Throwable;
 
 /**
  * LogSensor — Illuminate\Log\Events\MessageLogged → `log` record
- * (daywatch-mcp/docs/agent-protocol.md §2). Unlike Nightwatch's custom Monolog
- * channel, we hook the framework `MessageLogged` event: simpler, more portable,
- * and it yields the same `log` record (`level`, `message`, `context`).
+ * (agent protocol §2). We hook the framework `MessageLogged` event rather
+ * than installing a custom Monolog channel: simpler, more portable, and it
+ * yields the same `log` record (`level`, `message`, `context`).
  *
  * The handler is pure — it never logs (that would re-enter this sensor and loop)
  * and, per the cardinal rule, never throws into the host app.

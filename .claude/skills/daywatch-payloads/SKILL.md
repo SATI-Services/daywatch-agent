@@ -4,10 +4,9 @@ description: Change procedure for the Daywatch telemetry record contract, scoped
 ---
 
 <!--
-  Canonical for this repo: identical contract rules to the sibling projects'
-  copies (`../daywatch/.claude/skills/daywatch-payloads/`,
-  `../daywatch-ingest/.claude/skills/daywatch-payloads/`), but the checklist
-  covers only this package's steps — keep the shared rules in sync.
+  Canonical for this repo: identical contract rules to the copies carried by
+  the central app and the ingest relay, but the checklist covers only this
+  package's steps — keep the shared rules in sync.
 -->
 
 # Changing the record contract (agent-package view)
@@ -17,16 +16,13 @@ recipes, byte caps, TCP framing, and the ingest HTTP contract is
 **`agent-protocol.md` in the system docs corpus**. Read it as:
 
 - `read_doc("system/agent-protocol.md")` on the `daywatch-docs` MCP server
-  (configured in `.mcp.json`), or
-- `../daywatch-mcp/docs/agent-protocol.md` in the sibling checkout
-  (all four projects sit side by side in the `daywatch-project` folder).
+  (configured in `.mcp.json`).
 
 Three components implement the contract independently — this package
-(producer), the ingest API (consumer/transformer, `daywatch` or the
-`daywatch-ingest` relay), and the ClickHouse schema (storage,
-`daywatch/data-model.md` §9 row mapping) — so **the doc changes first, then
-the components fan out**. Never change a payload this package emits without
-the spec change landing first.
+(producer), the ingest API (consumer/transformer, the central app or the
+relay), and the ClickHouse schema (storage, `data-model.md` §9 row mapping) —
+so **the doc changes first, then the components fan out**. Never change a
+payload this package emits without the spec change landing first.
 
 ## Compatibility rules
 
@@ -49,9 +45,8 @@ the spec change landing first.
 1. **Spec first (lives outside this package):** the change lands in the
    system docs corpus — `agent-protocol.md` (field table, `_group` recipe,
    `v` bump if needed) and the canonical sample batch
-   `system/samples/records.v1.json` — before you write code. That corpus
-   lives in the sibling `../daywatch-mcp/docs/`; land the spec change there
-   first.
+   `system/samples/records.v1.json` — before you write code. Land the spec
+   change in that corpus first.
 2. **Record DTO** (`src/Records/`): the field, its byte-cap tier, the
    `_group` hash input, and the `v` bump if the change is non-additive.
 3. **Sensor** (`src/Sensors/`): populate the field; add a config option in
@@ -77,8 +72,7 @@ the spec change landing first.
   202 / 202-duplicate / 401 / 413 / 422 / 429 `{retry_in}` / 503
   `{stop, refresh_in}`.
 - Canonical sample batch (one record of every v1 type, valid `{"records":[…]}`
-  body): `system/samples/records.v1.json` (sibling checkout:
-  `../daywatch-mcp/docs/samples/records.v1.json`) — updated in
-  step 1 of any contract change; package tests and curl smoke tests reuse it.
-- Full Nightwatch-parity reference (deferred fields/types, agent-auth
-  exchange): `system/research/nightwatch-wire-protocol-parity.md`.
+  body): `system/samples/records.v1.json` — updated in step 1 of any contract
+  change; package tests and curl smoke tests reuse it.
+- Deferred fields/types and the agent-auth exchange are covered by the wire
+  protocol reference in `system/research/` on the `daywatch-docs` MCP server.

@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Buffer;
 use Daywatch\Agent\Core;
 
 /**
- * In-process, bounded buffer of record arrays (daywatch-mcp/docs/agent-protocol.md §3).
+ * In-process, bounded buffer of record arrays (agent protocol §3).
  * Overflow policy (auto-digest vs ring-drop) is decided by {@see Core} from the
  * head-sampling decision — this class only stores, measures, and empties.
  *

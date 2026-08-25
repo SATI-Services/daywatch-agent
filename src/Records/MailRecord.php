@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `mail` record (daywatch-mcp/docs/agent-protocol.md §2) — a message sent through a
+ * The `mail` record (agent protocol §2) — a message sent through a
  * mailer (MessageSending→MessageSent). `to`/`cc`/`bcc`/`attachments` are integer
  * COUNTS — recipient addresses are never transmitted. `_group = xxh128(class)`.
  *

@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Records;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `user` record (daywatch-mcp/docs/agent-protocol.md §2) — emitted once per execution when
+ * The `user` record (agent protocol §2) — emitted once per execution when
  * an authenticated user is present. Envelope only: **no `_group`, `trace_id`, or
  * `execution_*`.** The user id also travels inline on every other record.
  *

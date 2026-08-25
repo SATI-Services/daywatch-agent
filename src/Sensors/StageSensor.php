@@ -8,7 +8,7 @@ use Daywatch\Agent\Core;
 use Throwable;
 
 /**
- * StageSensor — owns the execution-stage state machine (daywatch-mcp/docs/agent-protocol.md §1).
+ * StageSensor — owns the execution-stage state machine (agent protocol §1).
  * Requests walk `bootstrap → before_middleware → action → render → after_middleware
  * → sending → terminating → end`; commands walk `bootstrap → action → terminating
  * → end`. It closes the running stage (accumulating its µs into {@see Core}) and

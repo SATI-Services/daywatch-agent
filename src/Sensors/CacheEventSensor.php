@@ -22,7 +22,7 @@ use Throwable;
 
 /**
  * CacheEventSensor — Illuminate cache events → `cache-event` records
- * (daywatch-mcp/docs/agent-protocol.md §2). Completion events (hit/miss/
+ * (agent protocol §2). Completion events (hit/miss/
  * write/delete and their failures) are paired with their preceding "start"
  * event (Retrieving/Writing/Forgetting) — keyed by store+key — to compute a
  * `duration` in integer microseconds; unpaired completions record duration 0.

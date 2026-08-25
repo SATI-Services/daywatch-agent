@@ -14,11 +14,11 @@ use Throwable;
 
 /**
  * OutgoingRequestSensor — HTTP calls made by the app via the Laravel HTTP
- * client → `outgoing-request` record (daywatch-mcp/docs/agent-protocol.md §2).
+ * client → `outgoing-request` record (agent protocol §2).
  *
- * Mirrors laravel/nightwatch: a Guzzle middleware installed via
- * Http::globalMiddleware(...) times the promise and, on fulfilment, hands the
- * PSR-7 request/response pair back to {@see record()}. `url` has any userinfo
+ * A Guzzle middleware installed via Http::globalMiddleware(...) times the
+ * promise and, on fulfilment, hands the PSR-7 request/response pair back to
+ * {@see record()}. `url` has any userinfo
  * stripped; `_group = xxh128(host)`.
  *
  * CARDINAL RULE: this sensor never throws into the host app.

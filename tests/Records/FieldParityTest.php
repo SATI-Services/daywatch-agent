@@ -22,9 +22,9 @@ function sampleRecords(): ?array
     $dir = __DIR__;
 
     for ($i = 0; $i < 6; $i++) {
-        // The sample lives in the daywatch-mcp system docs (sibling checkout:
-        // ../daywatch-mcp/docs/samples/); a plain docs/samples/ copy is
-        // also honoured for standalone checkouts.
+        // The sample ships with the system docs corpus; a plain docs/samples/
+        // copy is also honoured for standalone checkouts. Absent either, the
+        // parity assertions skip rather than fail.
         foreach (['/daywatch-mcp/docs/samples/records.v1.json', '/docs/samples/records.v1.json'] as $relative) {
             $candidate = $dir.$relative;
 
@@ -60,7 +60,7 @@ it('emits request fields in the exact order of the canonical sample', function (
     $expected = sampleKeysFor('request');
 
     if ($expected === []) {
-        $this->markTestSkipped('daywatch-mcp/docs/samples/records.v1.json not reachable from this checkout');
+        $this->markTestSkipped('canonical sample batch (samples/records.v1.json) not reachable from this checkout');
     }
 
     $keys = array_keys(makeRequestRecord()->toArray());

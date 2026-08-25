@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * Turns flushed batch bodies into gzipped POSTs to {base_url}/api/ingest and
- * applies the response contract (daywatch-mcp/docs/agent-protocol.md §6): success discard,
+ * applies the response contract (agent protocol §6): success discard,
  * 401/413/422 drop, 429 retry-after, 503 `{stop}` NullBuffer pause, and the
  * network/5xx retry ladder. Transport + timers are injected so all of this is
  * deterministically testable with no sockets and no sleeps.

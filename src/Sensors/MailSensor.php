@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * MailSensor — pairs MessageSending → MessageSent into a `mail` record
- * (daywatch-mcp/docs/agent-protocol.md §2). The Sending timestamp is stashed
+ * (agent protocol §2). The Sending timestamp is stashed
  * keyed by the message's object id so Sent can compute the send duration.
  *
  * `to`/`cc`/`bcc`/`attachments` are integer COUNTS only — recipient addresses

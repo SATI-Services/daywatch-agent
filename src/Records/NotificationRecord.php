@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `notification` record (daywatch-mcp/docs/agent-protocol.md §2) — a notification sent on
+ * The `notification` record (agent protocol §2) — a notification sent on
  * a channel (NotificationSending→NotificationSent). `_group = xxh128(class)`.
  *
  * Field names are WIRE CONTRACT.

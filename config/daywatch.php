@@ -17,7 +17,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Head sampling (decided once per execution — daywatch-mcp/docs/agent-protocol.md §3)
+    | Head sampling (decided once per execution — agent protocol §3)
     |--------------------------------------------------------------------------
     */
 
@@ -58,7 +58,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Local ingest (app → daemon, framed TCP — daywatch-mcp/docs/agent-protocol.md §4)
+    | Local ingest (app → daemon, framed TCP — agent protocol §4)
     |--------------------------------------------------------------------------
     */
 

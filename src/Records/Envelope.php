@@ -13,8 +13,8 @@ use Daywatch\Agent\Support\Truncate;
  * names, order, and truncation tiers here are WIRE CONTRACT — read the
  * `daywatch-payloads` skill before changing any of them.
  *
- * The three shapes (daywatch-mcp/docs/agent-protocol.md §2, canonical sample in
- * daywatch-mcp/docs/samples/records.v1.json):
+ * The three shapes (agent protocol §2, canonical sample in
+ * samples/records.v1.json):
  *
  *   child(t, group)     v, t, timestamp, deploy, server, [_group,] trace_id,
  *                       execution_id, execution_source, execution_preview,

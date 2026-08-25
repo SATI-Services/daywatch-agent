@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * Propagates the trace id, sampling decision, and user id across queue hops via
- * hidden Laravel Context keys (daywatch-mcp/docs/agent-protocol.md §3). Hidden keys ride with
+ * hidden Laravel Context keys (agent protocol §3). Hidden keys ride with
  * the serialized job and are read back when the job runs, so a trace spans hops
  * with zero payload parsing. All access is guarded — Context may be unavailable
  * or unbootable, and telemetry propagation must never throw.

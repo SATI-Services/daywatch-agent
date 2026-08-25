@@ -7,7 +7,7 @@ namespace Daywatch\Agent\Records;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `log` record (daywatch-mcp/docs/agent-protocol.md §2). **No `_group`.** `message` has
+ * The `log` record (agent protocol §2). **No `_group`.** `message` has
  * its placeholders interpolated; `context` and `extra` are JSON strings.
  *
  * Field names are WIRE CONTRACT.

@@ -12,7 +12,7 @@ use Throwable;
 
 /**
  * CommandSensor — captures an artisan command execution into a `command` record
- * (daywatch-mcp/docs/agent-protocol.md §2). The command is its own execution root and walks the
+ * (agent protocol §2). The command is its own execution root and walks the
  * three command stages (bootstrap → action → terminating). A small set of
  * self-referential / noisy commands (the daemon, status probe, scheduler/worker
  * loops) are never recorded so the collector never observes itself.

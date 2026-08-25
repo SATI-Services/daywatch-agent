@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * UserSensor — emits one `user` record per execution when an authenticated user
- * is present (daywatch-mcp/docs/agent-protocol.md §2). The user id also travels inline on every
+ * is present (agent protocol §2). The user id also travels inline on every
  * other record's `user` field; this record additionally carries name/username for
  * the dashboard's user directory. `Daywatch::user(fn ($user) => [...])` customises
  * the resolved `{id, name, username}`.

@@ -9,7 +9,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `command` record (daywatch-mcp/docs/agent-protocol.md §2) — an artisan command execution.
+ * The `command` record (agent protocol §2) — an artisan command execution.
  * The command IS the execution root, so it carries `trace_id` + `user` but no
  * `execution_*` duplication, and walks the three command stages. `_group =
  * xxh128(name)`. Vendor/framework commands are not sampled by default.

@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `outgoing-request` record (daywatch-mcp/docs/agent-protocol.md §2) — an HTTP call made
+ * The `outgoing-request` record (agent protocol §2) — an HTTP call made
  * by the app via the Laravel HTTP client. `url` has any userinfo stripped.
  * `_group = xxh128(host)`.
  *

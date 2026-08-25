@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * JobAttemptSensor — captures one worker execution of a queued job into a
- * `job-attempt` record (daywatch-mcp/docs/agent-protocol.md §2). The attempt is its own execution
+ * `job-attempt` record (agent protocol §2). The attempt is its own execution
  * (`attempt_id`) under the trace inherited from the dispatching request/command.
  * `sync` jobs are skipped (they run inline, captured by their parent execution).
  * Only wired in worker processes.

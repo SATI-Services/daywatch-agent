@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `scheduled-task` record (daywatch-mcp/docs/agent-protocol.md §2) — one run of a
+ * The `scheduled-task` record (agent protocol §2) — one run of a
  * scheduled task. Its own execution under a fresh trace; carries the full
  * counters block and a flat duration. `_group = xxh128(name|cron|timezone)`.
  *

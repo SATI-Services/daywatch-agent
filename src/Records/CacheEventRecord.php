@@ -8,7 +8,7 @@ use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Truncate;
 
 /**
- * The `cache-event` record (daywatch-mcp/docs/agent-protocol.md §2). Paired start/completion
+ * The `cache-event` record (agent protocol §2). Paired start/completion
  * cache events yield a `type` and a `duration`. `_group = xxh128(store|key)`.
  *
  * Field names are WIRE CONTRACT.

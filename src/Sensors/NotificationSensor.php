@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * NotificationSensor — pairs NotificationSending → NotificationSent into a
- * `notification` record (daywatch-mcp/docs/agent-protocol.md §2). The Sending
+ * `notification` record (agent protocol §2). The Sending
  * timestamp is stashed keyed by the notification's object id so the Sent event
  * can compute an integer-microsecond duration; an unpaired Sent yields 0.
  * `_group = xxh128(class)`. `failed` is always false — Laravel dispatches no

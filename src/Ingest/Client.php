@@ -18,7 +18,7 @@ interface Client
 
     /**
      * Send a STATS frame and read the daemon's counters reply
-     * (daywatch-mcp/docs/agent-protocol.md §4). Returns the decoded counters, or null on ANY
+     * (agent protocol §4). Returns the decoded counters, or null on ANY
      * failure — dead daemon, no reply (pre-STATS daemon or token mismatch),
      * timeout, malformed JSON. Never throws.
      *

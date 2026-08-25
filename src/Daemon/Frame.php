@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Daemon;
 
 /**
- * A single decoded local-socket frame (daywatch-mcp/docs/agent-protocol.md §4):
+ * A single decoded local-socket frame (agent protocol §4):
  *
  *   {length}:{version}:{token_hash}:{payload}
  *

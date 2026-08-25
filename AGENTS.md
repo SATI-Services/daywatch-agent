@@ -50,7 +50,7 @@ the host app is a P0 bug.
 ## Status & constraints
 
 Scaffolded + M2 **complete** (sensors, records, socket client, ReactPHP daemon +
-stats/STATS surface; all 14 sensors; 241 tests, non-flaky; `composer test` green — CI matrix
+stats/STATS surface; all 14 sensors; 268 tests, non-flaky; `composer test` green — CI matrix
 runs the suite green on Laravel 11/12/13). Pinned
 constraints (don't drift): `illuminate/support ^11|^12|^13`, PHP `^8.2`; daemon
 deps are tilde-to-locked `react/{event-loop ~1.6.0, socket ~1.17.0, promise
@@ -89,7 +89,7 @@ src/
   Sensors/                   # 14 sensors: Request, Query, Exception, Cache, Command, JobAttempt, Log, Mail, Notification, OutgoingRequest, QueuedJob, ScheduledTask, Stage, User
   Records/                   # one DTO per record type; _group hashing; byte-cap truncation
   Ingest/SocketClient.php    # stream_socket_client, 0.5s timeouts, {len}:v1:{hash}:{json} frame, 2:OK ack, stats()
-  Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop
+  Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop; boot AuthProbe + actionable EADDRINUSE report
   Console/StatusCommand.php  # daywatch:status — STATS counters (table / --json), PING fallback, exit 1 when down
   Facades/Daywatch.php       # user(), sample(), dontSample(), report(), ignore(), pause(), resume(), digest()
 config/daywatch.php          # full option table in agent-protocol.md §7 (daywatch-mcp system docs)
@@ -132,9 +132,9 @@ can never crash the loop), and `daywatch:status` (STATS frame → ack +
 
 When `daywatch:agent` runs attached to a **TTY** it renders a live in-place
 dashboard instead of scrolling lines (`Daemon/ConsoleDashboard`, self-rescheduling
-+ guarded like `StatsReporter`): memory/uptime, ingest throughput, auth errors
-(401s tracked via `DaemonStats::authFailed()`, kept off the frozen STATS
-`toArray()` contract), and the last N log lines — the daemon's logger feeds a
++ guarded like `StatsReporter`): the startup auth check, memory/uptime, ingest
+throughput, auth errors (401s tracked via `DaemonStats::authFailed()`, kept off
+the frozen STATS `toArray()` contract), and the last N log lines — the daemon's logger feeds a
 bounded `Daemon/RecentLog` ring buffer in this mode. Repaints every
 `daywatch.daemon.console_refresh` s (env `DAYWATCH_DAEMON_CONSOLE_REFRESH`,
 default 3, `0` disables), keeping `daywatch.daemon.console_lines`
@@ -144,6 +144,38 @@ periodic stats line. Resilience: `AgentCommand::runResiliently()` re-enters the
 event loop if any callback ever lets an exception escape `Loop::run()` (bounded
 against a hot re-throw loop), so the daemon never dies on an internal error —
 only a deliberate shutdown frame stops it.
+
+## Startup authentication check (`Daemon/AuthProbe`)
+
+`daywatch:agent` answers "is this agent actually authenticated?" at boot instead
+of leaving it to be inferred from silently dropped batches. `Daemon/AuthProbe`
+POSTs an **empty batch** — `{"records":[]}`, gzipped, carrying the same headers a
+real flush carries — to `{base_url}/api/ingest`. That is the one probe **both**
+ingest implementations answer identically and conclusively: auth precedes all
+payload handling in each, and an empty records array is a valid batch that stores
+nothing (Laravel app → `202 {"accepted":0}` with zero rows RPUSHed; Java relay →
+same, zero rows enqueued). So 2xx = token accepted, 401/403 = rejected, 404 =
+`DAYWATCH_BASE_URL` points at no ingest, 429/503/5xx = up but shedding (token
+unproven — the relay also 429s when its own tenancy directory is down), transport
+rejection = unreachable. On success only, a best-effort `GET
+{base_url}/api/ingest/tenancy` names the resolved project/environment; that
+endpoint exists on the Laravel app (it backs the relay's token lookup) and NOT on
+the relay, so its 404 never downgrades the headline result.
+
+Diagnostic only: the promise never rejects, the check never blocks the loop, and a
+failure never stops the daemon (the ingest may just not be up yet — the dispatcher
+owns retries). Surfaces: one boot log line (`[daywatch:agent] auth …`) and the
+dashboard's `auth` row. Gated by `daywatch.daemon.auth_check` (env
+`DAYWATCH_DAEMON_AUTH_CHECK`, default true) / `--no-auth-check`. The outcome lives
+on `DaemonStats::authProbed()/authState()/authSummary()` but is deliberately kept
+**off `toArray()`** — like `authFailures()`, that array is the frozen STATS wire
+contract, so exposing the auth state to `daywatch:status` would be a docs-first
+cross-repo change (`daywatch-payloads` skill), not a package-local one.
+
+The other boot failure worth naming is a taken port: `EADDRINUSE` is caught and
+reported as "another daywatch:agent is probably already running", with the
+`daywatch:status` / `lsof -nP -iTCP:{port} -sTCP:LISTEN` / `--listen=` next steps,
+instead of leaking the raw ReactPHP socket message.
 
 ## Ship Laravel Boost guidance for consumer apps
 

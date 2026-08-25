@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Daemon\AuthProbeResult;
 use Daywatch\Agent\Daemon\ConsoleDashboard;
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\RecentLog;
@@ -132,4 +133,16 @@ it('reports the flush age once records have flushed', function () {
 
     expect($frames[0])->toContain('last flush 4s ago')
         ->toContain('(5 records)');
+});
+
+it('renders the startup auth check, pending until it settles', function () {
+    [$dashboard, $frames, , $stats] = makeDashboard();
+
+    $dashboard->render();
+    expect($frames[0])->toContain('auth       checking…');
+
+    $stats->authProbed(AuthProbeResult::OK, 'ok · token accepted · project 3 · production');
+    $dashboard->render();
+
+    expect($frames[1])->toContain('auth       ok · token accepted · project 3 · production');
 });

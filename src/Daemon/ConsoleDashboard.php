@@ -10,9 +10,10 @@ use Throwable;
 
 /**
  * The live, in-place console for `daywatch:agent` when it runs attached to a TTY.
- * Every `refreshSeconds` it repaints a compact panel — daemon memory/uptime,
- * ingest throughput, auth errors, and the last N log lines ({@see RecentLog}) —
- * redrawing over the previous frame with ANSI cursor control instead of scrolling.
+ * Every `refreshSeconds` it repaints a compact panel — the startup auth check,
+ * daemon memory/uptime, ingest throughput, auth errors, and the last N log lines
+ * ({@see RecentLog}) — redrawing over the previous frame with ANSI cursor control
+ * instead of scrolling.
  *
  * Analogous to {@see StatsReporter}: it self-reschedules through the injected
  * {@see Scheduler} and every paint/reschedule is fully guarded. CARDINAL RULE:
@@ -108,6 +109,7 @@ final class ConsoleDashboard
             .'  ·  listening '.$this->listen;
         $lines[] = 'target '.$s['base_url'];
         $lines[] = '';
+        $lines[] = sprintf('  auth       %s', $this->stats->authSummary());
         $lines[] = sprintf('  memory     %-18s peak %s', $this->bytes((int) $mem), $this->bytes((int) $peak));
         $lines[] = sprintf('  received   %-18s buffered %s (%s)',
             number_format((int) $s['records_received']),

@@ -85,6 +85,13 @@ return [
     'daemon' => [
         'stats_interval' => env('DAYWATCH_DAEMON_STATS_INTERVAL', 60),
 
+        // Startup authentication check: as daywatch:agent boots it resolves its
+        // token against {base_url}/api/ingest/tenancy, so a wrong DAYWATCH_TOKEN or
+        // an ingest that isn't up is reported immediately instead of surfacing later
+        // as silently dropped batches. Diagnostic only — a failed check never stops
+        // the daemon. Disable with false or the --no-auth-check flag.
+        'auth_check' => env('DAYWATCH_DAEMON_AUTH_CHECK', true),
+
         // Live console (only when daywatch:agent is attached to a TTY): repaint the
         // dashboard every N seconds, keeping the last M log lines on screen. Set the
         // refresh to 0 — or pass --plain — to fall back to scrolling plain-line

@@ -42,6 +42,23 @@ It accepts digests over TCP, batches + gzips them, and POSTs to the ingest.
 php artisan daywatch:agent
 ```
 
+On boot it runs an authentication check against the ingest — it POSTs an empty
+batch to `{DAYWATCH_BASE_URL}/api/ingest` (stores nothing) and reports the answer
+on its first line, so a wrong token or URL is obvious immediately:
+
+```
+[daywatch:agent] auth ok · token accepted · project 7 · production
+[daywatch:agent] auth REJECTED · token not accepted (401) — check DAYWATCH_TOKEN
+[daywatch:agent] auth NOT FOUND · no ingest endpoint (404) — check DAYWATCH_BASE_URL
+[daywatch:agent] auth UNREACHABLE · Connection refused
+```
+
+A failed check never stops the daemon (the ingest may simply not be up yet).
+Skip it with `--no-auth-check` or `DAYWATCH_DAEMON_AUTH_CHECK=false`.
+
+If the port is already taken the daemon says so and how to find the process —
+that almost always means a second `daywatch:agent` is already running.
+
 Check reachability:
 
 ```bash

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Daywatch\Agent\Console;
 
+use Daywatch\Agent\Daemon\AuthProbe;
 use Daywatch\Agent\Daemon\BatchBuffer;
 use Daywatch\Agent\Daemon\ConnectionHandler;
 use Daywatch\Agent\Daemon\ConsoleDashboard;
@@ -36,12 +37,15 @@ class AgentCommand extends Command
 {
     protected $signature = 'daywatch:agent
         {--listen= : Override the listen address (host:port)}
-        {--plain : Disable the live dashboard — scroll plain log lines (for supervisors/log files)}';
+        {--plain : Disable the live dashboard — scroll plain log lines (for supervisors/log files)}
+        {--no-auth-check : Skip the startup authentication check against the ingest}';
 
     protected $description = 'Run the Daywatch local TCP ingest daemon (ReactPHP).';
 
     public function handle(): int
     {
+        $listen = '';
+
         try {
             $baseUrl = (string) (config('daywatch.base_url') ?? '');
 
@@ -155,6 +159,23 @@ class AgentCommand extends Command
                 $this->info('Daywatch agent listening on '.$listen.' → '.rtrim($baseUrl, '/').'/api/ingest');
             }
 
+            // Startup authentication check (daemon.auth_check / --no-auth-check):
+            // POST an empty batch NOW, so a wrong DAYWATCH_TOKEN / DAYWATCH_BASE_URL or
+            // a down ingest is reported at boot instead of surfacing later as silently
+            // dropped telemetry. Diagnostic only — it settles inside the loop and
+            // never blocks or stops the daemon.
+            if ($this->shouldCheckAuth()) {
+                (new AuthProbe(
+                    sender: $sender,
+                    url: rtrim($baseUrl, '/').'/api/ingest',
+                    token: (string) $token,
+                    server: (string) (config('daywatch.server') ?? ''),
+                    userAgent: 'DaywatchAgent/'.$this->packageVersion(),
+                    stats: $stats,
+                    logger: $logger,
+                ))->run();
+            }
+
             // CARDINAL RULE: the daemon must never die on an escaped error. If an
             // exception ever propagates out of a ReactPHP callback, log it and
             // re-enter the loop (listeners/timers stay armed) rather than exit.
@@ -162,10 +183,60 @@ class AgentCommand extends Command
 
             return self::SUCCESS;
         } catch (Throwable $e) {
+            if ($this->addressInUse($e)) {
+                return $this->reportAddressInUse($listen);
+            }
+
             $this->error('daywatch:agent failed to start: '.$e->getMessage());
 
             return self::FAILURE;
         }
+    }
+
+    /** The startup auth check is on unless disabled by flag or config. */
+    private function shouldCheckAuth(): bool
+    {
+        return ! $this->option('no-auth-check')
+            && (bool) config('daywatch.daemon.auth_check', true);
+    }
+
+    /**
+     * The single most common startup failure: something already holds the listen
+     * port — almost always another `daywatch:agent`. Say so, and say what to do,
+     * instead of leaking a raw ReactPHP socket message.
+     */
+    private function addressInUse(Throwable $e): bool
+    {
+        $message = $e->getMessage();
+
+        while (true) {
+            if (stripos($message, 'EADDRINUSE') !== false || stripos($message, 'Address in use') !== false
+                || stripos($message, 'Address already in use') !== false) {
+                return true;
+            }
+
+            $e = $e->getPrevious();
+
+            if ($e === null) {
+                return false;
+            }
+
+            $message = $e->getMessage();
+        }
+    }
+
+    private function reportAddressInUse(string $listen): int
+    {
+        $listen = $listen === '' ? (string) config('daywatch.ingest.uri', '127.0.0.1:2408') : $listen;
+        $port = str_contains($listen, ':') ? substr((string) strrchr($listen, ':'), 1) : $listen;
+
+        $this->error('daywatch:agent cannot listen on '.$listen.' — that address is already in use.');
+        $this->line('Another daywatch:agent daemon is most likely already running.');
+        $this->line('  • confirm it:        php artisan daywatch:status');
+        $this->line('  • find the process:  lsof -nP -iTCP:'.$port.' -sTCP:LISTEN');
+        $this->line('  • or listen elsewhere: php artisan daywatch:agent --listen=127.0.0.1:'.((int) $port + 1));
+
+        return self::FAILURE;
     }
 
     /**

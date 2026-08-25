@@ -35,6 +35,11 @@ final class DaemonStats
 
     private int $authFailures = 0;
 
+    /** Startup auth-check state — {@see AuthProbeResult} constants. */
+    private string $authState = AuthProbeResult::PENDING;
+
+    private string $authSummary = 'checking…';
+
     private ?float $lastFlushAt = null;
 
     private int $lastFlushRecords = 0;
@@ -88,6 +93,29 @@ final class DaemonStats
     public function authFailed(): void
     {
         $this->authFailures++;
+    }
+
+    /** Record the startup authentication check's outcome ({@see AuthProbe}). */
+    public function authProbed(string $state, string $summary): void
+    {
+        $this->authState = $state;
+        $this->authSummary = $summary;
+    }
+
+    /**
+     * Startup auth-check state / one-line summary. Surfaced by the live
+     * {@see ConsoleDashboard} and the boot log; kept out of {@see toArray()}
+     * alongside {@see authFailures()} — that array is the frozen STATS wire
+     * contract (daywatch-mcp/docs/agent-protocol.md §4).
+     */
+    public function authState(): string
+    {
+        return $this->authState;
+    }
+
+    public function authSummary(): string
+    {
+        return $this->authSummary;
     }
 
     /**

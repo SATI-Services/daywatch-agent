@@ -30,8 +30,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filtering (M4) — the privacy boundary runs in-app, before buffering.
+    | Filtering + redaction (RESERVED — M4)
     |--------------------------------------------------------------------------
+    |
+    | Declared here because they are part of the shared option table
+    | (agent-protocol.md §7) and the privacy boundary is deliberately in-app, before
+    | buffering. NOT YET READ by the collector: setting them today changes
+    | nothing. They are listed so the wire contract and this file stay in step —
+    | do not treat them as working switches until the sensors consult them.
+    |
     */
 
     'filtering' => [
@@ -60,6 +67,12 @@ return [
         'timeout' => env('DAYWATCH_INGEST_TIMEOUT', 0.5),
         'connection_timeout' => env('DAYWATCH_INGEST_CONNECTION_TIMEOUT', 0.5),
         'event_buffer' => env('DAYWATCH_INGEST_EVENT_BUFFER', 500),
+
+        // Second bound on the in-process buffer, in bytes (0 disables). Field caps
+        // let one record carry megabytes, so a record COUNT alone is not a memory
+        // bound — this is what keeps the host's footprint predictable. Sized just
+        // under the daemon's 6 MB flush threshold so one digest ≈ one batch.
+        'buffer_bytes' => env('DAYWATCH_INGEST_BUFFER_BYTES', 5_000_000),
 
         // Circuit breaker: after a failed digest, skip further socket attempts for
         // this many seconds (0 disables). Bounds host-request cost when the daemon

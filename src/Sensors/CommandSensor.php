@@ -6,6 +6,7 @@ namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\CommandRecord;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Support\ExecutionStage;
 use Throwable;
 
@@ -82,11 +83,7 @@ final class CommandSensor
             $core->beginStage(ExecutionStage::ACTION);
 
             $record = new CommandRecord(
-                timestamp: $core->requestStartedAt() ?: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->requestStartedAt() ?: $core->clock()->microtime()),
                 class: '',
                 name: $core->executionPreview,
                 command: $this->input,

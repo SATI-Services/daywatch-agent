@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\UserRecord;
 use Throwable;
 
@@ -48,9 +49,7 @@ final class UserSensor
             }
 
             $record = new UserRecord(
-                timestamp: $this->core->clock()->microtime(),
-                deploy: $this->core->deploy(),
-                server: $this->core->server(),
+                envelope: Envelope::for($this->core),
                 id: $id,
                 name: $name,
                 username: $username,

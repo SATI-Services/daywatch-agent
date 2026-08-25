@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\ScheduledTaskRecord;
 use Throwable;
 
@@ -76,11 +77,7 @@ final class ScheduledTaskSensor
             $core = $this->core;
 
             $record = new ScheduledTaskRecord(
-                timestamp: $core->requestStartedAt() ?: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->requestStartedAt() ?: $core->clock()->microtime()),
                 name: (string) ($this->meta['name'] ?? ''),
                 cron: (string) ($this->meta['cron'] ?? ''),
                 timezone: (string) ($this->meta['timezone'] ?? ''),

@@ -6,6 +6,7 @@ namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\CacheEventRecord;
+use Daywatch\Agent\Records\Envelope;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -111,15 +112,7 @@ final class CacheEventSensor
         $timestamp = $start ?? $now;
 
         $record = new CacheEventRecord(
-            timestamp: $timestamp,
-            deploy: $core->deploy(),
-            server: $core->server(),
-            traceId: $core->traceId,
-            executionId: $core->executionId,
-            executionSource: $core->executionSource,
-            executionPreview: $core->executionPreview,
-            executionStage: $core->executionStage,
-            user: $core->resolveUser(),
+            envelope: Envelope::for($core, $timestamp),
             store: $store,
             key: $key,
             type: $type,

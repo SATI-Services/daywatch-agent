@@ -16,15 +16,7 @@ use Daywatch\Agent\Support\Truncate;
 final class CacheEventRecord
 {
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $executionId,
-        public string $executionSource,
-        public string $executionPreview,
-        public string $executionStage,
-        public string $user,
+        public Envelope $envelope,
         public string $store,
         public string $key,
         public string $type,
@@ -34,19 +26,7 @@ final class CacheEventRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'cache-event',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::cache($this->store, $this->key),
-            'trace_id' => $this->traceId,
-            'execution_id' => $this->executionId,
-            'execution_source' => $this->executionSource,
-            'execution_preview' => Truncate::tiny($this->executionPreview),
-            'execution_stage' => $this->executionStage,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->child('cache-event', Group::cache($this->store, $this->key)) + [
             'store' => Truncate::tiny($this->store),
             'key' => Truncate::tiny($this->key),
             'type' => $this->type,

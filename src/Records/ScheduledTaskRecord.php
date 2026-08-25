@@ -20,11 +20,7 @@ final class ScheduledTaskRecord
      * @param  array<string, int>  $counters  keyed by Counters::KEYS
      */
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $user,
+        public Envelope $envelope,
         public string $name,
         public string $cron,
         public string $timezone,
@@ -41,15 +37,7 @@ final class ScheduledTaskRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'scheduled-task',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::scheduledTask($this->name, $this->cron, $this->timezone),
-            'trace_id' => $this->traceId,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->execution('scheduled-task', Group::scheduledTask($this->name, $this->cron, $this->timezone)) + [
             'name' => Truncate::tiny($this->name),
             'cron' => Truncate::tiny($this->cron),
             'timezone' => Truncate::tiny($this->timezone),
@@ -58,10 +46,11 @@ final class ScheduledTaskRecord
             'run_in_background' => $this->runInBackground,
             'status' => $this->status,
             'duration' => $this->duration,
-            ...Counters::normalize($this->counters),
-            'peak_memory_usage' => $this->peakMemoryUsage,
-            'exception_preview' => Truncate::tiny($this->exceptionPreview),
-            'context' => Truncate::text($this->context),
-        ];
+        ] + Counters::tail(
+            $this->counters,
+            $this->peakMemoryUsage,
+            $this->exceptionPreview,
+            $this->context,
+        );
     }
 }

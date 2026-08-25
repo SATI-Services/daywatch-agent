@@ -61,6 +61,12 @@ class Core
     /** @var (callable(mixed): (string|int|null))|null */
     private $userResolver = null;
 
+    /** Memoised non-empty user resolution for this execution. */
+    private ?string $resolvedUser = null;
+
+    /** Re-entrancy latch: user resolution must never recurse into itself. */
+    private bool $resolvingUser = false;
+
     /** @var array<string, true> set of object hashes to suppress from exception recording */
     private array $ignored = [];
 
@@ -84,11 +90,6 @@ class Core
     }
 
     // ── configuration accessors ───────────────────────────────────────────
-
-    public function enabled(): bool
-    {
-        return $this->enabled;
-    }
 
     public function clock(): Clock
     {
@@ -237,6 +238,8 @@ class Core
             $this->exceptionPreview = '';
             $this->userId = null;
             $this->userResolver = null;
+            $this->resolvedUser = null;
+            $this->resolvingUser = false;
             $this->ignored = [];
 
             $this->buffer->flush();
@@ -332,20 +335,63 @@ class Core
 
     // ── user ──────────────────────────────────────────────────────────────
 
+    /**
+     * Associate this execution with a user id, or install a resolver callback.
+     *
+     * A *string* id is NEVER treated as a resolver even when it happens to name a
+     * global function (`'info'`, `'logger'`, `'count'` …): `is_callable('info')` is
+     * true, and honouring that would invoke host code — with side effects, and
+     * with a logging helper it would recurse through the log sensor forever.
+     */
     public function user(string|int|callable|null $id): void
     {
-        if (is_callable($id)) {
+        if (! is_string($id) && ! is_int($id) && is_callable($id)) {
             $this->userResolver = $id;
+            $this->resolvedUser = null;
 
             return;
         }
 
         $this->userId = $id;
+        $this->resolvedUser = null;
         $this->propagate();
     }
 
-    /** Resolve the user id string for records ('' when anonymous). */
+    /**
+     * Resolve the user id string for records ('' when anonymous).
+     *
+     * Called once per record, so it is both memoised and re-entrancy latched. The
+     * latch is the load-bearing part: a resolver callback (or an auth guard) that
+     * touches the database or logs would otherwise re-enter a sensor, resolve the
+     * user again, and recurse without bound. Only non-empty resolutions are
+     * memoised, so a login part-way through an execution is still picked up.
+     */
     public function resolveUser(): string
+    {
+        if ($this->resolvedUser !== null) {
+            return $this->resolvedUser;
+        }
+
+        if ($this->resolvingUser) {
+            return '';
+        }
+
+        $this->resolvingUser = true;
+
+        try {
+            $user = $this->computeUser();
+
+            if ($user !== '') {
+                $this->resolvedUser = $user;
+            }
+
+            return $user;
+        } finally {
+            $this->resolvingUser = false;
+        }
+    }
+
+    private function computeUser(): string
     {
         try {
             if ($this->userId !== null && $this->userId !== '') {
@@ -573,6 +619,7 @@ class Core
 
         if ($propagated['user_id'] !== null && $propagated['user_id'] !== '') {
             $this->userId = $propagated['user_id'];
+            $this->resolvedUser = null;
         }
     }
 }

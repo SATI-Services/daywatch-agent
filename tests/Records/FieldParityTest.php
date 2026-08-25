@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Daywatch\Agent\Records\CacheEventRecord;
 use Daywatch\Agent\Records\CommandRecord;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\ExceptionRecord;
 use Daywatch\Agent\Records\JobAttemptRecord;
 use Daywatch\Agent\Records\LogRecord;
@@ -75,8 +76,7 @@ it('emits query fields in the exact order of the canonical sample', function () 
     }
 
     $record = new QueryRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         sql: 'select 1', file: '', line: 0, duration: 0, connection: 'mysql', connectionType: 'read',
     );
 
@@ -91,8 +91,7 @@ it('emits exception fields in the exact order of the canonical sample', function
     }
 
     $record = new ExceptionRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         class: 'X', file: 'f', line: 1, message: 'm', code: '0', trace: '[]',
         handled: true, phpVersion: '8.2', laravelVersion: '11',
     );
@@ -106,53 +105,47 @@ it('emits exception fields in the exact order of the canonical sample', function
  */
 dataset('new_records', [
     'cache-event' => [fn () => new CacheEventRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         store: 'redis', key: 'k', type: 'miss', duration: 0, ttl: 0,
     )],
     'outgoing-request' => [fn () => new OutgoingRequestRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         host: 'h', method: 'GET', url: 'u', duration: 0, requestSize: 0, responseSize: 0, statusCode: 200,
     )],
     'log' => [fn () => new LogRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         level: 'info', message: 'm', context: '{}', extra: '{}',
     )],
     'queued-job' => [fn () => new QueuedJobRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         jobId: 'j', name: 'n', connection: 'c', queue: 'q', duration: 0,
     )],
     'job-attempt' => [fn () => new JobAttemptRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't'),
         jobId: 'j', attemptId: 'a', attempt: 1, name: 'n', connection: 'c', queue: 'q',
         status: 'processed', duration: 0, counters: [], peakMemoryUsage: 0, exceptionPreview: '', context: '{}',
     )],
     'command' => [fn () => new CommandRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't'),
         class: 'C', name: 'n', command: 'n', exitCode: 0, stages: [], counters: [],
         peakMemoryUsage: 0, exceptionPreview: '', context: '{}',
     )],
     'scheduled-task' => [fn () => new ScheduledTaskRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't'),
         name: 'n', cron: '* * * * *', timezone: 'UTC', withoutOverlapping: true, onOneServer: false,
         runInBackground: false, status: 'processed', duration: 0, counters: [], peakMemoryUsage: 0,
         exceptionPreview: '', context: '{}',
     )],
     'mail' => [fn () => new MailRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         mailer: 'smtp', class: 'M', subject: 's', to: 1, cc: 0, bcc: 0, attachments: 0, duration: 0, failed: false,
     )],
     'notification' => [fn () => new NotificationRecord(
-        timestamp: 0.0, deploy: '', server: '', traceId: 't', executionId: 'e',
-        executionSource: 'request', executionPreview: '', executionStage: 'action', user: '',
+        envelope: new Envelope(timestamp: 0.0, traceId: 't', executionId: 'e', executionSource: 'request', executionStage: 'action'),
         channel: 'mail', class: 'N', duration: 0, failed: false,
     )],
     'user' => [fn () => new UserRecord(
-        timestamp: 0.0, deploy: '', server: '', id: '42', name: 'n', username: 'u',
+        envelope: new Envelope(timestamp: 0.0), id: '42', name: 'n', username: 'u',
     )],
 ]);
 

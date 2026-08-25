@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
-use Daywatch\Agent\Support\ExecutionStage;
 use Throwable;
 
 /**
@@ -30,11 +29,5 @@ final class StageSensor
             $this->core->beginStage($closingStage);
         } catch (Throwable) {
         }
-    }
-
-    /** Close the final timed stage, leaving the execution at `end`. */
-    public function stop(): void
-    {
-        $this->advance(ExecutionStage::TERMINATING);
     }
 }

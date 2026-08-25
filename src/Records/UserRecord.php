@@ -16,9 +16,7 @@ use Daywatch\Agent\Support\Truncate;
 final class UserRecord
 {
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
+        public Envelope $envelope,
         public string $id,
         public string $name,
         public string $username,
@@ -26,12 +24,7 @@ final class UserRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'user',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
+        return $this->envelope->minimal('user') + [
             'id' => Truncate::tiny($this->id),
             'name' => Truncate::tiny($this->name),
             'username' => Truncate::tiny($this->username),

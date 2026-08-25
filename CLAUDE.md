@@ -50,7 +50,7 @@ the host app is a P0 bug.
 ## Status & constraints
 
 Scaffolded + M2 **complete** (sensors, records, socket client, ReactPHP daemon +
-stats/STATS surface; all 14 sensors; 268 tests, non-flaky; `composer test` green — CI matrix
+stats/STATS surface; all 14 sensors; 300 tests, non-flaky; `composer test` green — CI matrix
 runs the suite green on Laravel 11/12/13). Pinned
 constraints (don't drift): `illuminate/support ^11|^12|^13`, PHP `^8.2`; daemon
 deps are tilde-to-locked `react/{event-loop ~1.6.0, socket ~1.17.0, promise
@@ -85,9 +85,10 @@ src/
   AgentServiceProvider.php   # plain Illuminate ServiceProvider; register-only wiring + `about` section
   Core.php                   # per-execution state: trace/execution ids, stage, sampling decision
   SensorManager.php
-  Buffer/RecordsBuffer.php   # ≤500 records; auto-digest when full; ring-drop if disabled
+  Buffer/RecordsBuffer.php   # TWO bounds: ≤500 records AND ≤buffer_bytes; auto-digest when full; ring-drop if disabled
   Sensors/                   # 14 sensors: Request, Query, Exception, Cache, Command, JobAttempt, Log, Mail, Notification, OutgoingRequest, QueuedJob, ScheduledTask, Stage, User
-  Records/                   # one DTO per record type; _group hashing; byte-cap truncation
+  Records/Envelope.php       # THE shared wire mapping: child/execution/minimal head shapes (+ Counters::tail)
+  Records/                   # one DTO per record type, envelope + own fields only; _group hashing; byte-cap truncation
   Ingest/SocketClient.php    # stream_socket_client, 0.5s timeouts, {len}:v1:{hash}:{json} frame, 2:OK ack, stats()
   Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop; boot AuthProbe + actionable EADDRINUSE report
   Console/StatusCommand.php  # daywatch:status — STATS counters (table / --json), PING fallback, exit 1 when down
@@ -105,6 +106,21 @@ config/daywatch.php          # full option table in agent-protocol.md §7 (daywa
 - String caps are **byte** truncation (255 B / 64 KB / 16 MB tiers) applied
   before buffering; durations are integer **microseconds**; redaction happens
   in-app (the privacy boundary), never downstream.
+- **All shared wire fields live in `Records/Envelope.php`** — three head shapes
+  (`child(t,group)` for records emitted *during* an execution, `execution(t,group)`
+  for records that *are* one, `minimal(t)` for `user`) plus `Counters::tail()` for
+  the twelve counters + `peak_memory_usage`/`exception_preview`/`context` that every
+  execution-root record ends with. A record DTO declares `Envelope $envelope` and
+  emits **only its own fields**; sensors build one with `Envelope::for($core)`.
+  Adding a record type = pick a head shape, append your fields, done — never
+  re-inline the envelope (`EnvelopeTest` fails the build if a DTO does).
+- The in-process buffer is bounded by **records AND bytes**
+  (`ingest.event_buffer` / `ingest.buffer_bytes`): field caps let one record carry
+  megabytes, so a count alone is not a memory bound on the host.
+- **User resolution is memoised + re-entrancy latched.** `Daywatch::user()` treats a
+  string/int as an id even when it happens to name a global function
+  (`is_callable('info')` is true — honouring it would invoke host code), and a
+  resolver that logs or queries can't recurse back through a sensor.
 - The daemon never re-parses record JSON — string-level buffer concatenation;
   flush ≥ 6 MB or 10 s; ≤ 5 in-flight POSTs; retry ladder + 503 `stop`
   NullBuffer pause contract per `../daywatch-mcp/docs/agent-protocol.md` §6.

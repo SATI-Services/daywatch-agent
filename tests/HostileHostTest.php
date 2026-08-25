@@ -2,20 +2,24 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Buffer\RecordsBuffer;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Daemon\ConnectionHandler;
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\FrameParser;
 use Daywatch\Agent\Daemon\StatsReporter;
 use Daywatch\Agent\Daywatch as DaywatchRuntime;
+use Daywatch\Agent\Facades\Daywatch as DaywatchFacade;
 use Daywatch\Agent\Ingest\Client;
 use Daywatch\Agent\Ingest\Payload;
 use Daywatch\Agent\Ingest\SocketClient;
 use Daywatch\Agent\Sensors\ExceptionSensor;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\FakeScheduler;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 use Daywatch\Agent\Tests\Support\SpyRecordSink;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /*
  * The cardinal rule: nothing this package does may throw into the host app.
@@ -165,4 +169,72 @@ it('boots the provider and attaches sensors without throwing', function () {
     // Reaching this point means register()/boot() wired everything cleanly.
     expect($this->app->bound(Core::class))->toBeTrue()
         ->and($this->app->make(DaywatchRuntime::class))->toBeInstanceOf(DaywatchRuntime::class);
+});
+
+it('a user resolver that logs cannot recurse through the log sensor', function () {
+    // The dangerous shape: resolving the user emits telemetry, which resolves the
+    // user again. Sensors are live here (the real SensorManager is registered by
+    // the provider), so an unlatched resolver would recurse until the stack blew.
+    $calls = 0;
+
+    $core = $this->app->make(Core::class);
+    $core->prepareForRequest(); // reset() clears resolvers, so install ours after
+
+    DaywatchFacade::user(function ($user) use (&$calls) {
+        $calls++;
+
+        Log::info('resolving the user'); // → MessageLogged → LogSensor → resolveUser
+
+        return 'u-1';
+    });
+
+    Log::info('host log line');
+
+    expect($core->resolveUser())->toBe('u-1')
+        ->and($calls)->toBeLessThanOrEqual(2); // bounded — never unbounded recursion
+});
+
+it('a user resolver that queries the database cannot recurse through the query sensor', function () {
+    $calls = 0;
+
+    $core = $this->app->make(Core::class);
+    $core->prepareForRequest();
+
+    DaywatchFacade::user(function ($user) use (&$calls) {
+        $calls++;
+
+        DB::select('select 1 as n'); // → QueryExecuted → QuerySensor → resolveUser
+
+        return 'u-2';
+    });
+
+    DB::select('select 2 as n');
+
+    expect($core->resolveUser())->toBe('u-2')
+        ->and($calls)->toBeLessThanOrEqual(2);
+});
+
+it('a single huge record cannot grow the host buffer without bound', function () {
+    config([
+        'daywatch.ingest.event_buffer' => 500,
+        'daywatch.ingest.buffer_bytes' => 50_000,
+    ]);
+
+    $buffer = new RecordsBuffer(500, 50_000);
+    $core = new Core(
+        buffer: $buffer,
+        client: new RecordingClient,
+        clock: new FrozenClock(1000.0),
+        enabled: true,
+    );
+
+    // Unsampled execution: no digest drains the buffer, so only the bounds do.
+    $core->dontSample();
+
+    for ($i = 0; $i < 50; $i++) {
+        $core->write(['t' => 'query', 'sql' => str_repeat('x', 20_000)]);
+    }
+
+    expect($buffer->bytes())->toBeLessThan(100_000)
+        ->and($buffer->count())->toBeLessThan(10);
 });

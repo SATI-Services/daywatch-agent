@@ -17,15 +17,7 @@ use Daywatch\Agent\Support\Truncate;
 final class OutgoingRequestRecord
 {
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $executionId,
-        public string $executionSource,
-        public string $executionPreview,
-        public string $executionStage,
-        public string $user,
+        public Envelope $envelope,
         public string $host,
         public string $method,
         public string $url,
@@ -37,19 +29,7 @@ final class OutgoingRequestRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'outgoing-request',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::host($this->host),
-            'trace_id' => $this->traceId,
-            'execution_id' => $this->executionId,
-            'execution_source' => $this->executionSource,
-            'execution_preview' => Truncate::tiny($this->executionPreview),
-            'execution_stage' => $this->executionStage,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->child('outgoing-request', Group::host($this->host)) + [
             'host' => Truncate::tiny($this->host),
             'method' => Truncate::tiny($this->method),
             'url' => Truncate::text($this->url),

@@ -6,8 +6,8 @@ use Daywatch\Agent\Daemon\AuthProbe;
 use Daywatch\Agent\Daemon\AuthProbeResult;
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\HttpResponse;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\FakeHttpSender;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 
 /**
  * @param  array<int, HttpResponse|Throwable|string>  $queue

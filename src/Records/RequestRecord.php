@@ -24,11 +24,7 @@ final class RequestRecord
      * @param  array<string, int>  $counters  keyed by Counters::KEYS
      */
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $user,
+        public Envelope $envelope,
         public string $method,
         public string $url,
         public string $routeName,
@@ -54,15 +50,7 @@ final class RequestRecord
             $stages[$stage] = (int) ($this->stages[$stage] ?? 0);
         }
 
-        return [
-            'v' => 1,
-            't' => 'request',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::request($this->routeMethods, $this->routeDomain, $this->routePath),
-            'trace_id' => $this->traceId,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->execution('request', Group::request($this->routeMethods, $this->routeDomain, $this->routePath)) + [
             'method' => Truncate::tiny($this->method),
             'url' => Truncate::text($this->url),
             'route_name' => Truncate::tiny($this->routeName),
@@ -82,10 +70,11 @@ final class RequestRecord
             'after_middleware' => $stages['after_middleware'],
             'sending' => $stages['sending'],
             'terminating' => $stages['terminating'],
-            ...Counters::normalize($this->counters),
-            'peak_memory_usage' => $this->peakMemoryUsage,
-            'exception_preview' => Truncate::tiny($this->exceptionPreview),
-            'context' => Truncate::text($this->context),
-        ];
+        ] + Counters::tail(
+            $this->counters,
+            $this->peakMemoryUsage,
+            $this->exceptionPreview,
+            $this->context,
+        );
     }
 }

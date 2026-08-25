@@ -23,11 +23,7 @@ final class CommandRecord
      * @param  array<string, int>  $counters  keyed by Counters::KEYS
      */
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $user,
+        public Envelope $envelope,
         public string $class,
         public string $name,
         public string $command,
@@ -46,15 +42,7 @@ final class CommandRecord
             $stages[$stage] = (int) ($this->stages[$stage] ?? 0);
         }
 
-        return [
-            'v' => 1,
-            't' => 'command',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::name($this->name),
-            'trace_id' => $this->traceId,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->execution('command', Group::name($this->name)) + [
             'class' => Truncate::tiny($this->class),
             'name' => Truncate::tiny($this->name),
             'command' => Truncate::text($this->command),
@@ -63,10 +51,11 @@ final class CommandRecord
             'bootstrap' => $stages['bootstrap'],
             'action' => $stages['action'],
             'terminating' => $stages['terminating'],
-            ...Counters::normalize($this->counters),
-            'peak_memory_usage' => $this->peakMemoryUsage,
-            'exception_preview' => Truncate::tiny($this->exceptionPreview),
-            'context' => Truncate::text($this->context),
-        ];
+        ] + Counters::tail(
+            $this->counters,
+            $this->peakMemoryUsage,
+            $this->exceptionPreview,
+            $this->context,
+        );
     }
 }

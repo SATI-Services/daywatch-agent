@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\OutgoingRequestRecord;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -42,15 +43,7 @@ final class OutgoingRequestSensor
             $uri = $request->getUri();
 
             $record = new OutgoingRequestRecord(
-                timestamp: $startMicrotime,
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $startMicrotime),
                 host: $uri->getHost(),
                 method: $request->getMethod(),
                 url: (string) $uri->withUserInfo(''),

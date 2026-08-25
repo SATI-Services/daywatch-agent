@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\MailRecord;
 use Throwable;
 
@@ -63,15 +64,7 @@ final class MailSensor
             $data = is_array($event->data ?? null) ? $event->data : [];
 
             $record = new MailRecord(
-                timestamp: $start,
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $start),
                 mailer: (string) ($data['mailer'] ?? ''),
                 class: (string) ($data['__laravel_mailable'] ?? ''),
                 subject: $this->subject($message),

@@ -16,15 +16,7 @@ use Daywatch\Agent\Support\Truncate;
 final class NotificationRecord
 {
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $executionId,
-        public string $executionSource,
-        public string $executionPreview,
-        public string $executionStage,
-        public string $user,
+        public Envelope $envelope,
         public string $channel,
         public string $class,
         public int $duration,
@@ -33,19 +25,7 @@ final class NotificationRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'notification',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::name($this->class),
-            'trace_id' => $this->traceId,
-            'execution_id' => $this->executionId,
-            'execution_source' => $this->executionSource,
-            'execution_preview' => Truncate::tiny($this->executionPreview),
-            'execution_stage' => $this->executionStage,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->child('notification', Group::name($this->class)) + [
             'channel' => Truncate::tiny($this->channel),
             'class' => Truncate::tiny($this->class),
             'duration' => $this->duration,

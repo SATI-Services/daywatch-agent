@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\LogRecord;
 use Throwable;
 
@@ -31,15 +32,7 @@ final class LogSensor
             $context = $event->context ?? [];
 
             $record = new LogRecord(
-                timestamp: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->clock()->microtime()),
                 level: $level,
                 message: $message,
                 context: $this->encodeContext($context),

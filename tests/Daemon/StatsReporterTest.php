@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\StatsReporter;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\FakeScheduler;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 
 it('arms a timer at the configured interval and emits one line per fire', function () {
     $scheduler = new FakeScheduler;

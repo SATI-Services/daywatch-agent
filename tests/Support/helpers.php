@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use Daywatch\Agent\Buffer\RecordsBuffer;
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\RequestRecord;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Support\Group;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 
 if (! function_exists('makeCore')) {
@@ -48,11 +49,13 @@ if (! function_exists('makeRequestRecord')) {
     function makeRequestRecord(): RequestRecord
     {
         return new RequestRecord(
-            timestamp: 1751446800.104217,
-            deploy: 'abc1234',
-            server: 'demo-01',
-            traceId: '0e8b1a2c-6f4d-4b7e-9c3a-5d2e8f1a0b4c',
-            user: '42',
+            envelope: new Envelope(
+                timestamp: 1751446800.104217,
+                deploy: 'abc1234',
+                server: 'demo-01',
+                traceId: '0e8b1a2c-6f4d-4b7e-9c3a-5d2e8f1a0b4c',
+                user: '42',
+            ),
             method: 'GET',
             url: 'https://demo.test/orders/1042',
             routeName: 'orders.show',

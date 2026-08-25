@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\ExceptionRecord;
 use Daywatch\Agent\Records\ExceptionTrace;
 use Daywatch\Agent\Support\Location;
@@ -35,15 +36,7 @@ final class ExceptionSensor
             $message = $e->getMessage();
 
             $record = new ExceptionRecord(
-                timestamp: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->clock()->microtime()),
                 class: $class,
                 file: Location::appRelative($e->getFile()),
                 line: $e->getLine(),

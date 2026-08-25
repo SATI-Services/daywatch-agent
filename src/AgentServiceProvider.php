@@ -40,6 +40,7 @@ class AgentServiceProvider extends ServiceProvider
 
         $this->app->singleton(RecordsBuffer::class, fn (): RecordsBuffer => new RecordsBuffer(
             (int) config('daywatch.ingest.event_buffer', 500),
+            (int) config('daywatch.ingest.buffer_bytes', 5_000_000),
         ));
 
         $this->app->singleton(Client::class, fn (): Client => new SocketClient(

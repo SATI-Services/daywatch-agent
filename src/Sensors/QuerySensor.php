@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\QueryRecord;
 use Daywatch\Agent\Support\Location;
 use Illuminate\Database\Events\QueryExecuted;
@@ -33,15 +34,7 @@ final class QuerySensor
             [$file, $line] = $this->origin();
 
             $record = new QueryRecord(
-                timestamp: $start,
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $start),
                 sql: (string) $event->sql,
                 file: $file,
                 line: $line,

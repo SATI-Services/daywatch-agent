@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Daywatch\Agent\Daemon\BatchBuffer;
-use Daywatch\Agent\Support\FrozenClock;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 
 it('strips brackets, comma-joins, and rewraps as {"records":[...]}', function () {
     $buffer = new BatchBuffer(new FrozenClock(1000.0));

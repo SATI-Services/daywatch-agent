@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\RequestRecord;
 use Daywatch\Agent\Support\ExecutionStage;
 use Illuminate\Support\Facades\Context;
@@ -77,11 +78,7 @@ final class RequestSensor
             $core->beginStage(ExecutionStage::SENDING);
 
             $record = new RequestRecord(
-                timestamp: $core->requestStartedAt() ?: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->requestStartedAt() ?: $core->clock()->microtime()),
                 method: $this->method($request),
                 url: $this->url($request),
                 routeName: $this->routeName($request),

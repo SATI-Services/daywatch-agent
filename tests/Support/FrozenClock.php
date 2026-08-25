@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Daywatch\Agent\Support;
+namespace Daywatch\Agent\Tests\Support;
+
+use Daywatch\Agent\Support\Clock;
 
 /**
  * Test double: a clock whose value only moves when told to.

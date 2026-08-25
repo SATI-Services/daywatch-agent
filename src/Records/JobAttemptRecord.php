@@ -21,11 +21,7 @@ final class JobAttemptRecord
      * @param  array<string, int>  $counters  keyed by Counters::KEYS
      */
     public function __construct(
-        public float $timestamp,
-        public string $deploy,
-        public string $server,
-        public string $traceId,
-        public string $user,
+        public Envelope $envelope,
         public string $jobId,
         public string $attemptId,
         public int $attempt,
@@ -42,15 +38,7 @@ final class JobAttemptRecord
 
     public function toArray(): array
     {
-        return [
-            'v' => 1,
-            't' => 'job-attempt',
-            'timestamp' => $this->timestamp,
-            'deploy' => Truncate::tiny($this->deploy),
-            'server' => Truncate::tiny($this->server),
-            '_group' => Group::name($this->name),
-            'trace_id' => $this->traceId,
-            'user' => Truncate::tiny($this->user),
+        return $this->envelope->execution('job-attempt', Group::name($this->name)) + [
             'job_id' => $this->jobId,
             'attempt_id' => $this->attemptId,
             'attempt' => $this->attempt,
@@ -59,10 +47,11 @@ final class JobAttemptRecord
             'queue' => Truncate::tiny($this->queue),
             'status' => $this->status,
             'duration' => $this->duration,
-            ...Counters::normalize($this->counters),
-            'peak_memory_usage' => $this->peakMemoryUsage,
-            'exception_preview' => Truncate::tiny($this->exceptionPreview),
-            'context' => Truncate::text($this->context),
-        ];
+        ] + Counters::tail(
+            $this->counters,
+            $this->peakMemoryUsage,
+            $this->exceptionPreview,
+            $this->context,
+        );
     }
 }

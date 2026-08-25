@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\JobAttemptRecord;
 use Throwable;
 
@@ -84,11 +85,7 @@ final class JobAttemptSensor
             $core = $this->core;
 
             $record = new JobAttemptRecord(
-                timestamp: $core->requestStartedAt() ?: $core->clock()->microtime(),
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $core->requestStartedAt() ?: $core->clock()->microtime()),
                 jobId: (string) ($this->meta['job_id'] ?? ''),
                 attemptId: $core->executionId,
                 attempt: (int) ($this->meta['attempt'] ?? 1),

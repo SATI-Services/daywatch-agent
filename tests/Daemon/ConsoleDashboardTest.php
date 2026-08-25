@@ -6,8 +6,8 @@ use Daywatch\Agent\Daemon\AuthProbeResult;
 use Daywatch\Agent\Daemon\ConsoleDashboard;
 use Daywatch\Agent\Daemon\DaemonStats;
 use Daywatch\Agent\Daemon\RecentLog;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\FakeScheduler;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 
 /**
  * @param  array{0:int,1:int}  $memory

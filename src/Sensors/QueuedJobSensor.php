@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daywatch\Agent\Sensors;
 
 use Daywatch\Agent\Core;
+use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\QueuedJobRecord;
 use Throwable;
 
@@ -59,15 +60,7 @@ final class QueuedJobSensor
             $start = $this->queueingAt ?? $now;
 
             $record = new QueuedJobRecord(
-                timestamp: $start,
-                deploy: $core->deploy(),
-                server: $core->server(),
-                traceId: $core->traceId,
-                executionId: $core->executionId,
-                executionSource: $core->executionSource,
-                executionPreview: $core->executionPreview,
-                executionStage: $core->executionStage,
-                user: $core->resolveUser(),
+                envelope: Envelope::for($core, $start),
                 jobId: $this->jobId($event),
                 name: $this->name($event),
                 connection: $connection,

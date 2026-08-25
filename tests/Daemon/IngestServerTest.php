@@ -6,9 +6,9 @@ use Daywatch\Agent\Daemon\BatchBuffer;
 use Daywatch\Agent\Daemon\HttpResponse;
 use Daywatch\Agent\Daemon\IngestDispatcher;
 use Daywatch\Agent\Daemon\IngestServer;
-use Daywatch\Agent\Support\FrozenClock;
 use Daywatch\Agent\Tests\Support\FakeHttpSender;
 use Daywatch\Agent\Tests\Support\FakeScheduler;
+use Daywatch\Agent\Tests\Support\FrozenClock;
 
 /** @return array{0: IngestServer, 1: BatchBuffer} */
 function makeIngestServer(FakeHttpSender $sender, FrozenClock $clock, int $flushBytes = 6_000_000, int $flushInterval = 10): array

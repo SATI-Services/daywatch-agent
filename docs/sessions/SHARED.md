@@ -20,7 +20,7 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Shared blockers
 
-- none
+- **`tests.yml` Laravel 11 legs red (pre-existing, never green since 2026-07-06)** [from 2026-09-06]: `composer update` on the `^9.0` testbench leg fails because every `laravel/framework` 11.x release is now blocked by Packagist security advisories under composer's audit policy (`PKSA-m5cs-t1y6-qpcs` et al.). PHP 8.3/8.4 × Laravel 12/13 legs are green. Owner decision needed (host-compat contract): composer `policy.advisories` config, a testbench pin that resolves to unblocked 11.x, or dropping the Laravel 11 leg.
 
 ## Known transients (not bugs — do not chase)
 

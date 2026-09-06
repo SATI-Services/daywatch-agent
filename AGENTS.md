@@ -206,3 +206,26 @@ record payloads (field names are wire contract — see `daywatch-payloads`
 skill). Socket client tested against a stub TCP server; daemon batching/retry
 tested with ReactPHP's test utilities; a "hostile host" suite proves nothing
 throws when the daemon is down, the token is wrong, or payloads are oversized.
+
+## Operating manual (AID harness)
+
+This file stays the **engineering guide**. Process/workflow — shared-memory
+sessions, git tracks, board coordination, validation bar — lives in
+[`docs/WORKFLOW.md`](docs/WORKFLOW.md), the canonical operating manual
+(`AGENTS.md` remains the verbatim mirror of this file). At every session start,
+load shared state and log as you go:
+
+```bash
+cat docs/sessions/SHARED.md
+cat docs/sessions/status/*.md
+ls docs/sessions/notes/*.md 2>/dev/null
+gh pr list 2>/dev/null
+git status -sb
+ls -t docs/sessions/*/2*.md | grep -vE '/(archive|notes)/' | head -1   # latest log; read it
+bash .claude/hooks/kimi-install.sh   # Kimi Code: self-provision the per-operator hooks (idempotent, safe on other harnesses)
+```
+
+Session docs are filed under the person (`docs/sessions/status/ryan.md`,
+`docs/sessions/ryan/…`); agents stamp `**Agent:** <harness>` inside the files.
+Never `git add -A` — stage by name; never leave an un-pushed commit on local
+`main` (details in `docs/WORKFLOW.md`).

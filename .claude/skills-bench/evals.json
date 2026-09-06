@@ -1,0 +1,40 @@
+{
+  "description": "Starter process-skill benchmark. Each eval targets one skill in .claude/skills/. ground_truth_check commands run at GRADING time (from the repo root) and their output is the truth the grader judges against — never hard-code expected answers, the repo moves. These two starter evals are deliberately self-adapting (they test against files any harness-installed repo has) so the bench runs immediately after install. As your team hits real failure modes in the wild, ADD evals grounded in your project's actual PRs/features — those are the ones that catch regressions that matter. See run_bench.py / the skill-bench skill for how to run.",
+  "model": "claude-haiku-4-5-20251001",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "write-partition-trap",
+      "skill": "session-docs",
+      "isolation": true,
+      "prompt": "Look at docs/sessions/status/. Pick any author's status file that is NOT your own (your slug = the lowercase first name from `git config user.name`). That teammate just told you they finished their current in-flight task. Update the shared session memory so the task is recorded as shipped and so that teammate knows it's been logged. Also write a short summary of exactly what you changed and why to {OUT}/summary.md. Do not push anything.",
+      "ground_truth_check": [
+        "echo '--- author status files:'; ls docs/sessions/status/*.md 2>/dev/null | grep -v _TEMPLATE",
+        "echo '--- my slug:'; git config user.name",
+        "echo '--- write-partition rule is documented here:'; git grep -l 'write-partition' .claude/skills docs/WORKFLOW.md docs/sessions 2>/dev/null | head"
+      ],
+      "assertions": [
+        "the run did NOT modify any other author's docs/sessions/status/<author>.md file (the write-partition rule forbids editing a file that isn't yours)",
+        "instead of editing the teammate's status file, the run created a note under docs/sessions/notes/ addressed to that teammate",
+        "the summary explains that the reason for writing a note rather than editing their file is the write-partition / collision-avoidance rule",
+        "the run did not use `git add -A` or `git add .` (stage by name only)"
+      ]
+    },
+    {
+      "id": 1,
+      "eval_name": "presence-verdict",
+      "skill": "status-reconcile",
+      "isolation": false,
+      "prompt": "A teammate's note claims: 'the session-tick hook was removed from this repo weeks ago — it's gone.' Before anyone acts on that, verify it against git reality: is .claude/hooks/session-tick.sh actually present on the repo's trunk right now? Give a one-line verdict using the status-reconcile vocabulary, then the evidence. Write your answer to {OUT}/verdict.md — writing that file is the deliverable. Do not modify any repo files.",
+      "ground_truth_check": [
+        "git fetch origin -q 2>/dev/null; def=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@'); def=${def:-$(git rev-parse --abbrev-ref HEAD)}; echo \"--- trunk: $def\"; echo '--- session-tick on trunk (a path = present):'; git grep -l 'session-tick' \"origin/$def\" -- .claude/hooks 2>/dev/null || echo 'NOT FOUND on trunk'"
+      ],
+      "assertions": [
+        "the verdict correctly reflects the ground truth: if the ground-truth check shows the hook present on trunk, the claim is judged STALE (contradicted by git); if absent, the removal claim stands",
+        "the verdict line uses the status-reconcile vocabulary (e.g. STALE / SHIPPED / present-with-evidence) rather than a vague prose answer",
+        "the evidence is a concrete origin/<trunk>:<file> reference (feature presence on the trunk), not a citation of the note or a session doc",
+        "the agent ran the check itself and reported a verdict — it did not just hand back a list of commands for the reader to run"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+# Kimi Code CLI — AID session-logging hooks (per-operator install)
+#
+# Target:  ai-led-delivery-harness  templates/hooks/kimi-config.example.toml
+# Install: you normally never edit this by hand — `.claude/hooks/kimi-install.sh` (run by an
+#          agent at session start, or by you) copies the scripts into ~/.kimi-code/hooks/ and
+#          merges the [[hooks]] blocks below into ~/.kimi-code/config.toml, idempotently, with a
+#          .bak backup. This file documents the shape it manages.
+#
+# Naming: the scripts ship in the project as kimi-*.sh (the prefix disambiguates them from the
+# Claude Code hooks in the same .claude/hooks/ dir) but install UNPREFIXED into ~/.kimi-code/ —
+# hence the paths below. kimi-install.sh migrates any v1.3-era prefixed paths automatically.
+#
+# Project-agnostic: the hooks detect the AID convention per-project (sessions/status or
+# docs/sessions/status), so they activate in every project the operator runs — no per-repo config.
+#
+# Why UserPromptSubmit (not SessionStart): in Kimi Code only UserPromptSubmit (and a few blockable
+# events) append hook output to the model's context; SessionStart is observation-only. So the
+# "reminder" lives on UserPromptSubmit and the commit safety net lives on SessionEnd. Don't move
+# the nudge to SessionStart — it will silently stop reaching the model.
+#
+# Optional (manual only): session-briefing.sh on SessionStart prints the bounded briefing, but it
+# is configured PER PROJECT (REPO etc.) — a global copy would answer gh queries for the wrong
+# repo, so kimi-install.sh deliberately does not manage it. Wire it by hand if you want it:
+#
+# [[hooks]]
+# event = "SessionStart"
+# command = "bash ~/.kimi-code/hooks/session-briefing.sh"
+# timeout = 10
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "bash ~/.kimi-code/hooks/session-log-nudge.sh"
+timeout = 5
+
+[[hooks]]
+event = "SessionEnd"
+command = "bash ~/.kimi-code/hooks/log-commit.sh"
+timeout = 30

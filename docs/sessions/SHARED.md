@@ -20,7 +20,7 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Shared blockers
 
-- **`tests.yml` Laravel 11 legs red (pre-existing, never green since 2026-07-06)** [from 2026-09-06]: `composer update` on the `^9.0` testbench leg fails because every `laravel/framework` 11.x release is now blocked by Packagist security advisories under composer's audit policy (`PKSA-m5cs-t1y6-qpcs` et al.). PHP 8.3/8.4 × Laravel 12/13 legs are green. Owner decision needed (host-compat contract): composer `policy.advisories` config, a testbench pin that resolves to unblocked 11.x, or dropping the Laravel 11 leg.
+- none — resolved 2026-09-06 (kimi, board #157): Laravel 11 `tests.yml` legs dropped from the CI matrix (every `laravel/framework` 11.x is advisory-blocked on Packagist → fresh install untestable in principle); fix `33ab20f`, dispatch run `34064976005` green (8.3/8.4 × L12/13). Declared support unchanged: composer.json still advertises `illuminate/support ^11` (L11 consumers keep working from their own lockfiles) — support claim vs CI testability now diverges, see [notes/2026-09-06-kimi-to-ryan-ci-fixes.md](notes/2026-09-06-kimi-to-ryan-ci-fixes.md).
 
 ## Known transients (not bugs — do not chase)
 
@@ -32,11 +32,11 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Recently shipped (5 newest — full history in dated logs)
 
+- 2026-09-06 ci: dropped advisory-blocked Laravel 11 `tests.yml` matrix legs (12/13 kept; dispatch run `34064976005` green) `33ab20f` → [note](notes/2026-09-06-kimi-to-ryan-ci-fixes.md)
 - 2026-08-25 **`1.0.0` tagged** — M2 complete: 14 sensors, ReactPHP daemon + STATS surface, 300 tests green → [log](ryan/2026-08-25-backfill.md)
 - 2026-08-24 wip → [log](ryan/2026-08-24-backfill.md)
 - 2026-07-07 agent MVP → [log](ryan/2026-07-07-backfill.md)
 - 2026-07-06 ingest + streamline agent → [log](ryan/2026-07-06-backfill.md)
-- 2026-07-03 first commit → [log](ryan/2026-07-03-backfill.md)
 
 ---
 

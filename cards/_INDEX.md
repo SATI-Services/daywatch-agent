@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 45
+## Facts — 46
 
-Status: verified 45.
+Status: verified 46.
 
-Tags: api 1, architecture 4, auth 4, auto-wiring 2, batching 1, buffer 2, cardinal-rule 1, ci 1, cli 4, command 2, config 2, configuration 3, conflicts 1, console 4, constraints 4, context 1, cross-repo 1, daemon 17, dashboard 3, dependencies 6, dev-tooling 1, diagnostics 1, env 2, envelope 3, error-handling 2, events 1, facade 1, framing 1, host-compatibility 1, hostile-host 1, ingest 2, installation 2, laravel 3, legal 1, license 1, limits 1, logging 1, monitoring 2, observability 4, observation 1, octane 1, performance 1, php 1, pinning 1, propagation 1, protocol 8, queue 1, react 2, reactor 1, records 2, reentrance 1, reliability 1, requirements 1, resilience 4, resolution 1, runtime 1, safety 1, sampling 3, scope 1, secrets 1, sensors 3, sizing 1, socket 1, stability 1, startup 3, state-reset 1, stats 2, suite 2, telemetry 2, testing 4, truncation 1, tty 4, user 1, wire-contract 4, worker 1, zlib 1
+Tags: api 1, architecture 4, auth 4, auto-wiring 2, batching 1, buffer 2, cardinal-rule 1, ci 2, cli 4, command 2, config 2, configuration 3, conflicts 1, console 4, constraints 4, context 1, cross-repo 1, daemon 17, dashboard 3, dependencies 7, dev-tooling 2, diagnostics 1, env 2, envelope 3, error-handling 2, events 1, facade 1, framing 1, host-compatibility 1, hostile-host 1, ingest 2, installation 2, laravel 3, legal 1, license 1, limits 1, logging 1, monitoring 2, observability 4, observation 1, octane 1, performance 1, php 1, pinning 1, propagation 1, protocol 8, queue 1, react 2, reactor 1, records 2, reentrance 1, reliability 1, requirements 1, resilience 4, resolution 1, runtime 1, safety 1, sampling 3, scope 1, secrets 1, sensors 3, sizing 1, socket 1, stability 1, startup 3, state-reset 1, stats 2, suite 2, telemetry 2, testbench 1, testing 4, truncation 1, tty 4, user 1, wire-contract 4, worker 1, zlib 1
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -13,6 +13,7 @@ Tags: api 1, architecture 4, auth 4, auto-wiring 2, batching 1, buffer 2, cardin
 | [auth-probe-never-blocks-daemon-never-stops-it](facts/auth-probe-never-blocks-daemon-never-stops-it.md) | AuthProbe promise never rejects; check never blocks loop or stops daemon | `daemon` `auth` `startup` `resilience` | verified 2026-09-09 auto |
 | [auth-probe-posts-empty-batch-at-boot](facts/auth-probe-posts-empty-batch-at-boot.md) | AuthProbe POSTs empty batch {records:[]} at boot to verify token acceptance | `daemon` `auth` `startup` `protocol` | verified 2026-09-09 auto |
 | [auth-state-kept-off-stats-toarray-contract](facts/auth-state-kept-off-stats-toarray-contract.md) | Auth state kept off STATS toArray() — frozen wire contract | `daemon` `auth` `observability` `protocol` | verified 2026-09-09 auto |
+| [ci-matrix-swaps-testbench-constraint-per-laravel-line](facts/ci-matrix-swaps-testbench-constraint-per-laravel-line.md) | CI matrix swaps the testbench constraint per Laravel line before composer update | `ci` `dependencies` `dev-tooling` `testbench` | verified 2026-09-09 auto |
 | [composer-json-require-block-is-host-compat-contract](facts/composer-json-require-block-is-host-compat-contract.md) | Only illuminate/support ^11|^12|^13 and php ^8.2 stay permissive in require; never tighten them | `dependencies` `constraints` `stability` | verified 2026-09-09 auto |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daemon-console-refresh-and-console-lines-tune-dashboard](facts/daemon-console-refresh-and-console-lines-tune-dashboard.md) | DAYWATCH_DAEMON_CONSOLE_REFRESH and DAYWATCH_DAEMON_CONSOLE_LINES tune the TTY dashboard | `daemon` `tty` `console` `dashboard` `config` | verified 2026-09-09 auto |

@@ -55,10 +55,11 @@ Tags: api 1, architecture 4, auth 4, auto-wiring 2, batching 1, buffer 2, cardin
 | [worker-octane-state-resets-between-executions](facts/worker-octane-state-resets-between-executions.md) | Worker/Octane state resets between executions; worker-loop noise never sampled | `worker` `octane` `state-reset` `sampling` | verified 2026-09-09 auto |
 | [zlib-is-optional-suggest-not-require](facts/zlib-is-optional-suggest-not-require.md) | ext-zlib is a suggest, not a require; gzencode guarded by function_exists | `dependencies` `zlib` `resilience` | verified 2026-09-09 auto |
 
-## Todos — 1
+## Todos — 2
 
-Status: open 1.
+Status: open 2.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
 | [boost-guidelines-published-to-host-apps](todos/boost-guidelines-published-to-host-apps.md) | Add and ship Boost guidelines to resources/boost/guidelines/core.blade.php | unassigned | 2026-09-09 | `laravel` `boost` `documentation` `installation` | open |
+| [daemon-signal-handling-implementation](todos/daemon-signal-handling-implementation.md) | Implement graceful shutdown on SIGINT/SIGTERM with in-flight batch completion | unassigned | 2026-09-09 | `daemon` `operations` `resilience` | open |

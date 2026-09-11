@@ -174,7 +174,7 @@ Reads anywhere; writes only against a local stub ingest or a throwaway Daywatch 
 - Disposable surface: lighter bar, the daily E2E is the net.
 - *"Tested against what?"* (env, real vs fixtures, suite green) goes in the log.
 - Run a minimal filter as you go; full suite before risky merges. Lint/format gate before finalising.
-- **Daily E2E** = the scheduled `tests.yml` matrix (PHP 8.3/8.4 × Laravel 11/12/13, cron `17 6 * * *`): on failure, surface in the briefing and ask before triaging.
+- **Daily E2E** = the scheduled `tests.yml` matrix (PHP 8.3/8.4 × Laravel 11/12/13, cron `17 6 * * *`): on failure, surface it in the briefing and triage it as first responder — a human reviews after the fact.
 - **Every red E2E run has a named owner, claimed the same day.** A regression-catcher nobody reads is *worse* than none — it manufactures false confidence, and the channel gets muted within the hour. Rule: the most-recent red run is claimed in-channel (in `SHARED.md` or the alerts channel) by end of day, or the alert is worthless. Send E2E failures to a **dedicated alerts channel**, not a busy work channel, so they're not drowned and muted. A repeatedly-firing failure with no owner is a process defect to fix, not noise to tune out.
 - **Metrics as regression tests.** None wired yet — candidate: the daemon's own STATS counters (records sent / send failures / retries) exercised on the same schedule (hourly where the metric earns it). A regression caused by a change gets an auto-remediation agent as first responder, and a failed auto-fix still leaves a red run with a named same-day owner.
 - **Synthetic QA.** The "hostile host" suite already plays the synthetic adversarial host (dead daemon, wrong token, oversized payloads); nothing beyond it is stood up yet.

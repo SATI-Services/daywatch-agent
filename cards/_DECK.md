@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `fd9044818` — 2026-09-10
+**As of:** `cdd56d1aa` — 2026-09-10
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-09-10 @ `cdd56d1aa` (run #842):** `AGENTS.md` — anthropic-fable / claude-fable-5-1, round 3 → 1 card(s)
 - **2026-09-10 @ `fd9044818` (run #817):** `AGENTS.md` — moonshot / kimi-k3, round 3 → 2 card(s)
 - **2026-09-10 @ `c8cd1c517` (run #779):** `AGENTS.md` — openrouter / openai/gpt-5-mini, round 2 → 6 card(s)
 - **2026-09-10 @ `80c896873` (run #724):** `AGENTS.md`, `config/daywatch.php`, `.github/workflows/tests.yml` — anthropic-haiku / claude-haiku-4-5-20251001 → 12 card(s)

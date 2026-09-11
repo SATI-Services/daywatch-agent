@@ -18,6 +18,8 @@ source — re-copy to `AGENTS.md` after edits). The package-local
 `.claude/agents/agent-package-engineer.md` and
 `.claude/skills/daywatch-payloads/` are canonical in this repo.
 
+**Before any work, read [`.claude/harness/instructions/INSTRUCTIONS.md`](.claude/harness/instructions/INSTRUCTIONS.md) — the composed Org + AID + Project ruleset.**
+
 ## Companion components (linked, but this package runs alone)
 
 - The daemon POSTs to **either** ingest implementation — the central Laravel

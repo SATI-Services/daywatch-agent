@@ -66,6 +66,13 @@ Both are first-class; pick by size and risk.
 
 Topic branch → push → `gh pr create`. Merge triggers deploy. The PR description is the review summary. Use for 5+ commits, schema migrations, structural refactors, and **anything touching the critical core**.
 
+
+> **Track policy (operator standard — this project's rule).** *Small, reversible* → **Track A1**:
+> commit straight to `main` and push. *Big or structural* (5+ commits, schema migrations, refactors,
+> anything touching the critical core) → **Track B**: branch + PR that **auto-merges to `main`** once
+> CI is green (`gh pr merge --auto --squash`) — a PR is never a gate that waits on a human. *Parallel
+> sessions* → **Track A2**: worktree-per-task. Two absolutes are wrong here and must not be written
+> down: "never commit to `main`" and "everything via PR". Friction is a defect.
 ### Rules for both
 
 - Never `git add -A`; stage by name.

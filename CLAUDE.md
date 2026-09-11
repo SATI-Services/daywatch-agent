@@ -228,4 +228,7 @@ bash .claude/hooks/kimi-install.sh   # Kimi Code: self-provision the per-operato
 Session docs are filed under the person (`docs/sessions/status/ryan.md`,
 `docs/sessions/ryan/…`); agents stamp `**Agent:** <harness>` inside the files.
 Never `git add -A` — stage by name; never leave an un-pushed commit on local
-`main` (details in `docs/WORKFLOW.md`).
+`main` (details in `docs/WORKFLOW.md`). **Committing and pushing is the
+operator's standing, explicit authorisation — do it without asking, and never
+end a turn offering to commit or asking permission.** Only force-push /
+amending already-pushed history / `reset --hard` need a check first.

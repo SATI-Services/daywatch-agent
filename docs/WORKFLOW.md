@@ -70,7 +70,7 @@ Topic branch → push → `gh pr create`. Merge triggers deploy. The PR descript
 
 - Never `git add -A`; stage by name.
 - Session docs always go to `main` directly, even when code is on a branch.
-- Ask before force-push / amend-pushed / `reset --hard` / reverting something on prod.
+- **Never ask before a normal commit + push** — committing/pushing is the operator's standing, pre-authorised policy on every track (A1/A2): do it without asking, and never end a turn offering to. **The only git operations that need a check are force-push / amending pushed commits / `reset --hard` / reverting something on prod.**
 - Nothing auto-deploys — there is no deploy; `tests.yml` runs on every push, docs-only included (cheap, keeps the check honest).
 - Keep a Track B branch fresh by *merging* `main` in, never rebasing a pushed branch (rebase forces `--force`, destructive across machines).
 - **Never `git merge -X theirs` / `-X ours` onto the trunk.** It auto-resolves every conflict silently in one side's favour — the fast way to *delete a teammate's just-pushed work with no conflict marker to warn you*. Resolve conflicts by reading both sides. (This is a real incident class: routes and features lost to a last-writer-wins merge.)

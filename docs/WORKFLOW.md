@@ -69,10 +69,10 @@ Topic branch → push → `gh pr create`. Merge triggers deploy. The PR descript
 
 > **Track policy (operator standard — this project's rule).** *Small, reversible* → **Track A1**:
 > commit straight to `main` and push. *Big or structural* (5+ commits, schema migrations, refactors,
-> anything touching the critical core) → **Track B**: branch + PR that **auto-merges to `main`** once
-> CI is green (`gh pr merge --auto --squash`) — a PR is never a gate that waits on a human. *Parallel
-> sessions* → **Track A2**: worktree-per-task. Two absolutes are wrong here and must not be written
-> down: "never commit to `main`" and "everything via PR". Friction is a defect.
+> anything touching the critical core) → **Track B**: branch + PR, then **merge your own PR** with
+> `gh pr merge --squash` — no permission, and nothing waits on a human; the PR is the documentation left
+> in the repo. *Parallel sessions* → **Track A2**: worktree-per-task. **Do not use GitHub's auto-merge** —
+> the agent merges. Two absolutes are wrong here: "never commit to `main`" and "everything via PR".
 ### Rules for both
 
 - Never `git add -A`; stage by name.

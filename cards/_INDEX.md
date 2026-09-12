@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 9
+## Facts — 11
 
-Status: verified 9.
+Status: verified 11.
 
-Tags: auto-wiring 2, boost 1, ci 1, cli 1, configuration 3, daemon 1, docs 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, sampling 1, secrets 1, telemetry 1, unresolved 1
+Tags: auto-wiring 2, boost 1, ci 1, cli 1, configuration 3, daemon 1, dependencies 1, design 1, docs 2, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, package 1, sampling 1, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 1
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -16,7 +16,9 @@ Tags: auto-wiring 2, boost 1, ci 1, cli 1, configuration 3, daemon 1, docs 1, en
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [package-discovery-auto-registers-service-provider](facts/package-discovery-auto-registers-service-provider.md) | Service provider auto-registers via Laravel package discovery | `laravel` `auto-wiring` `installation` | verified 2026-09-09 auto |
+| [package-stays-headless-no-ui-dependencies](facts/package-stays-headless-no-ui-dependencies.md) | Package has no rendered surface (no UI, no checked-in headless driver) | `package` `dependencies` `design` | verified 2026-09-12 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
+| [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
 ## Todos — 3
 

@@ -228,7 +228,13 @@ bash .claude/hooks/kimi-install.sh   # Kimi Code: self-provision the per-operato
 ```
 
 Session docs are filed under the person (`docs/sessions/status/ryan.md`,
-`docs/sessions/ryan/…`); agents stamp `**Agent:** <harness>` inside the files.
+`docs/sessions/ryan/…`); agents stamp `**Agent:** <harness> (<model>)` inside the
+files. **Never leave the model implied by the harness:** the `**Agent:**` stamp
+names the harness *and its model* — `**Agent:** <harness> (<model>)`, e.g.
+`kimi (deepseek/deepseek-v4.1-flash)` or `claude (claude-fable-5-1)` — because
+one harness runs several models, and which one drove a session changes how its
+work should be read. The Kimi nudge hook reports this session's model; write
+`(unreported)` if a harness reports none.
 Never `git add -A` — stage by name; never leave an un-pushed commit on local
 `main` (details in `docs/WORKFLOW.md`). **Committing and pushing is the
 operator's standing, explicit authorisation — do it without asking, and never

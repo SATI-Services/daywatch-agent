@@ -1,13 +1,14 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 7
+## Facts — 8
 
-Status: verified 7.
+Status: verified 8.
 
-Tags: auto-wiring 2, cli 1, configuration 3, daemon 1, env 2, installation 2, laravel 3, legal 1, license 1, observation 1, sampling 1, secrets 1, telemetry 1
+Tags: auto-wiring 2, ci 1, cli 1, configuration 3, daemon 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, sampling 1, secrets 1, telemetry 1, unresolved 1
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
+| [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |
 | [head-sampling-rates-configurable-errors-escape](facts/head-sampling-rates-configurable-errors-escape.md) | Head-sampling rates configurable (default 1.0); errors escape sampled-out traces | `configuration` `sampling` `telemetry` | verified 2026-09-09 auto |

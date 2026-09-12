@@ -1,14 +1,13 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 9
+## Facts — 8
 
-Status: verified 9.
+Status: verified 8.
 
-Tags: auto-wiring 2, boost 1, ci 1, cli 1, configuration 3, daemon 1, docs 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, sampling 1, secrets 1, telemetry 1, unresolved 1
+Tags: auto-wiring 2, ci 1, cli 1, configuration 3, daemon 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, sampling 1, secrets 1, telemetry 1, unresolved 1
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
-| [boost-guidelines-core-blade-published](facts/boost-guidelines-core-blade-published.md) | AGENTS.md requires Boost core.blade.php to cover config publish, env vars, daemon, facade API | `boost` `docs` | verified 2026-09-11 auto |
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |

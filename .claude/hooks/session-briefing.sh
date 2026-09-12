@@ -94,6 +94,27 @@ if is_set "$REPO"; then
 fi
 
 echo
+# ---- verified card index (compact project memory) -------------------------
+# The board's cut+mark loop commits a repo's verified facts + open todos into
+# <repo>/cards/ (facts/, todos/, _INDEX.md). Real indexes run 50-140 KB, so
+# this surfaces the COUNTS and a few verified titles and points at the file --
+# it never dumps the index. Two layouts: cards/_INDEX.md, and cards/*/_INDEX.md.
+echo
+echo '=== Verified cards (compact project memory; read the file on demand) ==='
+cards_found=0
+for idx in "$PROJECT_DIR"/cards/_INDEX.md "$PROJECT_DIR"/cards/*/_INDEX.md; do
+  [ -f "$idx" ] || continue
+  cards_found=$((cards_found + 1))
+  rel="${idx#"$PROJECT_DIR"/}"
+  counts=$(grep -m1 -E '^## Facts' "$idx" 2>/dev/null | sed -E 's/^## Facts[^0-9]*//')
+  ver=$(grep -m1 -E '^Status:' "$idx" 2>/dev/null | grep -oE 'verified [0-9]+' | head -1)
+  echo "- $rel -- ${counts:-?} facts, ${ver:-0 verified}:"
+  grep -E '^\| \[[^]]+\]\(facts/.*\| verified ' "$idx" 2>/dev/null | head -3 \
+    | awk -F'|' '{ t=$3; gsub(/^[[:space:]]+|[[:space:]]+$/, "", t); print "    - " substr(t, 1, 100) }'
+done
+if [ "$cards_found" -eq 0 ]; then
+  echo '(no cards/ deck in this checkout -- nothing has been cut for this repo yet)'
+fi
 echo '=== Pointers (read on demand) ==='
 echo "- Operating manual: docs/WORKFLOW.md"
 echo "- Full shared state: docs/sessions/SHARED.md   Per-author WIP: docs/sessions/status/*.md"

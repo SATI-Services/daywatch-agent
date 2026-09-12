@@ -1,4 +1,4 @@
-<!-- BEGIN GENERATED: aid-instr (kind=doc · aid v1.7 · org fp 97c0722e · aid fp 27417667 · region fp f1dbfc9d) — generated — do not edit; run `aid-instr compose --write` -->
+<!-- BEGIN GENERATED: aid-instr (kind=doc · aid v1.7 · org fp 30b10934 · aid fp 8af03579 · region fp f50e2635) — generated — do not edit; run `aid-instr compose --write` -->
 # Agent instructions — composed from the Org, AID and Project levels
 
 **Generated — do not edit inside the markers.** Edit the level file and re-run:
@@ -23,8 +23,13 @@ A rule's `strength` decides how the levels combine: **locked** rules resolve to 
 
 Session docs, status files and dated logs are filed under the **operator's** identity
 (`status/<person>.md`, `<person>/<date>.md`), whichever AI harness drove the work. The harness
-name is a stamp *inside* the file (`**Agent:** ...`), never the directory name. Never edit
-another agent's or another person's section.
+name is a stamp *inside* the file (`**Agent:** ...`), never the directory name. That stamp names
+the harness **and the model** — `**Agent:** <harness> (<model>)`, e.g.
+`kimi (deepseek/deepseek-v4.1-flash)` — because one harness runs several models and which model
+drove a session changes how its work should be read; never leave the model implied by the
+harness. A session that **switches model mid-flight** stamps the whole sequence
+(`**Agent:** kimi (a → b)`) and says which part of the work each model did — never one model name
+for a mixed session. Never edit another agent's or another person's section.
 
 ### `hygiene.no-secrets-anywhere`  _(org level)_
 
@@ -179,6 +184,18 @@ The trunk branch is `main`.
 Every change ships with a test. Run the project's test command before claiming a change is
 done, and quote the actual output. (A project replaces this fragment with its own commands;
 the seeded value is "not documented yet — find out before you claim it passes".)
+
+### `state.read-cards-before-history`  _(aid level)_
+
+**Read a repo's verified cards as a second lookup**
+
+Where a checkout carries `cards/` — a project's deck(s) plus `_INDEX.md` — skim its verified
+facts before re-deriving knowledge from code or from the long-form session history. Cards hold the
+durable facts (config values, scopes, conventions, gotchas); they are a SECOND lookup, not a
+replacement — the briefing and dated logs stay first for narrative and incident questions (measured
+2026-09-12, docs/design/cards-vs-sessions.md). Respect each card's status: `verified … auto` is
+machine-graded against only the sources it cites, `verified … <initials>` was read by a person, and
+a `draft` is not established.
 
 ### `deploy.target`  _(aid level)_
 

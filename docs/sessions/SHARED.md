@@ -32,6 +32,7 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Recently shipped (5 newest — full history in dated logs)
 
+- 2026-09-13 test(safety): forced `force="true"` DB/APP_ENV pins + forced empty `DB_URL` in `phpunit.xml` so a leaked `DB_*` env can't redirect the suite (board DB incident ref) → [log](will/2026-09-13-db-env-force-pins.md)
 - 2026-09-06 ci: dropped advisory-blocked Laravel 11 `tests.yml` matrix legs (12/13 kept; dispatch run `34064976005` green) `33ab20f` → [note](notes/2026-09-06-kimi-to-ryan-ci-fixes.md)
 - 2026-08-25 **`1.0.0` tagged** — M2 complete: 14 sensors, ReactPHP daemon + STATS surface, 300 tests green → [log](ryan/2026-08-25-backfill.md)
 - 2026-08-24 wip → [log](ryan/2026-08-24-backfill.md)

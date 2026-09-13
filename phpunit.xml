@@ -16,8 +16,17 @@
         </include>
     </source>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="DB_CONNECTION" value="testing"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- force="true" is load-bearing: an unforced <env> pin is only a DEFAULT
+             (PHPUnit's PhpHandler sets it only when getenv() === false), so a
+             DB_* value leaked into the process environment would silently win
+             and point RefreshDatabase/migrations at a real database — the board
+             DB incident of 2026-09-13 dropped a production database exactly this
+             way. Forcing pins the suite to in-memory sqlite no matter what the
+             shell exports. The forced empty DB_URL neutralises an inherited
+             DB_URL/DATABASE_URL, which Laravel prefers over connection config. -->
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="DB_CONNECTION" value="testing" force="true"/>
+        <env name="DB_DATABASE" value=":memory:" force="true"/>
+        <env name="DB_URL" value="" force="true"/>
     </php>
 </phpunit>

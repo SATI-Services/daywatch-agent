@@ -18,6 +18,7 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -29,6 +30,13 @@ use Throwable;
  * `ttl` (seconds) is only populated on writes. Every property read is guarded
  * because event shapes vary across Laravel 11/12/13, and every path is
  * try/caught: telemetry loss is fine, throwing into the host app is not.
+ *
+ * Two filters (config `daywatch.filtering`, applied before anything is buffered
+ * so ignored keys cost nothing downstream): `ignore_cache_events` drops the whole
+ * stream, and `ignore_cache_keys` drops keys matching a `Str::is()` pattern —
+ * defaulting to `*illuminate:*`, the framework's own internal keys
+ * (`illuminate:queue:restart` and friends), which are high-volume and not
+ * actionable from an application's point of view.
  */
 final class CacheEventSensor
 {
@@ -38,7 +46,35 @@ final class CacheEventSensor
     /** @var array<string, float> store|key → start microtime */
     private array $started = [];
 
-    public function __construct(private Core $core) {}
+    /** @var list<string> Plain `*substring*` patterns, reduced to a str_contains needle. */
+    private array $needles = [];
+
+    /** @var list<string> Patterns with real glob structure, matched with Str::is(). */
+    private array $globs = [];
+
+    /**
+     * @param  list<string>  $ignoreKeys  `Str::is()` patterns; a matching key is never recorded
+     */
+    public function __construct(
+        private Core $core,
+        array $ignoreKeys = [],
+        private bool $ignoreAll = false,
+    ) {
+        // Split the patterns ONCE, at construction. This filter runs on every cache
+        // event in the host process — on a busy app that is a genuinely hot path, and
+        // Str::is() compiles a fresh regex per call. The overwhelmingly common shape
+        // (`*illuminate:*`, the default) is a plain substring test, so precompute it
+        // into a str_contains needle and keep Str::is() for the rest.
+        foreach ($ignoreKeys as $pattern) {
+            if (preg_match('/^\*([^*?\[\]]+)\*$/', $pattern, $m) === 1) {
+                $this->needles[] = $m[1];
+
+                continue;
+            }
+
+            $this->globs[] = $pattern;
+        }
+    }
 
     /**
      * Entry point the SensorManager wires to every Illuminate cache event.
@@ -46,6 +82,10 @@ final class CacheEventSensor
     public function handle(object $event): void
     {
         try {
+            if ($this->ignoreAll) {
+                return;
+            }
+
             if ($this->isStartEvent($event)) {
                 $this->recordStart($event);
 
@@ -54,7 +94,7 @@ final class CacheEventSensor
 
             $type = $this->typeFor($event);
 
-            if ($type === null) {
+            if ($type === null || $this->ignored($this->key($event))) {
                 return;
             }
 
@@ -87,13 +127,35 @@ final class CacheEventSensor
 
         if ($keys !== null) {
             foreach ($keys as $key) {
+                if ($this->ignored((string) $key)) {
+                    continue;
+                }
+
                 $this->started[$this->pendingKey($store, (string) $key)] = $now;
             }
 
             return;
         }
 
-        $this->started[$this->pendingKey($store, $this->key($event))] = $now;
+        $key = $this->key($event);
+
+        if ($this->ignored($key)) {
+            return;
+        }
+
+        $this->started[$this->pendingKey($store, $key)] = $now;
+    }
+
+    /** Does this cache key match one of the ignore patterns? */
+    private function ignored(string $key): bool
+    {
+        foreach ($this->needles as $needle) {
+            if (str_contains($key, $needle)) {
+                return true;
+            }
+        }
+
+        return $this->globs !== [] && Str::is($this->globs, $key);
     }
 
     private function emit(object $event, string $type): void

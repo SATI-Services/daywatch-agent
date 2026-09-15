@@ -24,6 +24,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\Connector;
 use React\Socket\TcpServer;
+use Symfony\Component\Console\Terminal;
 use Throwable;
 
 /**
@@ -145,6 +146,9 @@ class AgentCommand extends Command
                     fn (string $s) => $this->output->write($s, false),
                     $listen,
                     $refresh,
+                    // Clamp each line to the terminal so nothing soft-wraps: the repaint
+                    // rewinds by line count, and a wrapped line would desync it.
+                    width: static fn (): int => (new Terminal)->getWidth(),
                 ))->start();
             } else {
                 // Periodic operator stats line on stdout (0 disables). Fully guarded —

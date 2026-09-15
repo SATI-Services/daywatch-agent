@@ -30,20 +30,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filtering + redaction (RESERVED — M4)
+    | Filtering + redaction (partly RESERVED — M4)
     |--------------------------------------------------------------------------
     |
     | Declared here because they are part of the shared option table
     | (agent-protocol.md §7) and the privacy boundary is deliberately in-app, before
-    | buffering. NOT YET READ by the collector: setting them today changes
-    | nothing. They are listed so the wire contract and this file stay in step —
-    | do not treat them as working switches until the sensors consult them.
+    | buffering.
+    |
+    | LIVE: `ignore_cache_events` and `ignore_cache_keys` (CacheEventSensor).
+    | NOT YET READ by the collector: `ignore_queries`, `ignore_outgoing_requests`
+    | and `log_level` — setting those today changes nothing. They are listed so the
+    | wire contract and this file stay in step; do not treat them as working
+    | switches until the sensors consult them.
     |
     */
 
     'filtering' => [
         'ignore_queries' => env('DAYWATCH_IGNORE_QUERIES', false),
         'ignore_cache_events' => env('DAYWATCH_IGNORE_CACHE_EVENTS', false),
+
+        /*
+         * Cache keys never recorded, as `Str::is()` patterns (`*` wildcard).
+         * The default drops Laravel's own internal keys — `illuminate:queue:restart`
+         * is polled by every queue worker on every loop, and nothing an application
+         * can act on lives under that namespace. Set DAYWATCH_IGNORE_CACHE_KEYS to a
+         * comma-separated pattern list to override, or to an empty string to record
+         * every key.
+         */
+        'ignore_cache_keys' => env('DAYWATCH_IGNORE_CACHE_KEYS', '*illuminate:*'),
+
         'ignore_outgoing_requests' => env('DAYWATCH_IGNORE_OUTGOING_REQUESTS', false),
         'log_level' => env('DAYWATCH_LOG_LEVEL', 'debug'),
     ],

@@ -146,3 +146,48 @@ it('renders the startup auth check, pending until it settles', function () {
 
     expect($frames[1])->toContain('auth       ok · token accepted · project 3 · production');
 });
+
+it('clamps every line to the terminal width so nothing soft-wraps the repaint', function () {
+    $clock = new FrozenClock(1000.0);
+    $stats = new DaemonStats('https://daywatch.example.com', $clock);
+    $recent = new RecentLog(10);
+    $frames = new ArrayObject;
+
+    $stats->authProbed(AuthProbeResult::UNREACHABLE,
+        'unreachable · Connection to tcp://localhost:8000 failed: Last error for IPv4: Connection to tcp://127.0.0.1:8000 failed: '
+        .'Connection refused (ECONNREFUSED). Previous error for IPv6: Connection to tcp://[::1]:8000 failed: '
+        .'Connection refused (ECONNREFUSED)'
+    );
+    $recent->push(str_repeat('x', 200));
+
+    $dashboard = new ConsoleDashboard(
+        $stats,
+        $recent,
+        $clock,
+        new FakeScheduler,
+        static fn (string $s) => $frames->append($s),
+        '127.0.0.1:2408',
+        3,
+        static fn (): array => [1024, 2048],
+        static fn (): int => 60,
+    );
+
+    $dashboard->start();
+
+    $body = preg_replace('/\e\[[0-9]*[A-Za-z]/', '', (string) $frames[0]);
+
+    foreach (explode("\n", rtrim((string) $body, "\n")) as $line) {
+        expect(mb_strlen($line))->toBeLessThanOrEqual(60);
+    }
+
+    expect($body)->toContain('…');
+});
+
+it('leaves lines untouched when the terminal width is unknown', function () {
+    [$dashboard, $frames, , $stats] = makeDashboard();
+
+    $stats->authProbed(AuthProbeResult::UNREACHABLE, str_repeat('e', 300));
+    $dashboard->start();
+
+    expect((string) $frames[0])->toContain(str_repeat('e', 300));
+});

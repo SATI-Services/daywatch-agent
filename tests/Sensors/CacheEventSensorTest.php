@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Buffer\RecordsBuffer;
+use Daywatch\Agent\Core;
 use Daywatch\Agent\Sensors\CacheEventSensor;
 use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Tests\Support\RecordingClient;
@@ -91,4 +93,66 @@ it('increments the cache_events counter', function () {
     (new CacheEventSensor($core))->handle(new CacheHit('redis', 'users:5', 'value'));
 
     expect($core->counters()['cache_events'])->toBe(1);
+});
+
+it('ignores cache keys matching the ignore patterns', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, ['*illuminate:*']);
+
+    $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'value'));
+    $sensor->handle(new CacheMissed('redis', 'laravel_cache_illuminate:cooldown:x'));
+    $sensor->handle(new CacheHit('redis', 'users:1', 'value'));
+
+    expect($buffer->all())->toHaveCount(1)
+        ->and($buffer->all()[0]['key'])->toBe('users:1');
+});
+
+it('does not hold pending start events for ignored keys', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, ['*illuminate:*']);
+
+    $sensor->handle(new RetrievingKey('redis', 'illuminate:queue:restart'));
+    $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'value'));
+
+    expect($buffer->all())->toBeEmpty();
+});
+
+it('records every key when no ignore patterns are configured', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    (new CacheEventSensor($core, []))->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v'));
+
+    expect($buffer->all())->toHaveCount(1);
+});
+
+it('drops the whole cache stream when ignore_cache_events is on', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, [], ignoreAll: true);
+
+    $sensor->handle(new RetrievingKey('redis', 'users:1'));
+    $sensor->handle(new CacheHit('redis', 'users:1', 'value'));
+
+    expect($buffer->all())->toBeEmpty();
+});
+
+it('ignores framework keys by default through the container binding', function () {
+    config()->set('daywatch.filtering.ignore_cache_keys', '*illuminate:*');
+
+    $sensor = app(CacheEventSensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v'));
+    $sensor->handle(new CacheHit('redis', 'users:1', 'v'));
+
+    $records = app(RecordsBuffer::class)->all();
+
+    expect(array_column($records, 'key'))->toBe(['users:1']);
 });

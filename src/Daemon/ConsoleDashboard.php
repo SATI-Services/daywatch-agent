@@ -28,6 +28,9 @@ final class ConsoleDashboard
     /** @var callable(): array{0: int, 1: int} */
     private $memory;
 
+    /** @var callable(): int */
+    private $width;
+
     private readonly float $startedAt;
 
     /** Newlines painted last frame — how far up to move the cursor to overwrite. */
@@ -36,6 +39,7 @@ final class ConsoleDashboard
     /**
      * @param  callable(string): void  $writer  raw stdout writer (no trailing newline added)
      * @param  (callable(): array{0: int, 1: int})|null  $memory  [current, peak] bytes; defaults to the real process
+     * @param  (callable(): int)|null  $width  terminal columns, re-read each frame so a resize is picked up; <= 0 disables clamping
      */
     public function __construct(
         private readonly DaemonStats $stats,
@@ -46,10 +50,12 @@ final class ConsoleDashboard
         private readonly string $listen,
         private readonly int $refreshSeconds = 3,
         ?callable $memory = null,
+        ?callable $width = null,
     ) {
         $this->writer = $writer;
         $this->startedAt = $clock->microtime();
         $this->memory = $memory ?? static fn (): array => [memory_get_usage(true), memory_get_peak_usage(true)];
+        $this->width = $width ?? static fn (): int => 0;
     }
 
     /** Draw the first frame immediately, then arm the periodic repaint. No-op if disabled. */
@@ -142,7 +148,42 @@ final class ConsoleDashboard
             }
         }
 
-        return implode("\n", $lines)."\n";
+        return implode("\n", $this->clamp($lines))."\n";
+    }
+
+    /**
+     * Cut every line to the terminal width.
+     *
+     * {@see paint()} moves the cursor up by the NEWLINE count of the last frame, so
+     * any line the terminal soft-wraps costs an extra physical row the repaint never
+     * rewinds over — the panel then walks down the screen, overwriting itself (a long
+     * auth error, e.g. a multi-address ECONNREFUSED, is more than enough to trigger it).
+     * Truncating keeps one logical line on one physical row, which is what makes the
+     * newline count a correct cursor offset.
+     *
+     * @param  list<string>  $lines
+     * @return list<string>
+     */
+    private function clamp(array $lines): array
+    {
+        $width = 0;
+
+        try {
+            $width = ($this->width)();
+        } catch (Throwable) {
+        }
+
+        if ($width <= 0) {
+            return $lines;
+        }
+
+        return array_map(static function (string $line) use ($width): string {
+            if (mb_strlen($line) <= $width) {
+                return $line;
+            }
+
+            return mb_substr($line, 0, max(1, $width - 1)).'…';
+        }, $lines);
     }
 
     private function flushAge(?float $lastFlushAt): string

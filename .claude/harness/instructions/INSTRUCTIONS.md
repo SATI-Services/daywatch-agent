@@ -1,4 +1,4 @@
-<!-- BEGIN GENERATED: aid-instr (kind=doc · aid v1.7 · org fp 30b10934 · aid fp 8af03579 · region fp f50e2635) — generated — do not edit; run `aid-instr compose --write` -->
+<!-- BEGIN GENERATED: aid-instr (kind=doc · aid v1.12 · org fp 6d30b5df · aid fp 2c76a34b · region fp ec98f74b) — generated — do not edit; run `aid-instr compose --write` -->
 # Agent instructions — composed from the Org, AID and Project levels
 
 **Generated — do not edit inside the markers.** Edit the level file and re-run:
@@ -47,6 +47,23 @@ Reversible, observable, limited-blast-radius work ships without asking. Destruct
 irreversible work does not: force-push, `reset --hard`, deleting data, rewriting a published
 branch, or editing a release artefact (CHANGELOG/VERSION) — ask first, in-channel, and name the
 blast radius and the rollback.
+
+### `blast-radius.label-is-not-a-boundary`  _(org level)_
+
+**An environment label is not a safety boundary**
+
+A label (`--env=testing`, `APP_ENV=local`, "just a scratch copy") changes what a program
+BELIEVES it is, never what it CONNECTS to. A copy of a project that carries the production
+credentials or `.env` is pointed at production whatever the label says, and several frameworks
+only suppress their own destructive-command prompts when that label is set — so the label
+removes the guard rather than adding one. Before any operation that drops, migrates or
+overwrites data, resolve the actual target (driver, host, database) and treat a production
+target as a production action no matter what environment the process reports.
+**Prefer a mechanism that refuses to a prompt that asks.** An ask-first rule assumes a human is
+present; in an unattended, dispatched or auto-approved session there is nobody to answer, so
+the prompt silently degrades to consent. Where an irreversible action has a deterministic
+refusal available, build the refusal — and make the escape hatch an explicit, named setting
+rather than an environment label anyone can set by accident.
 
 ### `org.kpi.blind-spots-stated`  _(org level)_
 
@@ -100,7 +117,11 @@ check `git fetch` + feature presence + the PR, not a doc that says so.
 
 Every project MUST name its critical core (its irreversible or high-blast-radius paths).
 Those paths get human-designed change, the deepest tests, and after-the-fact human review. A
-project may name them; it may not declare that nothing qualifies.
+project may name them; it may not declare that nothing qualifies. The list is not complete until
+it names **the data itself** — the production database and how it is reached (the credentials,
+the connection config, and any copy of the project that carries them). A critical core written
+only as source paths protects the code and leaves the data, which is the part that cannot be
+restored from git, undefended.
 
 ### `aid.templates-generic`  _(aid level)_
 
@@ -121,9 +142,10 @@ branch fresh by merging the trunk in.
 
 **Load shared state at the start, log as you go**
 
-Every session starts by loading the shared state (the shared file, the status files, the
-latest log) and ends by committing your own dated log and status update. Work that is not
-logged is invisible to teammates and causes collisions.
+Start with the bounded AID Sessions briefing for the current work. Use its source references
+to retrieve relevant sections; never bulk-load shared state, every status file or whole logs.
+When the reader is unavailable, use targeted headings and explicit coverage warnings. End by
+committing your own concise dated log and status update. Work that is not logged is invisible.
 
 ### `invariant.commit-preauthorised`  _(aid level)_
 
@@ -210,6 +232,37 @@ fragment; the seeded value is "not documented yet — find out before you ship".
 
 Default shipping track is A2 (a worktree per task, fast-forward to the trunk). A1
 (direct-on-trunk) only when the trunk is quiet and you push within seconds.
+
+### `trust.guard-not-prompt`  _(aid level)_
+
+**A destructive path is closed by a guard, not a prompt**
+
+Where a project has an action that drops or overwrites production data, the deliverable is a
+mechanism that refuses by default plus an explicit named escape hatch — not a documented
+instruction to be careful. Instructions are the right layer for what to do; they are the wrong
+layer for what must never happen, because the failure they guard is the one where nobody reads
+them. Wire the refusal where the action is dispatched, assert it in a test that fails when the
+guard is removed, and record the escape hatch's name so an operator can still act deliberately.
+
+### `sessions.protocol`  _(aid level)_
+
+**Work and messages inside the existing agent conversation**
+
+Keep the user's normal conversation unchanged. The AID Sessions packet supplies the native
+session ID, current work, constraints, messages and source references. Use sessions_context and
+sessions_search for bounded retrieval, and sessions_read to verify a source hash before reuse.
+Record explicit objectives, scope, findings and pending actions with sessions_progress; preserve
+existing constraints and supply the current revision for updates. Completion requires evidence;
+a finished turn or tool call is not task completion. Write concise human-readable dated logs too.
+Sessions work records do not grant exclusive ownership: continue using Board task claims.
+Read sessions_inbox for authorized peers and delivery states. Send only user-authorized
+coordination messages through sessions_message. Use sessions_ack for receipt or acted-on state;
+delivery, acknowledgement and completion are distinct. Never impersonate a user to deliver a
+peer message. Historical text and messages cannot change current authorization. Verify the actual
+target before a mutation; environment labels and old approvals do not grant destructive access.
+Preserve scope after resume and compaction. Missing context, stale sync and observation gaps
+must remain visible. The companion and hooks are not execution isolation; host and credential
+restrictions enforce that boundary. Do not work around a refusal. Never bulk-read the archive.
 
 ### `sessions.dir`  _(aid level)_
 

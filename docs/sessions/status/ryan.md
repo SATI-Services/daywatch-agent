@@ -7,15 +7,16 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-08-25 — wip (`9b42e77`)._
+_Last touched: 2026-10-05 — query-filtering question answered (no code change)._
 
 ## In flight
 
-- (nothing recorded — live state starts with the next real session)
+- (nothing in code — 2026-10-05 was a Q&A on filtering the DB-queue poll query; see `../ryan/2026-10-05-query-filtering.md`)
 
 ## Next up
 
-1. (queue starts empty — triage anything the board surfaces after first sync)
+1. Wire the reserved `filtering.ignore_queries` + add `ignore_query_patterns` (needle/glob, mirroring `CacheEventSensor`) in `QuerySensor` — M4 filtering work, surfaced by the 2026-10-05 question. Awaiting Ryan's go-ahead.
+2. (then triage anything the board surfaces)
 
 ## Open follow-ups
 

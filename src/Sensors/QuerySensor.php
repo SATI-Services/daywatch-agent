@@ -8,6 +8,7 @@ use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\QueryRecord;
 use Daywatch\Agent\Support\Location;
+use Daywatch\Agent\Support\Patterns;
 use Illuminate\Database\Events\QueryExecuted;
 use Throwable;
 
@@ -15,16 +16,33 @@ use Throwable;
  * QuerySensor — QueryExecuted → `query` record (daywatch/docs/data-model.md §2).
  * SQL is transmitted raw (bindings never substituted); origin file/line comes
  * from a bounded backtrace; `_group` uses the normalized SQL.
+ *
+ * Two filters (config `daywatch.filtering`, applied before anything is
+ * buffered so ignored queries cost nothing downstream): `ignore_queries`
+ * drops the whole stream, and `ignore_query_patterns` drops queries whose raw
+ * SQL matches a `Str::is()` pattern — defaulting to the framework's own
+ * internal tables (`jobs`, `cache`/`cache_locks`, `sessions`, `batches`), the
+ * housekeeping queries every worker and cache/session driver emits. Plain
+ * `*table*` needles match any grammar quoting (`"jobs"`, `` `jobs` ``,
+ * `[jobs]`).
  */
 final class QuerySensor
 {
     private const BACKTRACE_LIMIT = 30;
 
-    public function __construct(private Core $core) {}
+    public function __construct(
+        private Core $core,
+        private Patterns $ignorePatterns = new Patterns([]),
+        private bool $ignoreAll = false,
+    ) {}
 
     public function handle(QueryExecuted $event): void
     {
         try {
+            if ($this->ignoreAll || $this->ignorePatterns->matches((string) $event->sql)) {
+                return;
+            }
+
             $core = $this->core;
 
             // $event->time is milliseconds (float).

@@ -17,7 +17,9 @@ it('merges the packaged config defaults', function () {
         ->and(config('daywatch.agent.flush_bytes'))->toBe(6_000_000)     // 6 MB flush ceiling
         ->and(config('daywatch.agent.flush_interval'))->toBe(10)         // 10 s flush ceiling
         ->and(config('daywatch.agent.max_concurrent_requests'))->toBe(5)
-        ->and(config('daywatch.filtering.ignore_queries'))->toBeFalse();
+        ->and(config('daywatch.filtering.ignore_queries'))->toBeFalse()
+        ->and(config('daywatch.filtering.ignore_query_patterns'))->toBe('*jobs*,*cache*,*sessions*,*batches*')
+        ->and(config('daywatch.filtering.ignore_job_names'))->toBe('');
 });
 
 it('registers the config file under the daywatch-config publish tag', function () {

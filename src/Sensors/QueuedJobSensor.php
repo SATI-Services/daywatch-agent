@@ -7,6 +7,7 @@ namespace Daywatch\Agent\Sensors;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\QueuedJobRecord;
+use Daywatch\Agent\Support\Patterns;
 use Throwable;
 
 /**
@@ -18,6 +19,10 @@ use Throwable;
  * the enqueue duration (integer microseconds; unpaired → 0). `sync` connection
  * jobs are never emitted. `_group = xxh128(name)`.
  *
+ * Jobs whose name matches a `filtering.ignore_job_names` pattern are never
+ * recorded (the filter is shared with JobAttemptSensor, so an ignored job is
+ * invisible both at dispatch and at execution).
+ *
  * CARDINAL RULE: every handler is un-crashable — a dispatch must never fail
  * loudly because telemetry could not be recorded.
  */
@@ -25,7 +30,10 @@ final class QueuedJobSensor
 {
     private ?float $queueingAt = null;
 
-    public function __construct(private Core $core) {}
+    public function __construct(
+        private Core $core,
+        private Patterns $ignoreNames = new Patterns([]),
+    ) {}
 
     /** Stash the enqueue start so {@see queued()} can measure the duration. */
     public function queueing(object $event): void
@@ -52,6 +60,12 @@ final class QueuedJobSensor
                 return;
             }
 
+            $name = $this->name($event);
+
+            if ($this->ignoreNames->matches($name)) {
+                return;
+            }
+
             $duration = $this->queueingAt === null
                 ? 0
                 : (int) round(($now - $this->queueingAt) * 1_000_000);
@@ -61,7 +75,7 @@ final class QueuedJobSensor
             $record = new QueuedJobRecord(
                 envelope: Envelope::for($core, $start),
                 jobId: $this->jobId($event),
-                name: $this->name($event),
+                name: $name,
                 connection: $connection,
                 queue: $this->queue($event),
                 duration: max(0, $duration),

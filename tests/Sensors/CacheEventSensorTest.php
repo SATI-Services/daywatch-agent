@@ -6,6 +6,7 @@ use Daywatch\Agent\Buffer\RecordsBuffer;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Sensors\CacheEventSensor;
 use Daywatch\Agent\Support\Group;
+use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
@@ -99,7 +100,7 @@ it('ignores cache keys matching the ignore patterns', function () {
     [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
     $core->prepareForRequest();
 
-    $sensor = new CacheEventSensor($core, ['*illuminate:*']);
+    $sensor = new CacheEventSensor($core, new Patterns(['*illuminate:*']));
 
     $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'value'));
     $sensor->handle(new CacheMissed('redis', 'laravel_cache_illuminate:cooldown:x'));
@@ -113,7 +114,7 @@ it('does not hold pending start events for ignored keys', function () {
     [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
     $core->prepareForRequest();
 
-    $sensor = new CacheEventSensor($core, ['*illuminate:*']);
+    $sensor = new CacheEventSensor($core, new Patterns(['*illuminate:*']));
 
     $sensor->handle(new RetrievingKey('redis', 'illuminate:queue:restart'));
     $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'value'));
@@ -125,7 +126,7 @@ it('records every key when no ignore patterns are configured', function () {
     [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
     $core->prepareForRequest();
 
-    (new CacheEventSensor($core, []))->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v'));
+    (new CacheEventSensor($core, new Patterns([])))->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v'));
 
     expect($buffer->all())->toHaveCount(1);
 });
@@ -134,7 +135,7 @@ it('drops the whole cache stream when ignore_cache_events is on', function () {
     [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
     $core->prepareForRequest();
 
-    $sensor = new CacheEventSensor($core, [], ignoreAll: true);
+    $sensor = new CacheEventSensor($core, new Patterns([]), ignoreAll: true);
 
     $sensor->handle(new RetrievingKey('redis', 'users:1'));
     $sensor->handle(new CacheHit('redis', 'users:1', 'value'));

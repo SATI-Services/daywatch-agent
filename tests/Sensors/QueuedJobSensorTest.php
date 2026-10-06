@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Buffer\RecordsBuffer;
+use Daywatch\Agent\Core;
 use Daywatch\Agent\Sensors\QueuedJobSensor;
 use Daywatch\Agent\Support\Group;
+use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 
 /**
@@ -160,4 +163,74 @@ it('increments the jobs_queued counter', function () {
     (new QueuedJobSensor($core))->queued($event);
 
     expect($core->counters()['jobs_queued'])->toBe(1);
+});
+
+it('ignores jobs whose name matches the ignore patterns', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new QueuedJobSensor($core, new Patterns(['App\\Jobs\\Send*']));
+
+    $ignored = fakeQueueEvent(job: fakeJob('App\\Jobs\\SendWelcomeEmail'));
+    $sensor->queueing($ignored);
+    $sensor->queued($ignored);
+
+    $kept = fakeQueueEvent(job: fakeJob('App\\Jobs\\ReconcileAccounts'));
+    $sensor->queueing($kept);
+    $sensor->queued($kept);
+
+    expect($buffer->all())->toHaveCount(1)
+        ->and($buffer->all()[0]['name'])->toBe('App\\Jobs\\ReconcileAccounts')
+        ->and($core->counters()['jobs_queued'])->toBe(1);
+});
+
+it('does not leak an ignored job\'s queueing timestamp into the next job', function () {
+    $client = new RecordingClient;
+    [$core, $buffer, $clock] = makeCore($client, requestRate: 1.0, now: 1000.0);
+    $core->prepareForRequest();
+
+    $sensor = new QueuedJobSensor($core, new Patterns(['App\\Jobs\\Send*']));
+
+    $ignored = fakeQueueEvent(job: fakeJob('App\\Jobs\\SendWelcomeEmail'));
+    $sensor->queueing($ignored);
+    $sensor->queued($ignored);
+
+    // Unpaired JobQueued (no queueing call) — the ignored job's stashed start
+    // must not become this job's duration.
+    $clock->set(1000.002);
+    $sensor->queued(fakeQueueEvent(job: fakeJob('App\\Jobs\\ReconcileAccounts')));
+
+    expect($buffer->all())->toHaveCount(1)
+        ->and($buffer->all()[0]['duration'])->toBe(0);
+});
+
+it('records every job when no ignore patterns are configured', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    (new QueuedJobSensor($core, new Patterns([])))->queued(
+        fakeQueueEvent(job: fakeJob('App\\Jobs\\SendWelcomeEmail')),
+    );
+
+    expect($buffer->all())->toHaveCount(1);
+});
+
+it('applies ignore_job_names through the container binding', function () {
+    // Sensors are resolved once at boot, so re-resolve after overriding config
+    // (forgetInstance) — this exercises the provider's config wiring itself.
+    config()->set('daywatch.filtering.ignore_job_names', 'App\\Jobs\\Send*');
+    app()->forgetInstance(QueuedJobSensor::class);
+
+    $sensor = app(QueuedJobSensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->queued(fakeQueueEvent(job: fakeJob('App\\Jobs\\SendWelcomeEmail')));
+    $sensor->queued(fakeQueueEvent(job: fakeJob('App\\Jobs\\ReconcileAccounts')));
+
+    $records = app(RecordsBuffer::class)->all();
+
+    expect(array_column($records, 'name'))->toBe(['App\\Jobs\\ReconcileAccounts']);
 });

@@ -7,6 +7,7 @@ namespace Daywatch\Agent\Sensors;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\CacheEventRecord;
 use Daywatch\Agent\Records\Envelope;
+use Daywatch\Agent\Support\Patterns;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -18,7 +19,6 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -46,35 +46,11 @@ final class CacheEventSensor
     /** @var array<string, float> store|key → start microtime */
     private array $started = [];
 
-    /** @var list<string> Plain `*substring*` patterns, reduced to a str_contains needle. */
-    private array $needles = [];
-
-    /** @var list<string> Patterns with real glob structure, matched with Str::is(). */
-    private array $globs = [];
-
-    /**
-     * @param  list<string>  $ignoreKeys  `Str::is()` patterns; a matching key is never recorded
-     */
     public function __construct(
         private Core $core,
-        array $ignoreKeys = [],
+        private Patterns $ignoreKeys = new Patterns([]),
         private bool $ignoreAll = false,
-    ) {
-        // Split the patterns ONCE, at construction. This filter runs on every cache
-        // event in the host process — on a busy app that is a genuinely hot path, and
-        // Str::is() compiles a fresh regex per call. The overwhelmingly common shape
-        // (`*illuminate:*`, the default) is a plain substring test, so precompute it
-        // into a str_contains needle and keep Str::is() for the rest.
-        foreach ($ignoreKeys as $pattern) {
-            if (preg_match('/^\*([^*?\[\]]+)\*$/', $pattern, $m) === 1) {
-                $this->needles[] = $m[1];
-
-                continue;
-            }
-
-            $this->globs[] = $pattern;
-        }
-    }
+    ) {}
 
     /**
      * Entry point the SensorManager wires to every Illuminate cache event.
@@ -149,13 +125,7 @@ final class CacheEventSensor
     /** Does this cache key match one of the ignore patterns? */
     private function ignored(string $key): bool
     {
-        foreach ($this->needles as $needle) {
-            if (str_contains($key, $needle)) {
-                return true;
-            }
-        }
-
-        return $this->globs !== [] && Str::is($this->globs, $key);
+        return $this->ignoreKeys->matches($key);
     }
 
     private function emit(object $event, string $type): void

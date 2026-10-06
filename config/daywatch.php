@@ -37,16 +37,35 @@ return [
     | (agent-protocol.md §7) and the privacy boundary is deliberately in-app, before
     | buffering.
     |
-    | LIVE: `ignore_cache_events` and `ignore_cache_keys` (CacheEventSensor).
-    | NOT YET READ by the collector: `ignore_queries`, `ignore_outgoing_requests`
-    | and `log_level` — setting those today changes nothing. They are listed so the
-    | wire contract and this file stay in step; do not treat them as working
-    | switches until the sensors consult them.
+    | LIVE: `ignore_cache_events` and `ignore_cache_keys` (CacheEventSensor),
+    | `ignore_queries` and `ignore_query_patterns` (QuerySensor), and
+    | `ignore_job_names` (QueuedJobSensor + JobAttemptSensor).
+    | NOT YET READ by the collector: `ignore_outgoing_requests` and `log_level` —
+    | setting those today changes nothing. They are listed so the wire contract
+    | and this file stay in step; do not treat them as working switches until
+    | the sensors consult them.
     |
     */
 
     'filtering' => [
         'ignore_queries' => env('DAYWATCH_IGNORE_QUERIES', false),
+
+        /*
+         * Queries never recorded, as `Str::is()` patterns matched against the raw
+         * SQL (`*` wildcard). The default drops the framework's own internal
+         * tables — the database queue's poll (`jobs`), the database cache store
+         * (`cache`, which also covers `cache_locks`), the database session store
+         * (`sessions`) and job batches (`batches`) — housekeeping noise every
+         * worker emits and nothing an application can act on. Plain `*table*`
+         * needles match any grammar quoting ("jobs" / `jobs` / [jobs]). Set
+         * DAYWATCH_IGNORE_QUERY_PATTERNS to a comma-separated pattern list to
+         * override, or to an empty string to record every query. Beware a needle
+         * matches anywhere in the SQL: an application table whose name merely
+         * contains one of these words is dropped too — narrow the list if your
+         * schema collides.
+         */
+        'ignore_query_patterns' => env('DAYWATCH_IGNORE_QUERY_PATTERNS', '*jobs*,*cache*,*sessions*,*batches*'),
+
         'ignore_cache_events' => env('DAYWATCH_IGNORE_CACHE_EVENTS', false),
 
         /*
@@ -58,6 +77,15 @@ return [
          * every key.
          */
         'ignore_cache_keys' => env('DAYWATCH_IGNORE_CACHE_KEYS', '*illuminate:*'),
+
+        /*
+         * Job names never recorded — neither at dispatch (queued-job) nor at
+         * execution (job-attempt) — as `Str::is()` patterns matched against the
+         * job's display name / class (`*` wildcard). Empty by default; set
+         * DAYWATCH_IGNORE_JOB_NAMES to a comma-separated pattern list, e.g.
+         * `App\Jobs\Send*,*Horizon*`, to drop noisy or uninteresting jobs.
+         */
+        'ignore_job_names' => env('DAYWATCH_IGNORE_JOB_NAMES', ''),
 
         'ignore_outgoing_requests' => env('DAYWATCH_IGNORE_OUTGOING_REQUESTS', false),
         'log_level' => env('DAYWATCH_LOG_LEVEL', 'debug'),

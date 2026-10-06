@@ -7,6 +7,7 @@ namespace Daywatch\Agent\Sensors;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\Envelope;
 use Daywatch\Agent\Records\JobAttemptRecord;
+use Daywatch\Agent\Support\Patterns;
 use Throwable;
 
 /**
@@ -15,6 +16,10 @@ use Throwable;
  * (`attempt_id`) under the trace inherited from the dispatching request/command.
  * `sync` jobs are skipped (they run inline, captured by their parent execution).
  * Only wired in worker processes.
+ *
+ * Jobs whose name matches a `filtering.ignore_job_names` pattern are never
+ * recorded: no execution is started for them, so the attempt — and anything
+ * it does — is invisible (the filter is shared with QueuedJobSensor).
  */
 final class JobAttemptSensor
 {
@@ -25,8 +30,11 @@ final class JobAttemptSensor
     /** @var array<string, mixed> metadata captured at JobProcessing */
     private array $meta = [];
 
-    public function __construct(private Core $core, ?UserSensor $users = null)
-    {
+    public function __construct(
+        private Core $core,
+        ?UserSensor $users = null,
+        private Patterns $ignoreNames = new Patterns([]),
+    ) {
         $this->users = $users ?? new UserSensor($core);
     }
 
@@ -43,9 +51,16 @@ final class JobAttemptSensor
             }
 
             $job = $event->job ?? null;
+            $name = $this->jobName($job);
+
+            if ($this->ignoreNames->matches($name)) {
+                $this->active = false;
+
+                return;
+            }
 
             $this->meta = [
-                'name' => $this->jobName($job),
+                'name' => $name,
                 'connection' => $connection,
                 'queue' => $this->queue($job),
                 'job_id' => $this->jobId($job),

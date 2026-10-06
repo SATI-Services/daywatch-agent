@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Daywatch\Agent\Sensors\JobAttemptSensor;
 use Daywatch\Agent\Support\Group;
+use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 
 function fakeAttemptJob(string $name, string $queue = 'default', string $jobId = 'job-uuid', int $attempts = 1): object
@@ -93,4 +94,25 @@ it('skips sync-connection jobs entirely', function () {
 
     expect($client->sent)->toBe([])
         ->and($buffer->all())->toBe([]);
+});
+
+it('ignores jobs whose name matches the ignore patterns', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client);
+    $sensor = new JobAttemptSensor($core, null, new Patterns(['App\\Jobs\\Send*']));
+
+    $ignored = fakeAttemptJob('App\\Jobs\\SendReceipt');
+    $sensor->processing((object) ['connectionName' => 'redis', 'job' => $ignored]);
+    $core->sample();
+    $sensor->processed((object) ['connectionName' => 'redis', 'job' => $ignored]);
+
+    expect($client->sent)->toBe([])
+        ->and($buffer->all())->toBe([]);
+
+    $kept = fakeAttemptJob('App\\Jobs\\ReconcileAccounts');
+    $sensor->processing((object) ['connectionName' => 'redis', 'job' => $kept]);
+    $core->sample();
+    $sensor->processed((object) ['connectionName' => 'redis', 'job' => $kept]);
+
+    expect($client->lastDecoded()[0]['name'])->toBe('App\\Jobs\\ReconcileAccounts');
 });

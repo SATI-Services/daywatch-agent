@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Buffer\RecordsBuffer;
+use Daywatch\Agent\Core;
 use Daywatch\Agent\Sensors\QuerySensor;
 use Daywatch\Agent\Support\Group;
 use Daywatch\Agent\Support\Location;
+use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 use Illuminate\Database\Events\QueryExecuted;
 
@@ -79,4 +82,83 @@ it('increments the queries counter', function () {
     (new QuerySensor($core))->handle(new QueryExecuted('select 1', [], 1.0, fakeConnection()));
 
     expect($core->counters()['queries'])->toBe(1);
+});
+
+it('ignores queries whose SQL matches the ignore patterns', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new QuerySensor($core, new Patterns(['*jobs*', '*cache*', '*sessions*', '*batches*']));
+
+    // The database-queue poll, in both grammar quoting styles, plus the other
+    // framework-internal tables — all dropped; the application query is kept.
+    $sensor->handle(new QueryExecuted('select * from "jobs" where "queue" = ?', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from `jobs` where `queue` = ?', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from "cache" where "key" = ? limit 1', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from "cache_locks" where "key" = ? limit 1', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('delete from "sessions" where "last_activity" < ?', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from "job_batches" where "id" = ?', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from "orders"', [], 1.0, fakeConnection()));
+
+    expect($buffer->all())->toHaveCount(1)
+        ->and($buffer->all()[0]['sql'])->toBe('select * from "orders"')
+        ->and($core->counters()['queries'])->toBe(1);
+});
+
+it('ignores queries matching a real glob pattern', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new QuerySensor($core, new Patterns(['insert into jobs*']));
+
+    $sensor->handle(new QueryExecuted('insert into jobs (queue) values (?)', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from jobs', [], 1.0, fakeConnection()));
+
+    expect($buffer->all())->toHaveCount(1)
+        ->and($buffer->all()[0]['sql'])->toBe('select * from jobs');
+});
+
+it('drops the whole query stream when ignore_queries is on', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new QuerySensor($core, new Patterns([]), ignoreAll: true);
+
+    $sensor->handle(new QueryExecuted('select * from "orders"', [], 1.0, fakeConnection()));
+
+    expect($buffer->all())->toBeEmpty()
+        ->and($core->counters()['queries'])->toBe(0);
+});
+
+it('records every query when no ignore patterns are configured', function () {
+    $client = new RecordingClient;
+    [$core, $buffer] = makeCore($client, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    (new QuerySensor($core, new Patterns([])))->handle(
+        new QueryExecuted('select * from "jobs" where "queue" = ?', [], 1.0, fakeConnection()),
+    );
+
+    expect($buffer->all())->toHaveCount(1);
+});
+
+it('applies ignore_query_patterns through the container binding', function () {
+    // Sensors are resolved once at boot, so re-resolve after overriding config
+    // (forgetInstance) — this exercises the provider's config wiring itself.
+    config()->set('daywatch.filtering.ignore_query_patterns', '*internal_*');
+    app()->forgetInstance(QuerySensor::class);
+
+    $sensor = app(QuerySensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->handle(new QueryExecuted('select * from "internal_audit_log"', [], 1.0, fakeConnection()));
+    $sensor->handle(new QueryExecuted('select * from "orders"', [], 1.0, fakeConnection()));
+
+    $records = app(RecordsBuffer::class)->all();
+
+    expect(array_column($records, 'sql'))->toBe(['select * from "orders"']);
 });

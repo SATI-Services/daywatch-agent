@@ -7,25 +7,31 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-05 — query-filtering question answered (no code change)._
+_Last touched: 2026-10-06 — M4 filtering pulled forward: `ignore_query_patterns` + `ignore_job_names` shipped._
 
 ## In flight
 
-- (nothing in code — 2026-10-05 was a Q&A on filtering the DB-queue poll query; see `../ryan/2026-10-05-query-filtering.md`)
+- (nothing)
 
 ## Next up
 
-1. Wire the reserved `filtering.ignore_queries` + add `ignore_query_patterns` (needle/glob, mirroring `CacheEventSensor`) in `QuerySensor` — M4 filtering work, surfaced by the 2026-10-05 question. Awaiting Ryan's go-ahead.
-2. (then triage anything the board surfaces)
+1. (triage anything the board surfaces)
 
 ## Open follow-ups
 
-- (none)
+- Docs corpus `agent-protocol.md` §7 filtering line is stale (lacks
+  `ignore_cache_keys`, `ignore_query_patterns`, `ignore_job_names`) — refresh
+  in the daywatch-mcp repo when next touching the corpus.
+- Boost guidelines don't mention the filtering options yet.
 
 ## Shipped
 
 _Seeded from git history, newest first:_
 
+- 2026-10-06 M4 filtering: `ignore_queries` wired + new `ignore_query_patterns`
+  (default drops framework-internal tables) + new `ignore_job_names`
+  (queued-job AND job-attempt); shared `Support\Patterns` matcher; 321 tests
+  green → [log](../ryan/2026-10-06-filtering-jobs-and-queries.md)
 - 2026-08-25 wip — `9b42e77`
 - 2026-08-25 wip — `7b6b60d`
 - 2026-08-25 wip — `6de7637`

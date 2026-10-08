@@ -6,6 +6,7 @@ use Daywatch\Agent\Buffer\RecordsBuffer;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Sensors\CacheEventSensor;
 use Daywatch\Agent\Support\Group;
+use Daywatch\Agent\Support\KeyGrouper;
 use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 use Illuminate\Cache\Events\CacheHit;
@@ -131,14 +132,80 @@ it('records every key when no ignore patterns are configured', function () {
     expect($buffer->all())->toHaveCount(1);
 });
 
-it('drops the whole cache stream when ignore_cache_events is on', function () {
+it('rewrites a grouped key to its label and collapses the _group hash', function () {
     [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
     $core->prepareForRequest();
 
-    $sensor = new CacheEventSensor($core, new Patterns([]), ignoreAll: true);
+    $sensor = new CacheEventSensor($core, new Patterns([]), new KeyGrouper([
+        '#^sys_setting_.*$#' => 'sys_setting:*',
+    ]));
 
-    $sensor->handle(new RetrievingKey('redis', 'users:1'));
-    $sensor->handle(new CacheHit('redis', 'users:1', 'value'));
+    $sensor->handle(new CacheHit('redis', 'sys_setting_5753f25f3ab0b7e9442c9a528ab9efc1', 'v'));
+    $sensor->handle(new CacheHit('redis', 'sys_setting_185eb1bfd1bb70a9806e52fb0d57a11f', 'v'));
+
+    $records = $buffer->all();
+
+    expect($records)->toHaveCount(2)
+        ->and($records[0]['key'])->toBe('sys_setting:*')
+        ->and($records[0]['_group'])->toBe(Group::cache('redis', 'sys_setting:*'))
+        ->and($records[1]['_group'])->toBe($records[0]['_group']); // one dashboard row
+});
+
+it('passes an unmatched key through raw when groups are configured', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, new Patterns([]), new KeyGrouper([
+        '#^sys_setting_.*$#' => 'sys_setting:*',
+    ]));
+
+    $sensor->handle(new CacheHit('redis', 'users:1', 'v'));
+
+    expect($buffer->all()[0]['key'])->toBe('users:1');
+});
+
+it('honours the first matching group pattern', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, new Patterns([]), new KeyGrouper([
+        '#^sys_setting_admin.*$#' => 'sys_setting:admin',
+        '#^sys_setting_.*$#' => 'sys_setting:*',
+    ]));
+
+    $sensor->handle(new CacheHit('redis', 'sys_setting_admin_123', 'v'));
+
+    expect($buffer->all()[0]['key'])->toBe('sys_setting:admin');
+});
+
+it('still pairs start and completion events by the raw key when grouping', function () {
+    [$core, $buffer, $clock] = makeCore(new RecordingClient, requestRate: 1.0, now: 1000.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, new Patterns([]), new KeyGrouper([
+        '#^sys_setting_.*$#' => 'sys_setting:*',
+    ]));
+
+    $sensor->handle(new RetrievingKey('redis', 'sys_setting_abc123')); // start @ 1000.0 (raw)
+    $clock->advance(0.002); // +2ms
+    $sensor->handle(new CacheHit('redis', 'sys_setting_abc123', 'v')); // completion @ 1002.0ms
+
+    $record = $buffer->all()[0];
+
+    expect($record['key'])->toBe('sys_setting:*')
+        ->and($record['duration'])->toBe(2000)
+        ->and($record['timestamp'])->toEqualWithDelta(1000.0, 0.0000001);
+});
+
+it('applies ignore patterns to the raw key, before grouping', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    $sensor = new CacheEventSensor($core, new Patterns(['*illuminate:*']), new KeyGrouper([
+        '#^illuminate:.*$#' => 'illuminate:*',
+    ]));
+
+    $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v'));
 
     expect($buffer->all())->toBeEmpty();
 });
@@ -156,4 +223,38 @@ it('ignores framework keys by default through the container binding', function (
     $records = app(RecordsBuffer::class)->all();
 
     expect(array_column($records, 'key'))->toBe(['users:1']);
+});
+
+it('applies the new sensors.ignore option through the container binding', function () {
+    config()->set('daywatch.sensors.'.CacheEventSensor::class.'.ignore', '*secret*');
+    app()->forgetInstance(CacheEventSensor::class);
+
+    $sensor = app(CacheEventSensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->handle(new CacheHit('redis', 'secret_token', 'v'));
+    $sensor->handle(new CacheHit('redis', 'users:1', 'v'));
+
+    $records = app(RecordsBuffer::class)->all();
+
+    expect(array_column($records, 'key'))->toBe(['users:1']);
+});
+
+it('applies the sensors.groups option through the container binding', function () {
+    config()->set('daywatch.sensors.'.CacheEventSensor::class.'.groups', [
+        '#^sys_setting_.*$#' => 'sys_setting:*',
+    ]);
+    app()->forgetInstance(CacheEventSensor::class);
+
+    $sensor = app(CacheEventSensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->handle(new CacheHit('redis', 'sys_setting_abc123', 'v'));
+
+    $record = app(RecordsBuffer::class)->all()[0];
+
+    expect($record['key'])->toBe('sys_setting:*')
+        ->and($record['_group'])->toBe(Group::cache('redis', 'sys_setting:*'));
 });

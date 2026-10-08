@@ -1,5 +1,7 @@
 <?php
 
+use Daywatch\Agent\Sensors;
+
 return [
 
     /*
@@ -30,65 +32,147 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filtering + redaction (partly RESERVED — M4)
+    | Sensors (per-sensor switches, ignore lists and key grouping)
     |--------------------------------------------------------------------------
     |
-    | Declared here because they are part of the shared option table
-    | (agent-protocol.md §7) and the privacy boundary is deliberately in-app, before
-    | buffering.
+    | One entry per sensor, keyed by class — Laravel Pulse's `recorders` idiom.
+    | Every sensor supports `enabled` (listeners are not attached at all when
+    | false, so a noisy source can be silenced without disabling Daywatch).
+    | Some sensors add:
     |
-    | LIVE: `ignore_cache_events` and `ignore_cache_keys` (CacheEventSensor),
-    | `ignore_queries` and `ignore_query_patterns` (QuerySensor), and
-    | `ignore_job_names` (QueuedJobSensor + JobAttemptSensor).
-    | NOT YET READ by the collector: `ignore_outgoing_requests` and `log_level` —
-    | setting those today changes nothing. They are listed so the wire contract
-    | and this file stay in step; do not treat them as working switches until
-    | the sensors consult them.
+    |   `ignore`  Subjects never recorded, as `Str::is()` patterns (`*`
+    |             wildcard; a comma-separated env string or a config array).
+    |             Applied to the RAW value before anything is buffered.
+    |   `groups`  High-cardinality values collapsed to a label, Pulse-style:
+    |             a map of regex pattern ⇒ replacement, first match wins,
+    |             unmatched values recorded raw. The label BECOMES the recorded
+    |             value (so `_group` hashes collapse naturally); the raw value
+    |             is not retained. Config-file only — a map can't come from an
+    |             env var. Empty by default: everything is captured raw.
+    |
+    | UPGRADING from a pre-`sensors` config: a published `filtering` block
+    | (ignore_cache_events / ignore_cache_keys / ignore_queries /
+    | ignore_query_patterns / ignore_job_names / ignore_outgoing_requests) is
+    | still honoured — legacy keys win while present, so delete the block once
+    | you have migrated. The old env vars keep working either way: the ignore
+    | lists read the same names, and the enabled flags fall back to the old
+    | inverted kill-switches.
+    |
+    | Head sampling (`sampling` above) is deliberately NOT per-sensor: it is
+    | decided once per execution (agent protocol §3), so a trace is complete
+    | or absent, never partial.
     |
     */
 
-    'filtering' => [
-        'ignore_queries' => env('DAYWATCH_IGNORE_QUERIES', false),
+    'sensors' => [
 
-        /*
-         * Queries never recorded, as `Str::is()` patterns matched against the raw
-         * SQL (`*` wildcard). The default drops the framework's own internal
-         * tables — the database queue's poll (`jobs`), the database cache store
-         * (`cache`, which also covers `cache_locks`), the database session store
-         * (`sessions`) and job batches (`batches`) — housekeeping noise every
-         * worker emits and nothing an application can act on. Plain `*table*`
-         * needles match any grammar quoting ("jobs" / `jobs` / [jobs]). Set
-         * DAYWATCH_IGNORE_QUERY_PATTERNS to a comma-separated pattern list to
-         * override, or to an empty string to record every query. Beware a needle
-         * matches anywhere in the SQL: an application table whose name merely
-         * contains one of these words is dropped too — narrow the list if your
-         * schema collides.
-         */
-        'ignore_query_patterns' => env('DAYWATCH_IGNORE_QUERY_PATTERNS', '*jobs*,*cache*,*sessions*,*batches*'),
+        Sensors\RequestSensor::class => [
+            'enabled' => env('DAYWATCH_REQUESTS_ENABLED', true),
+        ],
 
-        'ignore_cache_events' => env('DAYWATCH_IGNORE_CACHE_EVENTS', false),
+        Sensors\QuerySensor::class => [
+            'enabled' => env('DAYWATCH_QUERIES_ENABLED', ! env('DAYWATCH_IGNORE_QUERIES', false)),
 
-        /*
-         * Cache keys never recorded, as `Str::is()` patterns (`*` wildcard).
-         * The default drops Laravel's own internal keys — `illuminate:queue:restart`
-         * is polled by every queue worker on every loop, and nothing an application
-         * can act on lives under that namespace. Set DAYWATCH_IGNORE_CACHE_KEYS to a
-         * comma-separated pattern list to override, or to an empty string to record
-         * every key.
-         */
-        'ignore_cache_keys' => env('DAYWATCH_IGNORE_CACHE_KEYS', '*illuminate:*'),
+            /*
+             * Queries never recorded, matched against the raw SQL. The default
+             * drops the framework's own internal tables — the database queue's
+             * poll (`jobs`), the database cache store (`cache`, which also
+             * covers `cache_locks`), the database session store (`sessions`)
+             * and job batches (`batches`) — housekeeping noise every worker
+             * emits and nothing an application can act on. Plain `*table*`
+             * needles match any grammar quoting ("jobs" / `jobs` / [jobs]).
+             * Set DAYWATCH_IGNORE_QUERY_PATTERNS to a comma-separated pattern
+             * list to override, or to an empty string to record every query.
+             * Beware a needle matches anywhere in the SQL: an application
+             * table whose name merely contains one of these words is dropped
+             * too — narrow the list if your schema collides.
+             */
+            'ignore' => env('DAYWATCH_IGNORE_QUERY_PATTERNS', '*jobs*,*cache*,*sessions*,*batches*'),
+        ],
 
-        /*
-         * Job names never recorded — neither at dispatch (queued-job) nor at
-         * execution (job-attempt) — as `Str::is()` patterns matched against the
-         * job's display name / class (`*` wildcard). Empty by default; set
-         * DAYWATCH_IGNORE_JOB_NAMES to a comma-separated pattern list, e.g.
-         * `App\Jobs\Send*,*Horizon*`, to drop noisy or uninteresting jobs.
-         */
-        'ignore_job_names' => env('DAYWATCH_IGNORE_JOB_NAMES', ''),
+        Sensors\ExceptionSensor::class => [
+            'enabled' => env('DAYWATCH_EXCEPTIONS_ENABLED', true),
+        ],
 
-        'ignore_outgoing_requests' => env('DAYWATCH_IGNORE_OUTGOING_REQUESTS', false),
-        'log_level' => env('DAYWATCH_LOG_LEVEL', 'debug'),
+        Sensors\CacheEventSensor::class => [
+            'enabled' => env('DAYWATCH_CACHE_EVENTS_ENABLED', ! env('DAYWATCH_IGNORE_CACHE_EVENTS', false)),
+
+            /*
+             * Cache keys never recorded. The default drops Laravel's own
+             * internal keys — `illuminate:queue:restart` is polled by every
+             * queue worker on every loop, and nothing an application can act
+             * on lives under that namespace. Set DAYWATCH_IGNORE_CACHE_KEYS
+             * to a comma-separated pattern list to override, or to an empty
+             * string to record every key.
+             */
+            'ignore' => env('DAYWATCH_IGNORE_CACHE_KEYS', '*illuminate:*'),
+
+            /*
+             * Cache-key grouping (Pulse-style): regex pattern ⇒ label, first
+             * match wins. Hash- or id-suffixed keys that would each be their
+             * own row on the dashboard collapse into one — e.g. with
+             * `'#^sys_setting_.*$#' => 'sys_setting:*'` every
+             * `sys_setting_5753f25f…` key records as `sys_setting:*`. The
+             * label replaces the recorded key (the raw key is NOT retained),
+             * replacements may use capture groups (`'user:$1:*'`), and a
+             * pattern that fails to compile is skipped, never fatal. Empty by
+             * default — every key is captured raw.
+             */
+            'groups' => [
+                // '#^sys_setting_.*$#' => 'sys_setting:*',
+                // '#^lookup_key_.*$#' => 'lookup_key:*',
+                // '#:\d+#' => ':*',
+            ],
+        ],
+
+        Sensors\LogSensor::class => [
+            'enabled' => env('DAYWATCH_LOGS_ENABLED', true),
+
+            // RESERVED — not yet read by the collector; setting it changes
+            // nothing today. Listed so the option table stays in step.
+            'level' => env('DAYWATCH_LOG_LEVEL', 'debug'),
+        ],
+
+        Sensors\MailSensor::class => [
+            'enabled' => env('DAYWATCH_MAIL_ENABLED', true),
+        ],
+
+        Sensors\NotificationSensor::class => [
+            'enabled' => env('DAYWATCH_NOTIFICATIONS_ENABLED', true),
+        ],
+
+        Sensors\OutgoingRequestSensor::class => [
+            'enabled' => env('DAYWATCH_OUTGOING_REQUESTS_ENABLED', ! env('DAYWATCH_IGNORE_OUTGOING_REQUESTS', false)),
+        ],
+
+        Sensors\QueuedJobSensor::class => [
+            'enabled' => env('DAYWATCH_QUEUED_JOBS_ENABLED', true),
+
+            /*
+             * Job names never recorded at dispatch, matched against the job's
+             * display name / class. Empty by default; set
+             * DAYWATCH_IGNORE_JOB_NAMES to a comma-separated pattern list,
+             * e.g. `App\Jobs\Send*,*Horizon*`, to drop noisy jobs.
+             */
+            'ignore' => env('DAYWATCH_IGNORE_JOB_NAMES', ''),
+        ],
+
+        Sensors\JobAttemptSensor::class => [
+            'enabled' => env('DAYWATCH_JOB_ATTEMPTS_ENABLED', true),
+
+            // Same job-name ignore list as QueuedJobSensor, applied per
+            // worker execution.
+            'ignore' => env('DAYWATCH_IGNORE_JOB_NAMES', ''),
+        ],
+
+        Sensors\CommandSensor::class => [
+            'enabled' => env('DAYWATCH_COMMANDS_ENABLED', true),
+        ],
+
+        Sensors\ScheduledTaskSensor::class => [
+            'enabled' => env('DAYWATCH_SCHEDULED_TASKS_ENABLED', true),
+        ],
+
     ],
 
     'redact_headers' => [

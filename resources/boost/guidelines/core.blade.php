@@ -33,6 +33,33 @@ DAYWATCH_REQUEST_SAMPLE_RATE=1.0
 DAYWATCH_EXCEPTION_SAMPLE_RATE=1.0
 ```
 
+## Sensors
+
+Each sensor can be switched off, and some take `ignore`/`groups` options, in
+the `sensors` block of `config/daywatch.php` (keyed by class, Pulse-style).
+Everything is captured by default.
+
+```php
+use Daywatch\Agent\Sensors;
+
+'sensors' => [
+    // Silence a noisy source without disabling Daywatch:
+    Sensors\QuerySensor::class => ['enabled' => false],
+
+    // Collapse hash-suffixed cache keys into one dashboard row. Regex ⇒ label,
+    // first match wins; the label replaces the recorded key:
+    Sensors\CacheEventSensor::class => [
+        'groups' => [
+            '#^sys_setting_.*$#' => 'sys_setting:*',
+            '#:\d+#' => ':*',
+        ],
+    ],
+],
+```
+
+Env toggles also exist per sensor (e.g. `DAYWATCH_CACHE_EVENTS_ENABLED=false`,
+`DAYWATCH_QUERIES_ENABLED=false`); `groups` is config-file only.
+
 ## Run the daemon
 
 One long-running daemon per app, supervised (systemd / Supervisor / Docker).

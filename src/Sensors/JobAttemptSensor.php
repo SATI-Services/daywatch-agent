@@ -17,9 +17,10 @@ use Throwable;
  * `sync` jobs are skipped (they run inline, captured by their parent execution).
  * Only wired in worker processes.
  *
- * Jobs whose name matches a `filtering.ignore_job_names` pattern are never
+ * Jobs whose name matches the sensor's `ignore` option
+ * (`daywatch.sensors` — see config/daywatch.php) are never
  * recorded: no execution is started for them, so the attempt — and anything
- * it does — is invisible (the filter is shared with QueuedJobSensor).
+ * it does — is invisible (the list is shared with QueuedJobSensor).
  */
 final class JobAttemptSensor
 {

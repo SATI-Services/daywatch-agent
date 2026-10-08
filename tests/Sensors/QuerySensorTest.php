@@ -120,19 +120,6 @@ it('ignores queries matching a real glob pattern', function () {
         ->and($buffer->all()[0]['sql'])->toBe('select * from jobs');
 });
 
-it('drops the whole query stream when ignore_queries is on', function () {
-    $client = new RecordingClient;
-    [$core, $buffer] = makeCore($client, requestRate: 1.0);
-    $core->prepareForRequest();
-
-    $sensor = new QuerySensor($core, new Patterns([]), ignoreAll: true);
-
-    $sensor->handle(new QueryExecuted('select * from "orders"', [], 1.0, fakeConnection()));
-
-    expect($buffer->all())->toBeEmpty()
-        ->and($core->counters()['queries'])->toBe(0);
-});
-
 it('records every query when no ignore patterns are configured', function () {
     $client = new RecordingClient;
     [$core, $buffer] = makeCore($client, requestRate: 1.0);

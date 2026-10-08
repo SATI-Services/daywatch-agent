@@ -17,14 +17,14 @@ use Throwable;
  * SQL is transmitted raw (bindings never substituted); origin file/line comes
  * from a bounded backtrace; `_group` uses the normalized SQL.
  *
- * Two filters (config `daywatch.filtering`, applied before anything is
- * buffered so ignored queries cost nothing downstream): `ignore_queries`
- * drops the whole stream, and `ignore_query_patterns` drops queries whose raw
- * SQL matches a `Str::is()` pattern — defaulting to the framework's own
- * internal tables (`jobs`, `cache`/`cache_locks`, `sessions`, `batches`), the
- * housekeeping queries every worker and cache/session driver emits. Plain
- * `*table*` needles match any grammar quoting (`"jobs"`, `` `jobs` ``,
- * `[jobs]`).
+ * One filter (config `daywatch.sensors` — see config/daywatch.php), applied
+ * before anything is buffered so ignored queries cost nothing downstream:
+ * `ignore` drops queries whose raw SQL matches a `Str::is()` pattern —
+ * defaulting to the framework's own internal tables (`jobs`,
+ * `cache`/`cache_locks`, `sessions`, `batches`), the housekeeping queries
+ * every worker and cache/session driver emits. Plain `*table*` needles match
+ * any grammar quoting (`"jobs"`, `` `jobs` ``, `[jobs]`). Whether the sensor
+ * runs at all is the SensorManager's `enabled` gate, not this class's concern.
  */
 final class QuerySensor
 {
@@ -33,13 +33,12 @@ final class QuerySensor
     public function __construct(
         private Core $core,
         private Patterns $ignorePatterns = new Patterns([]),
-        private bool $ignoreAll = false,
     ) {}
 
     public function handle(QueryExecuted $event): void
     {
         try {
-            if ($this->ignoreAll || $this->ignorePatterns->matches((string) $event->sql)) {
+            if ($this->ignorePatterns->matches((string) $event->sql)) {
                 return;
             }
 

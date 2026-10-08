@@ -81,16 +81,19 @@ does) while consumers keep `^8.2` — dev deps never ship to hosts.
 src/
   AgentServiceProvider.php   # plain Illuminate ServiceProvider; register-only wiring + `about` section
   Core.php                   # per-execution state: trace/execution ids, stage, sampling decision
-  SensorManager.php
+  SensorManager.php            # per-sensor `enabled` gate: a disabled sensor's listeners are never attached
   Buffer/RecordsBuffer.php   # TWO bounds: ≤500 records AND ≤buffer_bytes; auto-digest when full; ring-drop if disabled
   Sensors/                   # 14 sensors: Request, Query, Exception, Cache, Command, JobAttempt, Log, Mail, Notification, OutgoingRequest, QueuedJob, ScheduledTask, Stage, User
+  Support/KeyGrouper.php     # Pulse-style regex⇒label grouping (cache keys); compile-checked once, hot path safe
   Records/Envelope.php       # THE shared wire mapping: child/execution/minimal head shapes (+ Counters::tail)
   Records/                   # one DTO per record type, envelope + own fields only; _group hashing; byte-cap truncation
   Ingest/SocketClient.php    # stream_socket_client, 0.5s timeouts, {len}:v1:{hash}:{json} frame, 2:OK ack, stats()
   Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop; boot AuthProbe + actionable EADDRINUSE report
   Console/StatusCommand.php  # daywatch:status — STATS counters (table / --json), PING fallback, exit 1 when down
   Facades/Daywatch.php       # user(), sample(), dontSample(), report(), ignore(), pause(), resume(), digest()
-config/daywatch.php          # full option table in agent-protocol.md §7 (system docs corpus)
+config/daywatch.php          # `sensors` block: per-sensor enabled/ignore/groups keyed by class (Pulse recorders idiom);
+                             # legacy `filtering.*` keys from old published configs still win while present.
+                             # Full option table in agent-protocol.md §7 (system docs corpus)
 ```
 
 ## Non-negotiable behaviors (from the protocol doc)

@@ -19,8 +19,9 @@ use Throwable;
  * the enqueue duration (integer microseconds; unpaired → 0). `sync` connection
  * jobs are never emitted. `_group = xxh128(name)`.
  *
- * Jobs whose name matches a `filtering.ignore_job_names` pattern are never
- * recorded (the filter is shared with JobAttemptSensor, so an ignored job is
+ * Jobs whose name matches the sensor's `ignore` option
+ * (`daywatch.sensors` — see config/daywatch.php) are never
+ * recorded (the list is shared with JobAttemptSensor, so an ignored job is
  * invisible both at dispatch and at execution).
  *
  * CARDINAL RULE: every handler is un-crashable — a dispatch must never fail

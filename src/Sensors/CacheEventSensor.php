@@ -7,6 +7,7 @@ namespace Daywatch\Agent\Sensors;
 use Daywatch\Agent\Core;
 use Daywatch\Agent\Records\CacheEventRecord;
 use Daywatch\Agent\Records\Envelope;
+use Daywatch\Agent\Support\KeyGrouper;
 use Daywatch\Agent\Support\Patterns;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
@@ -31,12 +32,15 @@ use Throwable;
  * because event shapes vary across Laravel 11/12/13, and every path is
  * try/caught: telemetry loss is fine, throwing into the host app is not.
  *
- * Two filters (config `daywatch.filtering`, applied before anything is buffered
- * so ignored keys cost nothing downstream): `ignore_cache_events` drops the whole
- * stream, and `ignore_cache_keys` drops keys matching a `Str::is()` pattern —
- * defaulting to `*illuminate:*`, the framework's own internal keys
- * (`illuminate:queue:restart` and friends), which are high-volume and not
- * actionable from an application's point of view.
+ * Two key treatments, both config-driven (`daywatch.sensors` — see
+ * config/daywatch.php) and both applied to the RAW key so start/completion
+ * pairing is never disturbed: `ignore` drops matching keys before anything is
+ * buffered (default `*illuminate:*`, the framework's own internal keys such as
+ * `illuminate:queue:restart`, which are high-volume and not actionable), and
+ * `groups` rewrites the recorded key to a group label at emit time (Pulse-style
+ * regex ⇒ replacement, first match wins) so hash-suffixed keys collapse into
+ * one `_group`. Whether the sensor runs at all is the SensorManager's
+ * `enabled` gate, not this class's concern.
  */
 final class CacheEventSensor
 {
@@ -49,7 +53,7 @@ final class CacheEventSensor
     public function __construct(
         private Core $core,
         private Patterns $ignoreKeys = new Patterns([]),
-        private bool $ignoreAll = false,
+        private KeyGrouper $groups = new KeyGrouper,
     ) {}
 
     /**
@@ -58,10 +62,6 @@ final class CacheEventSensor
     public function handle(object $event): void
     {
         try {
-            if ($this->ignoreAll) {
-                return;
-            }
-
             if ($this->isStartEvent($event)) {
                 $this->recordStart($event);
 
@@ -134,9 +134,9 @@ final class CacheEventSensor
         $now = $core->clock()->microtime();
 
         $store = $this->store($event);
-        $key = $this->key($event);
+        $rawKey = $this->key($event);
 
-        $pendingKey = $this->pendingKey($store, $key);
+        $pendingKey = $this->pendingKey($store, $rawKey);
         $start = $this->started[$pendingKey] ?? null;
         unset($this->started[$pendingKey]);
 
@@ -146,7 +146,7 @@ final class CacheEventSensor
         $record = new CacheEventRecord(
             envelope: Envelope::for($core, $timestamp),
             store: $store,
-            key: $key,
+            key: $this->groups->group($rawKey),
             type: $type,
             duration: max(0, $duration),
             ttl: $this->ttl($event, $type),

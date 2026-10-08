@@ -7,8 +7,8 @@ namespace Daywatch\Agent\Support;
 use Illuminate\Support\Str;
 
 /**
- * Patterns — a precompiled `Str::is()` pattern list backing the
- * `daywatch.filtering.*` ignore options (cache keys, query SQL, job names).
+ * Patterns — a precompiled `Str::is()` pattern list backing the per-sensor
+ * `ignore` options (`daywatch.sensors.*.ignore`: cache keys, query SQL, job names).
  *
  * The patterns are split ONCE, at construction. These filters run on hot
  * host paths (every cache event, every query, every job dispatch) and

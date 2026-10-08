@@ -55,6 +55,10 @@ final class SensorManager
 
     private function attachRequestSensor(): void
     {
+        if (! $this->enabled(RequestSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(RequestSensor::class);
 
@@ -91,6 +95,10 @@ final class SensorManager
 
     private function attachQuerySensor(): void
     {
+        if (! $this->enabled(QuerySensor::class)) {
+            return;
+        }
+
         $sensor = $this->app->make(QuerySensor::class);
 
         $this->on($this->events(), 'Illuminate\\Database\\Events\\QueryExecuted', fn ($event) => $sensor->handle($event));
@@ -98,6 +106,10 @@ final class SensorManager
 
     private function attachExceptionSensor(): void
     {
+        if (! $this->enabled(ExceptionSensor::class)) {
+            return;
+        }
+
         $handler = $this->app->make(ExceptionHandler::class);
 
         if (method_exists($handler, 'reportable')) {
@@ -114,6 +126,10 @@ final class SensorManager
 
     private function attachCacheSensor(): void
     {
+        if (! $this->enabled(CacheEventSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(CacheEventSensor::class);
 
@@ -136,6 +152,10 @@ final class SensorManager
 
     private function attachLogSensor(): void
     {
+        if (! $this->enabled(LogSensor::class)) {
+            return;
+        }
+
         $sensor = $this->app->make(LogSensor::class);
 
         $this->on($this->events(), 'Illuminate\\Log\\Events\\MessageLogged', fn ($event) => $sensor->handle($event));
@@ -143,6 +163,10 @@ final class SensorManager
 
     private function attachMailSensor(): void
     {
+        if (! $this->enabled(MailSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(MailSensor::class);
 
@@ -152,6 +176,10 @@ final class SensorManager
 
     private function attachNotificationSensor(): void
     {
+        if (! $this->enabled(NotificationSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(NotificationSensor::class);
 
@@ -161,7 +189,7 @@ final class SensorManager
 
     private function attachOutgoingRequestSensor(): void
     {
-        if (! class_exists(Http::class)) {
+        if (! $this->enabled(OutgoingRequestSensor::class) || ! class_exists(Http::class)) {
             return;
         }
 
@@ -176,6 +204,13 @@ final class SensorManager
      */
     private function attachQueueSensors(): void
     {
+        $queuedEnabled = $this->enabled(QueuedJobSensor::class);
+        $attemptEnabled = $this->enabled(JobAttemptSensor::class);
+
+        if (! $queuedEnabled && ! $attemptEnabled) {
+            return;
+        }
+
         $events = $this->events();
 
         if (class_exists(Queue::class)) {
@@ -188,19 +223,27 @@ final class SensorManager
             });
         }
 
-        $queued = $this->app->make(QueuedJobSensor::class);
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobQueueing', fn ($event) => $queued->queueing($event));
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobQueued', fn ($event) => $queued->queued($event));
+        if ($queuedEnabled) {
+            $queued = $this->app->make(QueuedJobSensor::class);
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobQueueing', fn ($event) => $queued->queueing($event));
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobQueued', fn ($event) => $queued->queued($event));
+        }
 
-        $attempt = $this->app->make(JobAttemptSensor::class);
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobProcessing', fn ($event) => $attempt->processing($event));
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobProcessed', fn ($event) => $attempt->processed($event));
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobFailed', fn ($event) => $attempt->failed($event));
-        $this->on($events, 'Illuminate\\Queue\\Events\\JobReleasedAfterException', fn ($event) => $attempt->released($event));
+        if ($attemptEnabled) {
+            $attempt = $this->app->make(JobAttemptSensor::class);
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobProcessing', fn ($event) => $attempt->processing($event));
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobProcessed', fn ($event) => $attempt->processed($event));
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobFailed', fn ($event) => $attempt->failed($event));
+            $this->on($events, 'Illuminate\\Queue\\Events\\JobReleasedAfterException', fn ($event) => $attempt->released($event));
+        }
     }
 
     private function attachCommandSensor(): void
     {
+        if (! $this->enabled(CommandSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(CommandSensor::class);
 
@@ -210,6 +253,10 @@ final class SensorManager
 
     private function attachScheduledTaskSensor(): void
     {
+        if (! $this->enabled(ScheduledTaskSensor::class)) {
+            return;
+        }
+
         $events = $this->events();
         $sensor = $this->app->make(ScheduledTaskSensor::class);
 
@@ -222,6 +269,29 @@ final class SensorManager
     private function events(): Dispatcher
     {
         return $this->app->make('events');
+    }
+
+    /**
+     * Per-sensor on/off (config `daywatch.sensors.{class}.enabled`, default
+     * true). A legacy `filtering.*` kill-switch from a pre-sensors-block
+     * published config still wins when present — the package no longer ships
+     * those keys, so they can only come from the host's own config; their
+     * semantics invert ("ignore everything" = disabled).
+     */
+    private function enabled(string $sensor): bool
+    {
+        $legacy = match ($sensor) {
+            CacheEventSensor::class => 'daywatch.filtering.ignore_cache_events',
+            QuerySensor::class => 'daywatch.filtering.ignore_queries',
+            OutgoingRequestSensor::class => 'daywatch.filtering.ignore_outgoing_requests',
+            default => null,
+        };
+
+        if ($legacy !== null && config()->has($legacy)) {
+            return ! (bool) config($legacy);
+        }
+
+        return (bool) config("daywatch.sensors.{$sensor}.enabled", true);
     }
 
     /**

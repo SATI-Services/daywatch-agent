@@ -17,6 +17,7 @@ use Daywatch\Agent\Sensors\QuerySensor;
 use Daywatch\Agent\Sensors\QueuedJobSensor;
 use Daywatch\Agent\Sensors\RequestSensor;
 use Daywatch\Agent\Support\Clock;
+use Daywatch\Agent\Support\KeyGrouper;
 use Daywatch\Agent\Support\Patterns;
 use Daywatch\Agent\Support\SystemClock;
 use Illuminate\Foundation\Console\AboutCommand;
@@ -72,23 +73,22 @@ class AgentServiceProvider extends ServiceProvider
         $this->app->singleton(RequestSensor::class, fn ($app): RequestSensor => new RequestSensor($app->make(Core::class)));
         $this->app->singleton(QuerySensor::class, fn ($app): QuerySensor => new QuerySensor(
             $app->make(Core::class),
-            Patterns::from(config('daywatch.filtering.ignore_query_patterns', '*jobs*,*cache*,*sessions*,*batches*')),
-            (bool) config('daywatch.filtering.ignore_queries', false),
+            $this->sensorIgnore(QuerySensor::class, 'daywatch.filtering.ignore_query_patterns', '*jobs*,*cache*,*sessions*,*batches*'),
         ));
         $this->app->singleton(ExceptionSensor::class, fn ($app): ExceptionSensor => new ExceptionSensor($app->make(Core::class)));
         $this->app->singleton(CacheEventSensor::class, fn ($app): CacheEventSensor => new CacheEventSensor(
             $app->make(Core::class),
-            Patterns::from(config('daywatch.filtering.ignore_cache_keys', '*illuminate:*')),
-            (bool) config('daywatch.filtering.ignore_cache_events', false),
+            $this->sensorIgnore(CacheEventSensor::class, 'daywatch.filtering.ignore_cache_keys', '*illuminate:*'),
+            KeyGrouper::from(config('daywatch.sensors.'.CacheEventSensor::class.'.groups', [])),
         ));
         $this->app->singleton(QueuedJobSensor::class, fn ($app): QueuedJobSensor => new QueuedJobSensor(
             $app->make(Core::class),
-            Patterns::from(config('daywatch.filtering.ignore_job_names', '')),
+            $this->sensorIgnore(QueuedJobSensor::class, 'daywatch.filtering.ignore_job_names', ''),
         ));
         $this->app->singleton(JobAttemptSensor::class, fn ($app): JobAttemptSensor => new JobAttemptSensor(
             $app->make(Core::class),
             null,
-            Patterns::from(config('daywatch.filtering.ignore_job_names', '')),
+            $this->sensorIgnore(JobAttemptSensor::class, 'daywatch.filtering.ignore_job_names', ''),
         ));
         $this->app->singleton(SensorManager::class, fn ($app): SensorManager => new SensorManager($app));
 
@@ -110,6 +110,21 @@ class AgentServiceProvider extends ServiceProvider
         } catch (Throwable $e) {
             $this->bootException = $e;
         }
+    }
+
+    /**
+     * A sensor's `ignore` option as a compiled pattern list. A legacy
+     * `filtering.*` key from a pre-sensors-block published config wins when
+     * present — the package no longer ships those keys, so they can only come
+     * from the host's own config.
+     */
+    protected function sensorIgnore(string $sensor, string $legacyKey, mixed $default): Patterns
+    {
+        $value = config()->has($legacyKey)
+            ? config($legacyKey)
+            : config("daywatch.sensors.{$sensor}.ignore", $default);
+
+        return Patterns::from($value);
     }
 
     /** A fully-disabled Core with a no-op client — the facade's last-resort fallback. */

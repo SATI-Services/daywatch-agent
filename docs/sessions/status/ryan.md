@@ -7,11 +7,14 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-06 — `1.0.2` tagged (M4 filtering release)._
+_Last touched: 2026-10-08 — cache-key grouping investigation (proposal pending Ryan's decision)._
 
 ## In flight
 
-- (nothing)
+- Cache-key grouping (Pulse-style `groups` regex map ⇒ key label, rewriting
+  `key` pre-record so `_group` collapses with no wire-contract change) —
+  investigated 2026-10-08, awaiting go/no-go + glob-vs-regex call →
+  [log](../ryan/2026-10-08-cache-key-grouping-investigation.md)
 
 ## Next up
 

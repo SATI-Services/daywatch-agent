@@ -32,7 +32,7 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Recently shipped (5 newest — full history in dated logs)
 
-- 2026-10-08 **Pulse-style `sensors` config + cache-key grouping** — per-sensor `enabled`/`ignore`/`groups` in `config/daywatch.php` (legacy `filtering.*` fallback), `Support\KeyGrouper`, 339 tests green → [log](ryan/2026-10-08-sensors-config-and-cache-key-grouping.md)
+- 2026-10-08 **`1.1.0` tagged** — Pulse-style `sensors` config (per-sensor `enabled`/`ignore`/`groups`) + cache-key grouping release; legacy `filtering.*` back-compat; 344 tests green → [log](ryan/2026-10-08-sensors-config-and-cache-key-grouping.md)
 - 2026-10-06 **`1.0.2` tagged** — M4 filtering release (`ignore_queries` wired, `ignore_query_patterns`, `ignore_job_names`) → [log](ryan/2026-10-06-release-1.0.2.md)
 - 2026-09-13 test(safety): forced `force="true"` DB/APP_ENV pins + forced empty `DB_URL` in `phpunit.xml` so a leaked `DB_*` env can't redirect the suite (board DB incident ref) → [log](will/2026-09-13-db-env-force-pins.md)
 - 2026-09-06 ci: dropped advisory-blocked Laravel 11 `tests.yml` matrix legs (12/13 kept; dispatch run `34064976005` green) `33ab20f` → [note](notes/2026-09-06-kimi-to-ryan-ci-fixes.md)

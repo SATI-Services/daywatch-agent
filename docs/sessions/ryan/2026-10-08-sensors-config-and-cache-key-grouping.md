@@ -119,10 +119,20 @@ semantics and locked them in with tests:
   (outgoing-request URLs, Pulse groups those too) — mechanism is generic,
   wiring deferred.
 
+## Release — 1.1.0
+
+Ryan asked for the version bump same day. `Daywatch::VERSION` `1.0.2` →
+`1.1.0` (minor: additive `sensors` config + grouping, legacy `filtering.*`
+back-compat kept — no breaking change for existing installs). Suite re-run on
+the bump: 344 passed. Tagged `1.1.0` (lightweight, matching the
+1.0.0/1.0.1/1.0.2 pattern) and pushed with main.
+
 ## Commits
 
 - (this session) `feat(sensors): Pulse-style per-sensor config + cache-key grouping`
   (code + config + tests + docs), pushed to main.
 - (this session) `test(config): prove ingestion survives 1.0.x published configs`
   (legacy-boot suite + partial-`sensors`-block tests), pushed to main.
+- (this session) `chore(release): bump package version to 1.1.0` + tag `1.1.0`
+  (lightweight, matching the 1.0.x pattern), pushed to main.
 - (earlier) `docs(sessions): log cache-key grouping investigation (proposal pending)`.

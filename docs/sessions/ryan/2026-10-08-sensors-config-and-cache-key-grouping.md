@@ -74,6 +74,33 @@ taking Laravel Pulse as inspiration. Ryan then decided: **no default grouping
 - Note: the shell's default `php` is MAMP 8.2 (deps need ≥ 8.3); run with
   `PATH="$HOME/.config/herd-lite/bin:$PATH"` (herd-lite 8.4.1).
 
+## Upgrade-safety proof (same day, Ryan's "must not break ingesting" review)
+
+Ryan's follow-up: the config restructure must be purely a control knob —
+ingestion on already-working installs must be unaffected. Verified the merge
+semantics and locked them in with tests:
+
+- `ServiceProvider::mergeConfigFrom` is a SHALLOW top-level merge
+  (`array_merge(package, app)`) — confirmed in the installed
+  `laravel/framework` source. So a 1.0.2-era published config keeps its
+  `filtering` block (legacy fallback applies) while the package's `sensors`
+  block merges underneath; and a host-defined `sensors` key replaces the
+  package's whole block, so EVERY read site carries the shipped defaults as
+  code-level fallbacks (`enabled=true`, ignore defaults, `groups=[]`).
+- New `tests/Legacy/LegacyConfigTest.php` +
+  `tests/Support/LegacyPublishedConfig.php` (a TRAIT overriding
+  `defineEnvironment` — Pest can't bind two TestCase classes to overlapping
+  dirs, but traits compose): boots the app with the exact `filtering` array a
+  1.0.2 published file contributes and asserts end-to-end that cache events
+  and queries still record, framework noise is still ignored, keys record
+  raw with no grouping, and a host-set legacy kill-switch still gates.
+- Partial-block tests: a host `sensors` block defining only cache `groups`
+  keeps every sensor attaching (listener counts) and keeps the shipped
+  `*illuminate:*` ignore default while grouping applies.
+- `composer test` — **344 passed** (1082 assertions); pint PASS (138 files).
+- Untouched by the whole change: `SocketClient`/framing, `RecordsBuffer`,
+  daemon batching/retry, `Payload` — the digest path has zero diffs.
+
 ## Decisions worth remembering
 
 - Grouping rewrites `key` pre-record ⇒ deterministic `_group` collapse with
@@ -96,4 +123,6 @@ taking Laravel Pulse as inspiration. Ryan then decided: **no default grouping
 
 - (this session) `feat(sensors): Pulse-style per-sensor config + cache-key grouping`
   (code + config + tests + docs), pushed to main.
+- (this session) `test(config): prove ingestion survives 1.0.x published configs`
+  (legacy-boot suite + partial-`sensors`-block tests), pushed to main.
 - (earlier) `docs(sessions): log cache-key grouping investigation (proposal pending)`.

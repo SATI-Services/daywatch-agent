@@ -258,3 +258,24 @@ it('applies the sensors.groups option through the container binding', function (
     expect($record['key'])->toBe('sys_setting:*')
         ->and($record['_group'])->toBe(Group::cache('redis', 'sys_setting:*'));
 });
+
+it('keeps the shipped ignore default when a host defines only groups in a partial sensors block', function () {
+    // Shallow top-level merge replaces the whole `sensors` block; the provider
+    // must still default `ignore` to the shipped framework-noise patterns.
+    config()->set('daywatch.sensors', [
+        CacheEventSensor::class => ['groups' => ['#^sys_setting_.*$#' => 'sys_setting:*']],
+    ]);
+    app()->forgetInstance(CacheEventSensor::class);
+
+    $sensor = app(CacheEventSensor::class);
+
+    app(Core::class)->prepareForRequest();
+
+    $sensor->handle(new CacheHit('redis', 'illuminate:queue:restart', 'v')); // still ignored
+    $sensor->handle(new CacheHit('redis', 'sys_setting_abc123', 'v'));       // grouped
+    $sensor->handle(new CacheHit('redis', 'users:1', 'v'));                  // raw
+
+    $records = app(RecordsBuffer::class)->all();
+
+    expect(array_column($records, 'key'))->toBe(['sys_setting:*', 'users:1']);
+});

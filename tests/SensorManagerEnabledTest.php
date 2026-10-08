@@ -91,6 +91,25 @@ it('lets a legacy key win over the new enabled flag while both are present', fun
     expect(listenerCount('Illuminate\Cache\Events\CacheHit'))->toBe($cache);
 });
 
+it('keeps every sensor at shipped defaults when a host defines a partial sensors block', function () {
+    // Shallow top-level merge: a host-defined `sensors` key REPLACES the
+    // package's whole block. Every read site must fall back to shipped
+    // defaults per sensor, so nothing turns off by accident.
+    config()->set('daywatch.sensors', [
+        CacheEventSensor::class => ['groups' => ['#^sys_setting_.*$#' => 'sys_setting:*']],
+    ]);
+
+    $cache = listenerCount('Illuminate\Cache\Events\CacheHit');
+    $query = listenerCount('Illuminate\Database\Events\QueryExecuted');
+    $log = listenerCount('Illuminate\Log\Events\MessageLogged');
+
+    (new SensorManager(app()))->register();
+
+    expect(listenerCount('Illuminate\Cache\Events\CacheHit'))->toBe($cache + 1)
+        ->and(listenerCount('Illuminate\Database\Events\QueryExecuted'))->toBe($query + 1)
+        ->and(listenerCount('Illuminate\Log\Events\MessageLogged'))->toBe($log + 1);
+});
+
 it('stays enabled when a legacy kill-switch is present but false (old config defaults)', function () {
     config()->set('daywatch.filtering.ignore_cache_events', false);
     config()->set('daywatch.filtering.ignore_queries', false);

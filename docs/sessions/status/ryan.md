@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-08 — `1.1.0` tagged (Pulse-style `sensors` config + cache-key grouping)._
+_Last touched: 2026-10-08 — `1.1.0` tagged; `daywatch-docs` MCP server diagnosed down + restarted._
 
 ## In flight
 
@@ -34,6 +34,10 @@ _Last touched: 2026-10-08 — `1.1.0` tagged (Pulse-style `sensors` config + cac
 
 _Seeded from git history, newest first:_
 
+- 2026-10-08 ops: `daywatch-docs` MCP server (`:8091`) was down — diagnosed
+  (nothing listening; error body was a stray occupant's Laravel 500) and
+  restarted from the daywatch-mcp checkout; 3 tools verified →
+  [log](../ryan/2026-10-08-mcp-docs-server-restart.md)
 - 2026-10-08 **`1.1.0` tagged** — Pulse-style `sensors` config + cache-key
   grouping release; 344 tests green →
   [log](../ryan/2026-10-08-sensors-config-and-cache-key-grouping.md)

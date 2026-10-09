@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-08 — `1.1.0` tagged; `daywatch-docs` MCP server diagnosed down + restarted._
+_Last touched: 2026-10-09 — audited: agent issues no queries of its own (observes only; `auth()->user()` guard-read nuance)._
 
 ## In flight
 
@@ -34,6 +34,11 @@ _Last touched: 2026-10-08 — `1.1.0` tagged; `daywatch-docs` MCP server diagnos
 
 _Seeded from git history, newest first:_
 
+- 2026-10-09 audit (read-only): confirmed the agent issues **no queries of
+  its own** — sensors are pure event listeners; only nuance is
+  `auth()->user()` can trigger the framework guard's lazy `retrieveById()`
+  SELECT on public routes for logged-in visitors →
+  [log](../ryan/2026-10-09-agent-user-query-audit.md)
 - 2026-10-08 ops: `daywatch-docs` MCP server (`:8091`) was down — diagnosed
   (nothing listening; error body was a stray occupant's Laravel 500) and
   restarted from the daywatch-mcp checkout; 3 tools verified →

@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Http\Middleware\CaptureRequest;
 use Daywatch\Agent\SensorManager;
 use Daywatch\Agent\Sensors\CacheEventSensor;
 use Daywatch\Agent\Sensors\JobAttemptSensor;
 use Daywatch\Agent\Sensors\QuerySensor;
 use Daywatch\Agent\Sensors\QueuedJobSensor;
+use Daywatch\Agent\Sensors\RequestSensor;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 
 /**
  * The per-sensor `enabled` gate (config `daywatch.sensors.{class}.enabled`)
@@ -122,4 +125,53 @@ it('stays enabled when a legacy kill-switch is present but false (old config def
 
     expect(listenerCount('Illuminate\Cache\Events\CacheHit'))->toBe($cache + 1)
         ->and(listenerCount('Illuminate\Database\Events\QueryExecuted'))->toBe($query + 1);
+});
+
+/**
+ * The kernel's global middleware list (Foundation kernel keeps it protected;
+ * Testbench's kernel has no accessor).
+ *
+ * @return array<int, string>
+ */
+function kernelMiddleware(object $kernel): array
+{
+    $property = new ReflectionProperty($kernel, 'middleware');
+    $property->setAccessible(true);
+
+    return $property->getValue($kernel);
+}
+
+/** Strip the boot-time prepend so a fresh register's own behaviour is observed. */
+function stripCaptureMiddleware(object $kernel): void
+{
+    $property = new ReflectionProperty($kernel, 'middleware');
+    $property->setAccessible(true);
+    $property->setValue($kernel, array_values(array_filter(
+        $property->getValue($kernel),
+        fn (string $middleware): bool => $middleware !== CaptureRequest::class,
+    )));
+}
+
+it('prepends the request-capture middleware to the HTTP kernel', function () {
+    // Listener diffs cover the event half of attachRequestSensor; the other
+    // half is the global middleware — without it no request execution ever
+    // starts, so pin the prepend itself. (The kernel dedupes prepends, so the
+    // boot-time copy is stripped first.)
+    $kernel = app(HttpKernel::class);
+    stripCaptureMiddleware($kernel);
+
+    (new SensorManager(app()))->register();
+
+    expect(kernelMiddleware($kernel)[0] ?? null)->toBe(CaptureRequest::class);
+});
+
+it('does not prepend the middleware when the request sensor is disabled', function () {
+    config()->set('daywatch.sensors.'.RequestSensor::class.'.enabled', false);
+
+    $kernel = app(HttpKernel::class);
+    stripCaptureMiddleware($kernel);
+
+    (new SensorManager(app()))->register();
+
+    expect(kernelMiddleware($kernel))->not->toContain(CaptureRequest::class);
 });

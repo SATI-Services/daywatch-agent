@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-09 — audited: agent issues no queries of its own (observes only; `auth()->user()` guard-read nuance)._
+_Last touched: 2026-10-12 — audited `daywatch.sampling` (works; wiring now regression-tested) + shipped per-sensor record sampling (`sensors.{class}.sample`) on main; 355 tests green._
 
 ## In flight
 
@@ -20,20 +20,30 @@ _Last touched: 2026-10-09 — audited: agent issues no queries of its own (obser
 ## Open follow-ups
 
 - Docs corpus `agent-protocol.md` §7 option table is stale: it lacks the new
-  `sensors` block (per-sensor `enabled`/`ignore`/`groups`) AND the M4 filters
+  `sensors` block (per-sensor `enabled`/`ignore`/`groups`), the M4 filters
   it replaced (`ignore_cache_keys`, `ignore_query_patterns`,
-  `ignore_job_names`) — refresh in the daywatch-mcp repo when next touching
-  the corpus.
+  `ignore_job_names`), AND the 2026-10-12 per-sensor `sample` option (seven
+  `DAYWATCH_*_SAMPLE_RATE` env vars) — refresh in the daywatch-mcp repo when
+  next touching the corpus.
 - Consider `groups` for other high-cardinality values (outgoing-request URLs)
   — `Support\KeyGrouper` is generic; wiring deferred.
 - Host apps on 1.0.x published configs: no action needed on upgrade to 1.1.0
   (legacy `filtering.*` keys still honoured), but the published file's
   `filtering` block can be deleted when convenient.
+- Per-sensor `sample` is on main unreleased — candidate for a `1.2.0` tag
+  (VERSION bump + tag in a release session).
 
 ## Shipped
 
 _Seeded from git history, newest first:_
 
+- 2026-10-12 feat(sampling): audited `daywatch.sampling` end-to-end (correct;
+  container-wiring regression tests added) + new per-sensor record sampling —
+  `sensors.{class}.sample` on the seven high-volume child-record sensors
+  (queries, cache events, logs, mail, notifications, outgoing requests,
+  queued jobs); per-record rolls, counters always count every event;
+  355 tests green →
+  [log](../ryan/2026-10-12-per-sensor-sampling.md)
 - 2026-10-09 audit (read-only): confirmed the agent issues **no queries of
   its own** — sensors are pure event listeners; only nuance is
   `auth()->user()` can trigger the framework guard's lazy `retrieveById()`

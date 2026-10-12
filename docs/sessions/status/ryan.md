@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-12 — test hardening: request-capture middleware + facade un-crashability; 367 tests green._
+_Last touched: 2026-10-12 — **`1.3.0` tagged** (sample_rate wire stamping release); 370 tests green._
 
 ## In flight
 
@@ -35,6 +35,11 @@ _Last touched: 2026-10-12 — test hardening: request-capture middleware + facad
 
 _Seeded from git history, newest first:_
 
+- 2026-10-12 **`1.3.0` tagged** (kimi) — sample_rate wire stamping release
+  (`b863ab9` stamping + `2e5e303` π-correction + `d2b1043` guard tests);
+  unblocks dashboard badges for hosts on 1.2.0 (icicle, pingpath) — 1.2.0
+  samples but never stamps. 370 tests green →
+  [log](../ryan/2026-10-12-release-1.3.0.md)
 - 2026-10-12 test: entry-point + facade guards (kimi) — `CaptureRequest`
   middleware tests (starts the execution, never blocks the request), kernel
   prepend gating, `Daywatch` manager exploding-core/container-fallback

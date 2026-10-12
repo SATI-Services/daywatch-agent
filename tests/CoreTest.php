@@ -359,3 +359,71 @@ it('propagates the effective rate and rejects an out-of-range one on read', func
     Context::addHidden('daywatch_sample_rate', 0.1);
     expect(ContextPropagation::read()['sample_rate'])->toBe(0.1);
 });
+
+it('stamps the COMBINED inclusion probability when the execution recorded an exception', function () {
+    Context::addHidden('daywatch_trace_id', 'trace-from-upstream');
+    Context::addHidden('daywatch_should_sample', true);
+    Context::addHidden('daywatch_sample_rate', 0.5);
+
+    $client = new RecordingClient;
+    [$core] = makeCore($client, exceptionRate: 0.5);
+    $core->prepareForJob();
+
+    $core->write(['t' => 'job-attempt']);
+    $core->recordException(['t' => 'exception'], 'X: boom');
+    $core->finishExecution();
+
+    // Kept by EITHER roll: π = 0.5 + (1−0.5)×0.5 = 0.75 — stamping the head
+    // rate alone would over-weight this execution ~1.33× on error counts.
+    expect($client->lastDecoded())->toBe([
+        ['t' => 'job-attempt', 'sample_rate' => 0.75],
+        ['t' => 'exception', 'sample_rate' => 0.75],
+    ]);
+});
+
+it('combines the per-sensor roll with the exception-inclusive probability on gated records', function () {
+    mt_srand(4242); // deterministic roll sequence for this test only
+
+    Context::addHidden('daywatch_trace_id', 'trace-from-upstream');
+    Context::addHidden('daywatch_should_sample', true);
+    Context::addHidden('daywatch_sample_rate', 0.5);
+
+    $client = new RecordingClient;
+    [$core] = makeCore($client, exceptionRate: 0.5, recordSampleRates: ['query' => 0.5]);
+    $core->prepareForJob();
+
+    $core->write(['t' => 'job-attempt']);
+    $core->recordException(['t' => 'exception'], 'X: boom');
+    for ($i = 0; $i < 200; $i++) {
+        $core->recordQuery(['t' => 'query']);
+    }
+    $core->finishExecution();
+
+    $records = $client->lastDecoded();
+    $queries = array_values(array_filter($records, fn (array $r): bool => $r['t'] === 'query'));
+
+    expect($queries)->not->toBe([])
+        ->and($records[0])->toBe(['t' => 'job-attempt', 'sample_rate' => 0.75])
+        ->and(array_unique(array_column($queries, 'sample_rate')))->toBe([0.375]);
+});
+
+it('omits the stamp for exception executions when the combined probability reaches 1.0', function () {
+    Context::addHidden('daywatch_trace_id', 'trace-from-upstream');
+    Context::addHidden('daywatch_should_sample', true);
+    Context::addHidden('daywatch_sample_rate', 0.5);
+
+    $client = new RecordingClient;
+    [$core] = makeCore($client, exceptionRate: 1.0);
+    $core->prepareForJob();
+
+    $core->write(['t' => 'job-attempt']);
+    $core->recordException(['t' => 'exception'], 'X: boom');
+    $core->finishExecution();
+
+    // π = 0.5 + 0.5×1.0 = 1.0 → errors at the default exceptions rate stay
+    // exact and read as unsampled downstream.
+    expect($client->lastDecoded())->toBe([
+        ['t' => 'job-attempt'],
+        ['t' => 'exception'],
+    ]);
+});

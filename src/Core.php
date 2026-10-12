@@ -695,24 +695,37 @@ class Core
      * protocol §1 `sample_rate`): the execution's effective head rate, times
      * the per-sensor roll for rate-gated child types. Digest time, not record
      * time — the decision is final here, so an exception re-roll rescue stamps
-     * the EXCEPTIONS rate, never the head rate that had dropped the execution.
-     * Omitted when the product is 1.0 (absent ≡ 1.0 on the wire); appended as
-     * the trailing key, so ordered parity fixtures never carry it.
+     * the rescue-inclusive rate, never the head rate that had dropped the
+     * execution. Omitted when the product is 1.0 (absent ≡ 1.0 on the wire);
+     * appended as the trailing key, so ordered parity fixtures never carry it.
+     *
+     * Executions that recorded an exception are kept by EITHER roll (the head
+     * roll or report()'s re-roll), so their true inclusion probability is the
+     * COMBINED π = r + (1−r)·exceptions-rate — stamping only the winning
+     * roll's rate would over-weight them ~2× at r=0.1, and error counts are
+     * the last number that may lie. (Propagation carries the head-equivalent
+     * r, not π: each hop combines with its own exception count.)
      *
      * @param  list<array<string, mixed>>  $records
      */
     private function stampSampleRates(array &$records): void
     {
+        $rate = $this->effectiveSampleRate;
+
+        if (($this->counters['exceptions'] ?? 0) > 0 && $rate < 1.0) {
+            $rate += (1.0 - $rate) * $this->exceptionSampleRate;
+        }
+
         foreach ($records as &$record) {
-            $rate = $this->effectiveSampleRate;
+            $recordRate = $rate;
             $type = str_replace('-', '_', (string) ($record['t'] ?? ''));
 
             if (in_array($type, self::RATE_GATED_TYPES, true)) {
-                $rate *= $this->recordSampleRates[$type] ?? 1.0;
+                $recordRate *= $this->recordSampleRates[$type] ?? 1.0;
             }
 
-            if ($rate < 1.0) {
-                $record['sample_rate'] = round($rate, 6);
+            if ($recordRate < 1.0) {
+                $record['sample_rate'] = round($recordRate, 6);
             }
         }
 

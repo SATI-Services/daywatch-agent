@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Daywatch\Agent\Support\ContextPropagation;
 use Daywatch\Agent\Tests\Support\RecordingClient;
 use Illuminate\Support\Facades\Context;
 
@@ -257,4 +258,104 @@ it('swallows a transport that throws (cardinal rule)', function () {
     $core->digest(); // must not throw
 
     expect(true)->toBeTrue();
+});
+
+it('leaves records unstamped when the execution is unsampled (rate 1.0 ≡ absent)', function () {
+    $client = new RecordingClient;
+    [$core] = makeCore($client, requestRate: 1.0);
+
+    $core->prepareForRequest();
+    $core->write(['t' => 'request', 'x' => 1]);
+    $core->write(['t' => 'query']);
+    $core->finishExecution();
+
+    expect($client->lastDecoded())->toBe([['t' => 'request', 'x' => 1], ['t' => 'query']]);
+});
+
+it('stamps every digested record with the propagated sample rate', function () {
+    Context::addHidden('daywatch_trace_id', 'trace-from-upstream');
+    Context::addHidden('daywatch_should_sample', true);
+    Context::addHidden('daywatch_sample_rate', 0.25);
+
+    $client = new RecordingClient;
+    [$core] = makeCore($client);
+    $core->prepareForJob();
+
+    $core->write(['t' => 'job-attempt']); // execution root: head rate only
+    $core->write(['t' => 'query']); // gated type, roll 1.0 by default
+    $core->finishExecution();
+
+    expect($core->sampleRate())->toBe(0.25)
+        ->and($client->lastDecoded())->toBe([
+            ['t' => 'job-attempt', 'sample_rate' => 0.25],
+            ['t' => 'query', 'sample_rate' => 0.25],
+        ]);
+});
+
+it('multiplies the execution rate by the per-sensor roll on gated child records', function () {
+    mt_srand(4242); // deterministic roll sequence for this test only
+
+    Context::addHidden('daywatch_trace_id', 'trace-from-upstream');
+    Context::addHidden('daywatch_should_sample', true);
+    Context::addHidden('daywatch_sample_rate', 0.5);
+
+    $client = new RecordingClient;
+    [$core] = makeCore($client, recordSampleRates: ['query' => 0.5]);
+    $core->prepareForJob();
+
+    $core->write(['t' => 'job-attempt']);
+    for ($i = 0; $i < 200; $i++) {
+        $core->recordQuery(['t' => 'query']);
+    }
+    $core->finishExecution();
+
+    $records = $client->lastDecoded();
+    $queries = array_values(array_filter($records, fn (array $r): bool => $r['t'] === 'query'));
+
+    expect($queries)->not->toBe([])
+        ->and($records[0])->toBe(['t' => 'job-attempt', 'sample_rate' => 0.5])
+        ->and(array_unique(array_column($queries, 'sample_rate')))->toBe([0.25]);
+});
+
+it('reports the head rate that dropped the execution, then the exceptions rate after a rescue', function () {
+    $client = new RecordingClient;
+    [$core] = makeCore($client, requestRate: 0.0, exceptionRate: 1.0);
+
+    $core->prepareForRequest();
+    expect($core->sampleRate())->toBe(0.0);
+
+    $core->recordException(['t' => 'exception'], 'X: boom');
+
+    // Rescued by the re-roll: records must weight at the EXCEPTIONS rate
+    // (here 1.0 → nothing stamped), never the head rate that dropped them.
+    expect($core->sampleRate())->toBe(1.0);
+
+    $core->finishExecution();
+    expect($client->lastDecoded())->toBe([['t' => 'exception']]);
+});
+
+it('stamps nothing for a forced sample() even when the head roll dropped the execution', function () {
+    $client = new RecordingClient;
+    [$core] = makeCore($client, requestRate: 0.0);
+
+    $core->prepareForRequest();
+    $core->sample();
+    $core->write(['t' => 'request']);
+    $core->finishExecution();
+
+    expect($core->sampleRate())->toBe(1.0)
+        ->and($client->lastDecoded())->toBe([['t' => 'request']]);
+});
+
+it('propagates the effective rate and rejects an out-of-range one on read', function () {
+    [$core] = makeCore(new RecordingClient, requestRate: 1.0);
+    $core->prepareForRequest();
+
+    expect(Context::getHidden('daywatch_sample_rate'))->toBe(1.0);
+
+    Context::addHidden('daywatch_sample_rate', 1.5);
+    expect(ContextPropagation::read()['sample_rate'])->toBeNull();
+
+    Context::addHidden('daywatch_sample_rate', 0.1);
+    expect(ContextPropagation::read()['sample_rate'])->toBe(0.1);
 });

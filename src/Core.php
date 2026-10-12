@@ -52,6 +52,20 @@ class Core
 
     private ?bool $sampleOverride = null;
 
+    /**
+     * Effective inclusion probability of the current execution's digest decision
+     * (agent protocol §3): the rate of the roll that won — the execution type's
+     * head rate, the exceptions rate when a re-roll rescued a sampled-out
+     * execution, 1.0 for a `sample()` force, or the upstream rate adopted via
+     * propagation. Stamped on every record at digest time as `sample_rate`.
+     */
+    private float $effectiveSampleRate = 1.0;
+
+    /** Wire types (dash→underscore) whose child rows a per-sensor `sample` roll gates. */
+    private const RATE_GATED_TYPES = [
+        'query', 'cache_event', 'outgoing_request', 'log', 'mail', 'notification', 'queued_job',
+    ];
+
     private bool $paused = false;
 
     private string $exceptionPreview = '';
@@ -143,6 +157,7 @@ class Core
             $this->executionId = $this->traceId;
 
             $this->sampleDecision = $this->decideSampling($this->requestSampleRate);
+            $this->effectiveSampleRate = $this->requestSampleRate;
 
             $this->propagate();
         } catch (Throwable) {
@@ -194,6 +209,7 @@ class Core
             $this->stageStartedAt = $this->requestStartedAt;
 
             $this->sampleDecision = $this->decideSampling($this->commandSampleRate);
+            $this->effectiveSampleRate = $this->commandSampleRate;
 
             $this->propagate();
         } catch (Throwable) {
@@ -218,6 +234,7 @@ class Core
             $this->stageStartedAt = $this->requestStartedAt;
 
             $this->sampleDecision = $this->decideSampling($this->scheduledTaskSampleRate);
+            $this->effectiveSampleRate = $this->scheduledTaskSampleRate;
 
             $this->propagate();
         } catch (Throwable) {
@@ -244,6 +261,7 @@ class Core
             $this->requestStartedAt = 0.0;
             $this->sampleDecision = false;
             $this->sampleOverride = null;
+            $this->effectiveSampleRate = 1.0;
             $this->paused = false;
             $this->exceptionPreview = '';
             $this->userId = null;
@@ -297,15 +315,25 @@ class Core
         return $this->sampleOverride ?? $this->sampleDecision;
     }
 
+    /** Effective inclusion probability of this execution's records (agent protocol §1 `sample_rate`). */
+    public function sampleRate(): float
+    {
+        return $this->effectiveSampleRate;
+    }
+
     public function sample(): void
     {
         $this->sampleOverride = true;
+        // A user force is not a probability draw: the trace is kept outright,
+        // so it must not be extrapolated — weight 1.
+        $this->effectiveSampleRate = 1.0;
         $this->propagate();
     }
 
     public function dontSample(): void
     {
         $this->sampleOverride = false;
+        $this->effectiveSampleRate = 1.0;
         $this->propagate();
     }
 
@@ -601,6 +629,10 @@ class Core
 
         if (! $this->shouldSample() && $this->decideSampling($this->exceptionSampleRate)) {
             $this->sampleOverride = true;
+            // Rescued by the exception re-roll: this execution's inclusion
+            // probability is the EXCEPTIONS rate, not the head rate that
+            // dropped it — stamping the head rate would over-weight the rows.
+            $this->effectiveSampleRate = $this->exceptionSampleRate;
             $this->propagate();
         }
 
@@ -642,6 +674,8 @@ class Core
                 return;
             }
 
+            $this->stampSampleRates($records);
+
             $payload = json_encode(
                 $records,
                 JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE,
@@ -656,11 +690,40 @@ class Core
         }
     }
 
+    /**
+     * Stamp every record in the digest with its inclusion probability (agent
+     * protocol §1 `sample_rate`): the execution's effective head rate, times
+     * the per-sensor roll for rate-gated child types. Digest time, not record
+     * time — the decision is final here, so an exception re-roll rescue stamps
+     * the EXCEPTIONS rate, never the head rate that had dropped the execution.
+     * Omitted when the product is 1.0 (absent ≡ 1.0 on the wire); appended as
+     * the trailing key, so ordered parity fixtures never carry it.
+     *
+     * @param  list<array<string, mixed>>  $records
+     */
+    private function stampSampleRates(array &$records): void
+    {
+        foreach ($records as &$record) {
+            $rate = $this->effectiveSampleRate;
+            $type = str_replace('-', '_', (string) ($record['t'] ?? ''));
+
+            if (in_array($type, self::RATE_GATED_TYPES, true)) {
+                $rate *= $this->recordSampleRates[$type] ?? 1.0;
+            }
+
+            if ($rate < 1.0) {
+                $record['sample_rate'] = round($rate, 6);
+            }
+        }
+
+        unset($record);
+    }
+
     // ── propagation ───────────────────────────────────────────────────────
 
     private function propagate(): void
     {
-        ContextPropagation::write($this->traceId, $this->shouldSample(), $this->resolveUser());
+        ContextPropagation::write($this->traceId, $this->shouldSample(), $this->resolveUser(), $this->effectiveSampleRate);
     }
 
     /** Adopt a trace propagated from an upstream execution (queue hop), if any. */
@@ -674,6 +737,13 @@ class Core
 
         if ($propagated['should_sample'] !== null) {
             $this->sampleOverride = $propagated['should_sample'];
+        }
+
+        // The rate the upstream execution's records were stamped with — a
+        // downstream hop must weight identically or a sampled request's job
+        // attempts would extrapolate against the wrong probability.
+        if ($propagated['sample_rate'] !== null) {
+            $this->effectiveSampleRate = $propagated['sample_rate'];
         }
 
         if ($propagated['user_id'] !== null && $propagated['user_id'] !== '') {

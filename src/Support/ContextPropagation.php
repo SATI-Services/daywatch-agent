@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Context;
 use Throwable;
 
 /**
- * Propagates the trace id, sampling decision, and user id across queue hops via
- * hidden Laravel Context keys (agent protocol §3). Hidden keys ride with
- * the serialized job and are read back when the job runs, so a trace spans hops
- * with zero payload parsing. All access is guarded — Context may be unavailable
- * or unbootable, and telemetry propagation must never throw.
+ * Propagates the trace id, sampling decision, effective sample rate, and user id
+ * across queue hops via hidden Laravel Context keys (agent protocol §3). Hidden
+ * keys ride with the serialized job and are read back when the job runs, so a
+ * trace spans hops with zero payload parsing. All access is guarded — Context
+ * may be unavailable or unbootable, and telemetry propagation must never throw.
  */
 final class ContextPropagation
 {
@@ -20,9 +20,11 @@ final class ContextPropagation
 
     public const SHOULD_SAMPLE = 'daywatch_should_sample';
 
+    public const SAMPLE_RATE = 'daywatch_sample_rate';
+
     public const USER_ID = 'daywatch_user_id';
 
-    public static function write(string $traceId, bool $shouldSample, string $userId): void
+    public static function write(string $traceId, bool $shouldSample, string $userId, float $sampleRate = 1.0): void
     {
         try {
             if (! class_exists(Context::class)) {
@@ -31,6 +33,7 @@ final class ContextPropagation
 
             Context::addHidden(self::TRACE_ID, $traceId);
             Context::addHidden(self::SHOULD_SAMPLE, $shouldSample);
+            Context::addHidden(self::SAMPLE_RATE, $sampleRate);
             Context::addHidden(self::USER_ID, $userId);
         } catch (Throwable) {
             // Propagation is best-effort.
@@ -38,11 +41,11 @@ final class ContextPropagation
     }
 
     /**
-     * @return array{trace_id: ?string, should_sample: ?bool, user_id: ?string}
+     * @return array{trace_id: ?string, should_sample: ?bool, sample_rate: ?float, user_id: ?string}
      */
     public static function read(): array
     {
-        $default = ['trace_id' => null, 'should_sample' => null, 'user_id' => null];
+        $default = ['trace_id' => null, 'should_sample' => null, 'sample_rate' => null, 'user_id' => null];
 
         try {
             if (! class_exists(Context::class)) {
@@ -51,11 +54,15 @@ final class ContextPropagation
 
             $traceId = Context::getHidden(self::TRACE_ID);
             $shouldSample = Context::getHidden(self::SHOULD_SAMPLE);
+            $sampleRate = Context::getHidden(self::SAMPLE_RATE);
             $userId = Context::getHidden(self::USER_ID);
 
             return [
                 'trace_id' => is_string($traceId) ? $traceId : null,
                 'should_sample' => is_bool($shouldSample) ? $shouldSample : null,
+                'sample_rate' => is_numeric($sampleRate) && $sampleRate > 0 && $sampleRate <= 1
+                    ? (float) $sampleRate
+                    : null,
                 'user_id' => is_string($userId) ? $userId : null,
             ];
         } catch (Throwable) {

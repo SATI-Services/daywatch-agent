@@ -15,7 +15,7 @@ use Throwable;
 class Daywatch
 {
     /** The Daywatch agent package version. */
-    public const VERSION = '1.1.0';
+    public const VERSION = '1.2.0';
 
     public function __construct(
         private Core $core,

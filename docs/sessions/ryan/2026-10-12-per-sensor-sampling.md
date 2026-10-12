@@ -109,5 +109,13 @@ the savings are buffer/socket/daemon/ingest volume, which was the ask.
 
 - Docs corpus `agent-protocol.md` §7 option table: add the seven `sample`
   options (already-stale entry in status/ryan.md extended).
-- Release candidate for `1.2.0` (feature addition) — VERSION bump + tag left
-  for a release session, per convention.
+
+## Release — 1.2.0
+
+Later the same day: bumped `Daywatch::VERSION` to `1.2.0` (minor: per-sensor
+record sampling feature addition). Full suite green on the bump: 355 passed.
+Tagged `1.2.0` (lightweight, matching the `1.x` tag style) and pushed with
+tags — two commits:
+
+- `chore(release): bump package version to 1.2.0` (`src/Daywatch.php` only)
+- `docs(sessions): log 1.2.0 release` (this log + status + SHARED ticker)

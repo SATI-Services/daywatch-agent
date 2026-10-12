@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-12 — audited `daywatch.sampling` (works; wiring now regression-tested) + shipped per-sensor record sampling (`sensors.{class}.sample`) on main; 355 tests green._
+_Last touched: 2026-10-12 — **`1.2.0` tagged** (per-sensor record sampling release); 355 tests green._
 
 ## In flight
 
@@ -30,18 +30,13 @@ _Last touched: 2026-10-12 — audited `daywatch.sampling` (works; wiring now reg
 - Host apps on 1.0.x published configs: no action needed on upgrade to 1.1.0
   (legacy `filtering.*` keys still honoured), but the published file's
   `filtering` block can be deleted when convenient.
-- Per-sensor `sample` is on main unreleased — candidate for a `1.2.0` tag
-  (VERSION bump + tag in a release session).
 
 ## Shipped
 
 _Seeded from git history, newest first:_
 
-- 2026-10-12 feat(sampling): audited `daywatch.sampling` end-to-end (correct;
-  container-wiring regression tests added) + new per-sensor record sampling —
-  `sensors.{class}.sample` on the seven high-volume child-record sensors
-  (queries, cache events, logs, mail, notifications, outgoing requests,
-  queued jobs); per-record rolls, counters always count every event;
+- 2026-10-12 **`1.2.0` tagged** — per-sensor record sampling release
+  (`sensors.{class}.sample` on the seven high-volume child-record sensors);
   355 tests green →
   [log](../ryan/2026-10-12-per-sensor-sampling.md)
 - 2026-10-09 audit (read-only): confirmed the agent issues **no queries of

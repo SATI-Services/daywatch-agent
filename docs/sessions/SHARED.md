@@ -32,7 +32,7 @@ Open PRs (Track B in flight) are surfaced live by the session-start hook via `gh
 
 ## Recently shipped (5 newest — full history in dated logs)
 
-- 2026-10-12 **per-sensor record sampling on main** (unreleased, 1.2.0 candidate) — `sensors.{class}.sample` for the 7 high-volume child-record sensors + `daywatch.sampling` audit/wiring tests; 355 tests green → [log](ryan/2026-10-12-per-sensor-sampling.md)
+- 2026-10-12 **`1.2.0` tagged** — per-sensor record sampling release (`sensors.{class}.sample` for the 7 high-volume child-record sensors) + `daywatch.sampling` audit/wiring tests; 355 tests green → [log](ryan/2026-10-12-per-sensor-sampling.md)
 - 2026-10-08 **`1.1.0` tagged** — Pulse-style `sensors` config (per-sensor `enabled`/`ignore`/`groups`) + cache-key grouping release; legacy `filtering.*` back-compat; 344 tests green → [log](ryan/2026-10-08-sensors-config-and-cache-key-grouping.md)
 - 2026-10-06 **`1.0.2` tagged** — M4 filtering release (`ignore_queries` wired, `ignore_query_patterns`, `ignore_job_names`) → [log](ryan/2026-10-06-release-1.0.2.md)
 - 2026-09-13 test(safety): forced `force="true"` DB/APP_ENV pins + forced empty `DB_URL` in `phpunit.xml` so a leaked `DB_*` env can't redirect the suite (board DB incident ref) → [log](will/2026-09-13-db-env-force-pins.md)

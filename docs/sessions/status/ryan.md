@@ -7,7 +7,7 @@ historical detail lives in the dated logs under `../ryan/`.
 > Seeded 2026-09-06 by the AID adoption backfill from git history (`--since 2026-06-08`). Entries below
 > are reconstructed from commits, not contemporary notes.
 
-_Last touched: 2026-10-12 — **`sample_rate` wire stamping** (effective inclusion probability on every digested record); 361 tests green._
+_Last touched: 2026-10-12 — test hardening: request-capture middleware + facade un-crashability; 367 tests green._
 
 ## In flight
 
@@ -35,6 +35,11 @@ _Last touched: 2026-10-12 — **`sample_rate` wire stamping** (effective inclusi
 
 _Seeded from git history, newest first:_
 
+- 2026-10-12 test: entry-point + facade guards (kimi) — `CaptureRequest`
+  middleware tests (starts the execution, never blocks the request), kernel
+  prepend gating, `Daywatch` manager exploding-core/container-fallback
+  guards; 367 tests green →
+  [log](../ryan/2026-10-12-entry-point-and-facade-guard-tests.md)
 - 2026-10-12 **`sample_rate` wire stamping** (kimi) — every digested record
   carries its effective inclusion probability (winning roll's rate × per-sensor
   roll for the seven gated child types; rescue stamps the exceptions rate;

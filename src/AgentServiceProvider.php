@@ -13,6 +13,10 @@ use Daywatch\Agent\Ingest\SocketClient;
 use Daywatch\Agent\Sensors\CacheEventSensor;
 use Daywatch\Agent\Sensors\ExceptionSensor;
 use Daywatch\Agent\Sensors\JobAttemptSensor;
+use Daywatch\Agent\Sensors\LogSensor;
+use Daywatch\Agent\Sensors\MailSensor;
+use Daywatch\Agent\Sensors\NotificationSensor;
+use Daywatch\Agent\Sensors\OutgoingRequestSensor;
 use Daywatch\Agent\Sensors\QuerySensor;
 use Daywatch\Agent\Sensors\QueuedJobSensor;
 use Daywatch\Agent\Sensors\RequestSensor;
@@ -68,6 +72,15 @@ class AgentServiceProvider extends ServiceProvider
             (float) config('daywatch.sampling.exceptions', 1.0),
             (bool) config('daywatch.capture_exception_source_code', true),
             (float) config('daywatch.sampling.scheduled_tasks', 1.0),
+            recordSampleRates: [
+                'query' => $this->sensorSampleRate(QuerySensor::class),
+                'cache_event' => $this->sensorSampleRate(CacheEventSensor::class),
+                'outgoing_request' => $this->sensorSampleRate(OutgoingRequestSensor::class),
+                'log' => $this->sensorSampleRate(LogSensor::class),
+                'mail' => $this->sensorSampleRate(MailSensor::class),
+                'notification' => $this->sensorSampleRate(NotificationSensor::class),
+                'queued_job' => $this->sensorSampleRate(QueuedJobSensor::class),
+            ],
         ));
 
         $this->app->singleton(RequestSensor::class, fn ($app): RequestSensor => new RequestSensor($app->make(Core::class)));
@@ -125,6 +138,17 @@ class AgentServiceProvider extends ServiceProvider
             : config("daywatch.sensors.{$sensor}.ignore", $default);
 
         return Patterns::from($value);
+    }
+
+    /**
+     * A sensor's `sample` option as a rate — the fraction of that sensor's
+     * records kept within an execution (1.0 keeps everything). Only the
+     * high-volume child-record sensors take the option; execution-root and
+     * exception records are governed by head sampling (`daywatch.sampling`).
+     */
+    protected function sensorSampleRate(string $sensor): float
+    {
+        return (float) config("daywatch.sensors.{$sensor}.sample", 1.0);
     }
 
     /** A fully-disabled Core with a no-op client — the facade's last-resort fallback. */

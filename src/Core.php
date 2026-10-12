@@ -70,6 +70,14 @@ class Core
     /** @var array<string, true> set of object hashes to suppress from exception recording */
     private array $ignored = [];
 
+    /**
+     * Per-record-type sample rates (config `sensors.{class}.sample`), keyed by
+     * short type name. Absent types keep every record.
+     *
+     * @var array<string, float>
+     */
+    private array $recordSampleRates;
+
     public function __construct(
         private RecordsBuffer $buffer,
         private Client $client,
@@ -82,11 +90,13 @@ class Core
         private float $exceptionSampleRate = 1.0,
         private bool $captureExceptionSourceCode = true,
         private float $scheduledTaskSampleRate = 1.0,
+        array $recordSampleRates = [],
     ) {
         $this->traceId = Uuid::v4();
         $this->executionId = $this->traceId;
         $this->counters = Counters::zeroed();
         $this->stages = array_fill_keys(ExecutionStage::REQUEST_STAGES, 0);
+        $this->recordSampleRates = $recordSampleRates;
     }
 
     // ── configuration accessors ───────────────────────────────────────────
@@ -316,6 +326,29 @@ class Core
         }
     }
 
+    /**
+     * Per-record sampling roll for high-volume child records (config
+     * `sensors.{class}.sample`). Independent of the head decision: the roll only
+     * governs whether THIS row is buffered — the execution's counters always
+     * increment, so the execution-root record still reports the true event count
+     * (342 queries ran, a `sample`-fraction of the rows is kept). mt_rand is
+     * deliberate: the roll is per record on the hot path and not security-sensitive.
+     */
+    private function keepsRecord(string $type): bool
+    {
+        $rate = $this->recordSampleRates[$type] ?? 1.0;
+
+        if ($rate >= 1.0) {
+            return true;
+        }
+
+        if ($rate <= 0.0) {
+            return false;
+        }
+
+        return mt_rand(1, mt_getrandmax()) <= (int) ($rate * mt_getrandmax());
+    }
+
     // ── pause / resume ────────────────────────────────────────────────────
 
     public function pause(): void
@@ -483,46 +516,72 @@ class Core
         }
     }
 
+    /**
+     * Record a high-volume child record: the counter ALWAYS increments (the
+     * execution tail keeps the true count) while the row itself is buffered
+     * only when the type's per-sensor `sample` roll keeps it.
+     */
     public function recordQuery(array $record): void
     {
         $this->increment('queries');
-        $this->write($record);
+
+        if ($this->keepsRecord('query')) {
+            $this->write($record);
+        }
     }
 
     public function recordCacheEvent(array $record): void
     {
         $this->increment('cache_events');
-        $this->write($record);
+
+        if ($this->keepsRecord('cache_event')) {
+            $this->write($record);
+        }
     }
 
     public function recordOutgoingRequest(array $record): void
     {
         $this->increment('outgoing_requests');
-        $this->write($record);
+
+        if ($this->keepsRecord('outgoing_request')) {
+            $this->write($record);
+        }
     }
 
     public function recordLog(array $record): void
     {
         $this->increment('logs');
-        $this->write($record);
+
+        if ($this->keepsRecord('log')) {
+            $this->write($record);
+        }
     }
 
     public function recordMail(array $record): void
     {
         $this->increment('mail');
-        $this->write($record);
+
+        if ($this->keepsRecord('mail')) {
+            $this->write($record);
+        }
     }
 
     public function recordNotification(array $record): void
     {
         $this->increment('notifications');
-        $this->write($record);
+
+        if ($this->keepsRecord('notification')) {
+            $this->write($record);
+        }
     }
 
     public function recordQueuedJob(array $record): void
     {
         $this->increment('jobs_queued');
-        $this->write($record);
+
+        if ($this->keepsRecord('queued_job')) {
+            $this->write($record);
+        }
     }
 
     /** Write a record that carries no execution counter of its own (e.g. `user`). */

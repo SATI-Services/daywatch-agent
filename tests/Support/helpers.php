@@ -23,6 +23,7 @@ if (! function_exists('makeCore')) {
         float $exceptionRate = 1.0,
         int $bufferLimit = 500,
         float $now = 1000.0,
+        array $recordSampleRates = [],
     ): array {
         $buffer = new RecordsBuffer($bufferLimit);
         $clock = new FrozenClock($now);
@@ -38,6 +39,7 @@ if (! function_exists('makeCore')) {
             commandSampleRate: 1.0,
             exceptionSampleRate: $exceptionRate,
             captureExceptionSourceCode: true,
+            recordSampleRates: $recordSampleRates,
         );
 
         return [$core, $buffer, $clock];

@@ -49,6 +49,12 @@ return [
     |             value (so `_group` hashes collapse naturally); the raw value
     |             is not retained. Config-file only — a map can't come from an
     |             env var. Empty by default: everything is captured raw.
+    |   `sample`  Fraction of the sensor's records kept within each execution
+    |             (1.0 keeps everything, 0.1 keeps ~10% — each record rolls
+    |             independently). For high-volume sources where a
+    |             representative slice is enough. The execution's counters
+    |             still count EVERY event, so "this request ran 342 queries"
+    |             stays true while only a sample of the query rows is kept.
     |
     | UPGRADING from a pre-`sensors` config: a published `filtering` block
     | (ignore_cache_events / ignore_cache_keys / ignore_queries /
@@ -58,9 +64,13 @@ return [
     | lists read the same names, and the enabled flags fall back to the old
     | inverted kill-switches.
     |
-    | Head sampling (`sampling` above) is deliberately NOT per-sensor: it is
-    | decided once per execution (agent protocol §3), so a trace is complete
-    | or absent, never partial.
+    | Two sampling layers, deliberately separate: head sampling (`sampling`
+    | above) is decided once per execution (agent protocol §3), so a trace is
+    | complete or absent, never partial — while `sample` here thins the
+    | high-volume child records WITHIN a kept trace. Execution-root records
+    | (request, command, scheduled task, job attempt) and exceptions take no
+    | `sample` option: dropping a root would orphan its trace, and exceptions
+    | are already governed by `sampling.exceptions`.
     |
     */
 
@@ -72,6 +82,9 @@ return [
 
         Sensors\QuerySensor::class => [
             'enabled' => env('DAYWATCH_QUERIES_ENABLED', ! env('DAYWATCH_IGNORE_QUERIES', false)),
+
+            // Fraction of query records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_QUERIES_SAMPLE_RATE', 1.0),
 
             /*
              * Queries never recorded, matched against the raw SQL. The default
@@ -96,6 +109,9 @@ return [
 
         Sensors\CacheEventSensor::class => [
             'enabled' => env('DAYWATCH_CACHE_EVENTS_ENABLED', ! env('DAYWATCH_IGNORE_CACHE_EVENTS', false)),
+
+            // Fraction of cache-event records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_CACHE_EVENTS_SAMPLE_RATE', 1.0),
 
             /*
              * Cache keys never recorded. The default drops Laravel's own
@@ -128,6 +144,9 @@ return [
         Sensors\LogSensor::class => [
             'enabled' => env('DAYWATCH_LOGS_ENABLED', true),
 
+            // Fraction of log records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_LOGS_SAMPLE_RATE', 1.0),
+
             // RESERVED — not yet read by the collector; setting it changes
             // nothing today. Listed so the option table stays in step.
             'level' => env('DAYWATCH_LOG_LEVEL', 'debug'),
@@ -135,18 +154,30 @@ return [
 
         Sensors\MailSensor::class => [
             'enabled' => env('DAYWATCH_MAIL_ENABLED', true),
+
+            // Fraction of mail records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_MAIL_SAMPLE_RATE', 1.0),
         ],
 
         Sensors\NotificationSensor::class => [
             'enabled' => env('DAYWATCH_NOTIFICATIONS_ENABLED', true),
+
+            // Fraction of notification records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_NOTIFICATIONS_SAMPLE_RATE', 1.0),
         ],
 
         Sensors\OutgoingRequestSensor::class => [
             'enabled' => env('DAYWATCH_OUTGOING_REQUESTS_ENABLED', ! env('DAYWATCH_IGNORE_OUTGOING_REQUESTS', false)),
+
+            // Fraction of outgoing-request records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_OUTGOING_REQUESTS_SAMPLE_RATE', 1.0),
         ],
 
         Sensors\QueuedJobSensor::class => [
             'enabled' => env('DAYWATCH_QUEUED_JOBS_ENABLED', true),
+
+            // Fraction of queued-job records kept per execution (see `sample` above).
+            'sample' => env('DAYWATCH_QUEUED_JOBS_SAMPLE_RATE', 1.0),
 
             /*
              * Job names never recorded at dispatch, matched against the job's

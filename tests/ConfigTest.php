@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use Daywatch\Agent\AgentServiceProvider;
 use Daywatch\Agent\Sensors\CacheEventSensor;
+use Daywatch\Agent\Sensors\LogSensor;
+use Daywatch\Agent\Sensors\MailSensor;
+use Daywatch\Agent\Sensors\NotificationSensor;
+use Daywatch\Agent\Sensors\OutgoingRequestSensor;
 use Daywatch\Agent\Sensors\QuerySensor;
 use Daywatch\Agent\Sensors\QueuedJobSensor;
 use Illuminate\Support\ServiceProvider;
@@ -20,14 +24,22 @@ it('merges the packaged config defaults', function () {
         ->and(config('daywatch.agent.flush_bytes'))->toBe(6_000_000)     // 6 MB flush ceiling
         ->and(config('daywatch.agent.flush_interval'))->toBe(10)         // 10 s flush ceiling
         ->and(config('daywatch.agent.max_concurrent_requests'))->toBe(5)
-        // Per-sensor defaults: everything on, framework noise ignored, no grouping.
+        // Per-sensor defaults: everything on, framework noise ignored, no grouping,
+        // and every high-volume sensor keeps all of its records (sample 1.0).
         ->and(config('daywatch.sensors.'.CacheEventSensor::class.'.enabled'))->toBeTrue()
         ->and(config('daywatch.sensors.'.CacheEventSensor::class.'.ignore'))->toBe('*illuminate:*')
         ->and(config('daywatch.sensors.'.CacheEventSensor::class.'.groups'))->toBe([])
+        ->and(config('daywatch.sensors.'.CacheEventSensor::class.'.sample'))->toBe(1.0)
         ->and(config('daywatch.sensors.'.QuerySensor::class.'.enabled'))->toBeTrue()
         ->and(config('daywatch.sensors.'.QuerySensor::class.'.ignore'))->toBe('*jobs*,*cache*,*sessions*,*batches*')
+        ->and(config('daywatch.sensors.'.QuerySensor::class.'.sample'))->toBe(1.0)
         ->and(config('daywatch.sensors.'.QueuedJobSensor::class.'.enabled'))->toBeTrue()
-        ->and(config('daywatch.sensors.'.QueuedJobSensor::class.'.ignore'))->toBe('');
+        ->and(config('daywatch.sensors.'.QueuedJobSensor::class.'.ignore'))->toBe('')
+        ->and(config('daywatch.sensors.'.QueuedJobSensor::class.'.sample'))->toBe(1.0)
+        ->and(config('daywatch.sensors.'.LogSensor::class.'.sample'))->toBe(1.0)
+        ->and(config('daywatch.sensors.'.MailSensor::class.'.sample'))->toBe(1.0)
+        ->and(config('daywatch.sensors.'.NotificationSensor::class.'.sample'))->toBe(1.0)
+        ->and(config('daywatch.sensors.'.OutgoingRequestSensor::class.'.sample'))->toBe(1.0);
 });
 
 it('registers the config file under the daywatch-config publish tag', function () {

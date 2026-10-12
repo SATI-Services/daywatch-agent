@@ -91,7 +91,7 @@ src/
   Console/AgentCommand.php   # daywatch:agent — ReactPHP TCP server + StreamBuffer + gzip POST + DaemonStats/StatsReporter; live TTY dashboard (ConsoleDashboard + RecentLog) + resilient loop; boot AuthProbe + actionable EADDRINUSE report
   Console/StatusCommand.php  # daywatch:status — STATS counters (table / --json), PING fallback, exit 1 when down
   Facades/Daywatch.php       # user(), sample(), dontSample(), report(), ignore(), pause(), resume(), digest()
-config/daywatch.php          # `sensors` block: per-sensor enabled/ignore/groups keyed by class (Pulse recorders idiom);
+config/daywatch.php          # `sensors` block: per-sensor enabled/ignore/groups/sample keyed by class (Pulse recorders idiom);
                              # legacy `filtering.*` keys from old published configs still win while present.
                              # Full option table in agent-protocol.md §7 (system docs corpus)
 ```
@@ -101,6 +101,13 @@ config/daywatch.php          # `sensors` block: per-sensor enabled/ignore/groups
 - Head sampling decided once per execution; sensors always buffer — the
   decision picks digest vs flush at the end. `report()` re-rolls with
   `sampling.exceptions` so errors escape sampled-out traces.
+- Per-sensor record sampling (`sensors.{class}.sample`, 1.0 keeps all) thins
+  the high-volume CHILD records (query, cache-event, outgoing-request, log,
+  mail, notification, queued-job) within a kept execution: each record rolls
+  independently in `Core::keepsRecord()`, counters ALWAYS increment (the
+  execution tail keeps the true count), and execution-root/exception records
+  take no rate — a dropped root would orphan its trace, exceptions are
+  governed by `sampling.exceptions`.
 - Trace/sample/user propagate to queue hops via hidden Context keys
   (`daywatch_trace_id`, `daywatch_should_sample`, `daywatch_user_id`).
 - String caps are **byte** truncation (255 B / 64 KB / 16 MB tiers) applied

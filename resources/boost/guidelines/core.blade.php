@@ -35,9 +35,9 @@ DAYWATCH_EXCEPTION_SAMPLE_RATE=1.0
 
 ## Sensors
 
-Each sensor can be switched off, and some take `ignore`/`groups` options, in
-the `sensors` block of `config/daywatch.php` (keyed by class, Pulse-style).
-Everything is captured by default.
+Each sensor can be switched off, and some take `ignore`/`groups`/`sample`
+options, in the `sensors` block of `config/daywatch.php` (keyed by class,
+Pulse-style). Everything is captured by default.
 
 ```php
 use Daywatch\Agent\Sensors;
@@ -45,6 +45,12 @@ use Daywatch\Agent\Sensors;
 'sensors' => [
     // Silence a noisy source without disabling Daywatch:
     Sensors\QuerySensor::class => ['enabled' => false],
+
+    // Keep only a slice of a high-volume source (0.1 = ~10% of records; the
+    // execution's counters still count every event):
+    Sensors\CacheEventSensor::class => [
+        'sample' => env('DAYWATCH_CACHE_EVENTS_SAMPLE_RATE', 0.1),
+    ],
 
     // Collapse hash-suffixed cache keys into one dashboard row. Regex ⇒ label,
     // first match wins; the label replaces the recorded key:

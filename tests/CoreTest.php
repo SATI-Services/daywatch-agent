@@ -57,6 +57,91 @@ it('re-rolls sampling on report so errors escape a sampled-out trace', function 
     expect($client->sent)->toHaveCount(1);
 });
 
+it('buffers every record when no per-type sample rates are configured', function () {
+    [$core, $buffer] = makeCore(new RecordingClient);
+
+    $core->prepareForRequest();
+    $core->recordQuery(['t' => 'query']);
+    $core->recordCacheEvent(['t' => 'cache-event']);
+    $core->recordOutgoingRequest(['t' => 'outgoing-request']);
+    $core->recordLog(['t' => 'log']);
+    $core->recordMail(['t' => 'mail']);
+    $core->recordNotification(['t' => 'notification']);
+    $core->recordQueuedJob(['t' => 'queued-job']);
+
+    expect($buffer->count())->toBe(7);
+});
+
+it('drops a record type at sample rate 0.0 but still counts every event', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, recordSampleRates: ['query' => 0.0]);
+
+    $core->prepareForRequest();
+    $core->recordQuery(['t' => 'query']);
+    $core->recordQuery(['t' => 'query']);
+
+    expect($buffer->count())->toBe(0)
+        ->and($core->counters()['queries'])->toBe(2); // the execution tail keeps the true count
+});
+
+it('samples record types independently', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, recordSampleRates: [
+        'query' => 0.0,
+        'cache_event' => 1.0,
+    ]);
+
+    $core->prepareForRequest();
+    $core->recordQuery(['t' => 'query']);
+    $core->recordCacheEvent(['t' => 'cache-event']);
+
+    expect($buffer->all())->toBe([['t' => 'cache-event']])
+        ->and($core->counters()['queries'])->toBe(1)
+        ->and($core->counters()['cache_events'])->toBe(1);
+});
+
+it('drops every high-volume record type at rate 0.0', function () {
+    [$core, $buffer] = makeCore(new RecordingClient, recordSampleRates: [
+        'query' => 0.0,
+        'cache_event' => 0.0,
+        'outgoing_request' => 0.0,
+        'log' => 0.0,
+        'mail' => 0.0,
+        'notification' => 0.0,
+        'queued_job' => 0.0,
+    ]);
+
+    $core->prepareForRequest();
+    $core->recordQuery(['t' => 'query']);
+    $core->recordCacheEvent(['t' => 'cache-event']);
+    $core->recordOutgoingRequest(['t' => 'outgoing-request']);
+    $core->recordLog(['t' => 'log']);
+    $core->recordMail(['t' => 'mail']);
+    $core->recordNotification(['t' => 'notification']);
+    $core->recordQueuedJob(['t' => 'queued-job']);
+
+    expect($buffer->count())->toBe(0)
+        ->and($core->counters()['queries'])->toBe(1)
+        ->and($core->counters()['cache_events'])->toBe(1)
+        ->and($core->counters()['outgoing_requests'])->toBe(1)
+        ->and($core->counters()['logs'])->toBe(1)
+        ->and($core->counters()['mail'])->toBe(1)
+        ->and($core->counters()['notifications'])->toBe(1)
+        ->and($core->counters()['jobs_queued'])->toBe(1);
+});
+
+it('keeps roughly the configured fraction of records at a mid rate', function () {
+    mt_srand(4242); // deterministic roll sequence for this test only
+
+    [$core, $buffer] = makeCore(new RecordingClient, recordSampleRates: ['query' => 0.25]);
+
+    $core->prepareForRequest();
+    for ($i = 0; $i < 1000; $i++) {
+        $core->recordQuery(['t' => 'query']);
+    }
+
+    expect($core->counters()['queries'])->toBe(1000) // every event counted
+        ->and($buffer->count())->toBeGreaterThan(150)->toBeLessThan(350); // ~25% kept
+});
+
 it('auto-digests when the buffer fills on a sampled execution', function () {
     $client = new RecordingClient;
     [$core, $buffer] = makeCore($client, requestRate: 1.0, bufferLimit: 2);

@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 11
+## Facts — 12
 
-Status: verified 11.
+Status: verified 12.
 
-Tags: architecture 1, auto-wiring 2, ci 1, cli 1, configuration 3, daemon 1, docs 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, query-audit 1, sampling 2, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 2
+Tags: architecture 1, auto-wiring 2, ci 1, cli 1, config 1, configuration 3, daemon 1, docs 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, query-audit 1, sampling 3, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -16,6 +16,7 @@ Tags: architecture 1, auto-wiring 2, ci 1, cli 1, configuration 3, daemon 1, doc
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [package-discovery-auto-registers-service-provider](facts/package-discovery-auto-registers-service-provider.md) | Service provider auto-registers via Laravel package discovery | `laravel` `auto-wiring` `installation` | verified 2026-09-09 auto |
+| [per-sensor-record-sampling-seven-high-volume-child-types](facts/per-sensor-record-sampling-seven-high-volume-child-types.md) | Per-sensor record sampling via `sensors.{class}.sample` gates seven high-volume child-record sensor types | `sampling` `config` | verified 2026-10-21 auto |
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |

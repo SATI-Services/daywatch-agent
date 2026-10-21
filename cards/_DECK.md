@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `6866d739e` — 2026-10-12
+**As of:** `7e1999d1e` — 2026-10-20
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-21 @ `7e1999d1e` (run #1530):** `.claude/harness/instructions/INSTRUCTIONS.md`, `docs/sessions/status/ryan.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 1 card(s)
 - **2026-10-20 @ `6866d739e` (run #1473):** `docs/sessions/SHARED.md`, `.claude/harness/instructions/INSTRUCTIONS.md`, `docs/sessions/status/ryan.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 8 card(s)
 - **2026-09-12 @ `f10ffdf64` (run #1240):** `.claude/harness/instructions/INSTRUCTIONS.md`, `.claude/skills/daywatch-payloads/SKILL.md`, `docs/sessions/SHARED.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 49 card(s)
 - **2026-09-12 @ `a5e5084a1` (run #1108):** `docs/sessions/notes/2026-09-06-kimi-to-ryan-ci-fixes.md`, `composer.json`, `.claude/harness/CHANGELOG.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 2 card(s)

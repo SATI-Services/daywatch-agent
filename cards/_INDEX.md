@@ -1,14 +1,15 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 12
+## Facts — 13
 
-Status: verified 12.
+Status: verified 13.
 
-Tags: architecture 1, auto-wiring 2, ci 1, cli 1, config 1, configuration 3, daemon 1, docs 1, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, query-audit 1, sampling 3, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 2
+Tags: architecture 1, auto-wiring 2, boost 1, ci 1, cli 1, config 2, configuration 3, daemon 1, docs 2, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, query-audit 1, sampling 3, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
 | [agent-issues-no-queries-of-its-own-sensors-pure-event-listeners](facts/agent-issues-no-queries-of-its-own-sensors-pure-event-listeners.md) | Agent issues no queries of its own; sensors are pure event listeners | `architecture` `query-audit` | verified 2026-10-20 auto |
+| [boost-guidelines-sensor-configuration-example](facts/boost-guidelines-sensor-configuration-example.md) | Boost guidelines include per-sensor config examples for enabled, sample, and groups | `docs` `boost` `config` | verified 2026-10-21 auto |
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |

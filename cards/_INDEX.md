@@ -22,9 +22,9 @@ Tags: architecture 1, auto-wiring 2, boost 1, ci 1, cli 1, config 2, configurati
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
-## Todos — 6
+## Todos — 7
 
-Status: open 6.
+Status: open 7.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
@@ -34,3 +34,4 @@ Status: open 6.
 | [daemon-signal-handling-implementation](todos/daemon-signal-handling-implementation.md) | Decide and implement process signal handling (SIGINT/SIGTERM) for daywatch:agent | unassigned | 2026-09-10 | `daemon` `operations` `resilience` | open |
 | [docs-corpus-agent-protocol-option-table-refresh](todos/docs-corpus-agent-protocol-option-table-refresh.md) | Refresh docs corpus agent-protocol.md §7 option table with new sensors block and per-sensor sample | ryan | 2026-10-12 | `docs` `corpus` | open |
 | [legacy-host-app-filtering-config-cleanup](todos/legacy-host-app-filtering-config-cleanup.md) | Delete filtering block from published config when host apps upgrade past 1.0.x | unassigned | 2026-10-12 | `config` `cleanup` | open |
+| [release-1.3.0-host-apps-upgrade-and-daemon-restart](todos/release-1.3.0-host-apps-upgrade-and-daemon-restart.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |

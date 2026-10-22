@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 13
+## Facts — 18
 
-Status: verified 13.
+Status: verified 18.
 
-Tags: architecture 1, auto-wiring 2, boost 1, ci 1, cli 1, config 2, configuration 3, daemon 1, docs 2, env 2, installation 2, laravel 4, legal 1, license 1, observation 1, query-audit 1, sampling 3, secrets 1, skill 1, telemetry 1, unresolved 1, wire-contract 2
+Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 2, configuration 3, context 1, core 1, daemon 1, docs 2, emit 1, entry-point 1, env 2, facade 1, fluent 1, installation 2, laravel 4, legal 1, license 1, middleware 2, observation 1, propagation 1, query-audit 1, sampling 5, secrets 1, service-provider 1, skill 1, telemetry 1, uncrashable 2, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -13,13 +13,18 @@ Tags: architecture 1, auto-wiring 2, boost 1, ci 1, cli 1, config 2, configurati
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |
+| [daywatch-facade-methods-never-throw-all-eight-fluent](facts/daywatch-facade-methods-never-throw-all-eight-fluent.md) | All eight Daywatch facade methods never throw and stay fluent; swallow all Core failures | `facade` `uncrashable` `fluent` | verified 2026-10-22 auto |
+| [effective-sample-rate-stamped-at-digest-time-in-core](facts/effective-sample-rate-stamped-at-digest-time-in-core.md) | Core.effectiveSampleRate stamps records at digest time; product of head and per-sensor rates | `sampling` `emit` `core` | verified 2026-10-22 auto |
 | [head-sampling-rates-configurable-errors-escape](facts/head-sampling-rates-configurable-errors-escape.md) | Head-sampling rates configurable (default 1.0); errors escape sampled-out traces | `configuration` `sampling` `telemetry` | verified 2026-09-09 auto |
+| [http-middleware-capture-request-entry-point-never-blocks](facts/http-middleware-capture-request-entry-point-never-blocks.md) | Http/Middleware/CaptureRequest starts request execution; exceptions never block the request | `middleware` `entry-point` `uncrashable` | verified 2026-10-22 auto |
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [package-discovery-auto-registers-service-provider](facts/package-discovery-auto-registers-service-provider.md) | Service provider auto-registers via Laravel package discovery | `laravel` `auto-wiring` `installation` | verified 2026-09-09 auto |
 | [per-sensor-record-sampling-seven-high-volume-child-types](facts/per-sensor-record-sampling-seven-high-volume-child-types.md) | Per-sensor record sampling via `sensors.{class}.sample` gates seven high-volume child-record sensor types | `sampling` `config` | verified 2026-10-21 auto |
+| [propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops](facts/propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops.md) | Queue hops adopt sample_rate via hidden daywatch_sample_rate Context key, read validates (0,1] | `sampling` `propagation` `context` | verified 2026-10-22 auto |
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
+| [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
 ## Todos — 7

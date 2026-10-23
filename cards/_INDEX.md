@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 18
+## Facts — 19
 
-Status: verified 18.
+Status: verified 19.
 
-Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 2, configuration 3, context 1, core 1, daemon 1, docs 2, emit 1, entry-point 1, env 2, facade 1, fluent 1, installation 2, laravel 4, legal 1, license 1, middleware 2, observation 1, propagation 1, query-audit 1, sampling 5, secrets 1, service-provider 1, skill 1, telemetry 1, uncrashable 2, unresolved 1, wire-contract 2
+Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 2, configuration 3, context 1, core 1, daemon 1, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 1, fluent 1, installation 2, laravel 4, legal 1, license 1, middleware 2, observation 1, propagation 1, query-audit 1, queue 1, sampling 5, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, uncrashable 2, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -22,6 +22,7 @@ Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 2, con
 | [package-discovery-auto-registers-service-provider](facts/package-discovery-auto-registers-service-provider.md) | Service provider auto-registers via Laravel package discovery | `laravel` `auto-wiring` `installation` | verified 2026-09-09 auto |
 | [per-sensor-record-sampling-seven-high-volume-child-types](facts/per-sensor-record-sampling-seven-high-volume-child-types.md) | Per-sensor record sampling via `sensors.{class}.sample` gates seven high-volume child-record sensor types | `sampling` `config` | verified 2026-10-21 auto |
 | [propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops](facts/propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops.md) | Queue hops adopt sample_rate via hidden daywatch_sample_rate Context key, read validates (0,1] | `sampling` `propagation` `context` | verified 2026-10-22 auto |
+| [queryexecuted-unconditionally-recorded-ignore-queries-reserved](facts/queryexecuted-unconditionally-recorded-ignore-queries-reserved.md) | QuerySensor records every QueryExecuted; ignore_queries config is reserved, not wired | `sensor` `filtering` `queue` `draft-feature` | verified 2026-10-23 auto |
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |

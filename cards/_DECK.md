@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `788fd372e` — 2026-10-22
+**As of:** `40aed7ebf` — 2026-10-22
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-23 @ `40aed7ebf` (run #1897):** `.claude/agents/code-reviewer.md`, `.claude/skills/status-reconcile/SKILL.md`, `docs/sessions/ryan/2026-10-05-query-filtering.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 2 card(s)
 - **2026-10-22 @ `2fb153d96` (run #1796):** `docs/sessions/ryan/2026-10-12-sample-rate-stamping.md`, `docs/sessions/ryan/2026-10-12-entry-point-and-facade-guard-tests.md`, `.claude/agents/agent-package-engineer.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 6 card(s)
 - **2026-10-21 @ `50b6411a1` (run #1644):** `.claude/skills/session-docs/SKILL.md`, `docs/sessions/ryan/2026-10-12-release-1.3.0.md`, `docs/sessions/ryan/2026-10-09-agent-user-query-audit.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 1 card(s)
 - **2026-10-21 @ `1d707a5df` (run #1593):** `docs/sessions/ryan/2026-10-12-per-sensor-sampling.md`, `docs/sessions/ryan/2026-10-08-sensors-config-and-cache-key-grouping.md`, `resources/boost/guidelines/core.blade.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 2 card(s)

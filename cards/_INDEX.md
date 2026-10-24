@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 26
+## Facts — 27
 
-Status: verified 26.
+Status: verified 27.
 
-Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 7, configuration 3, context 1, core 1, daemon 1, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 4, fluent 1, gotcha 1, installation 2, job-sensor 1, laravel 4, legal 1, license 1, mcp 2, middleware 2, observation 1, ops 2, propagation 1, query-audit 1, query-sensor 1, queue 1, safety 1, sampling 5, secrets 1, sensor 2, sensor-internal 1, service-provider 1, skill 1, telemetry 1, testing 2, uncrashable 2, unresolved 1, wire-contract 2
+Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 7, configuration 3, context 1, core 1, daemon 1, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 4, fluent 1, gotcha 1, installation 2, job-sensor 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, query-audit 1, query-sensor 1, queue 1, safety 1, sampling 5, secrets 1, sensor 2, sensor-internal 1, service-provider 1, skill 1, telemetry 1, testing 2, tools 1, uncrashable 2, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -22,6 +22,7 @@ Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 7, con
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose](facts/mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose.md) | daywatch-docs port 8091 is set in four .mcp.json files plus the daywatch-mcp compose file | `mcp` `ops` `config` | verified 2026-10-24 auto |
 | [mcp-daywatch-docs-server-port-8091](facts/mcp-daywatch-docs-server-port-8091.md) | daywatch-docs MCP server listens on http://localhost:8091/mcp | `mcp` `ops` `config` | verified 2026-10-24 auto |
+| [mcp-daywatch-docs-server-tools-list-docs-read-doc-search-docs](facts/mcp-daywatch-docs-server-tools-list-docs-read-doc-search-docs.md) | daywatch-docs MCP server exposes three tools: list_docs, read_doc, search_docs | `mcp` `tools` | verified 2026-10-24 auto |
 | [package-discovery-auto-registers-service-provider](facts/package-discovery-auto-registers-service-provider.md) | Service provider auto-registers via Laravel package discovery | `laravel` `auto-wiring` `installation` | verified 2026-09-09 auto |
 | [patterns-php-extracted-needle-glob-precompile](facts/patterns-php-extracted-needle-glob-precompile.md) | Patterns.php (new) extracts needle/glob precompile shared by all filter sensors | `filtering` `sensor-internal` | verified 2026-10-23 auto |
 | [per-sensor-record-sampling-seven-high-volume-child-types](facts/per-sensor-record-sampling-seven-high-volume-child-types.md) | Per-sensor record sampling via `sensors.{class}.sample` gates seven high-volume child-record sensor types | `sampling` `config` | verified 2026-10-21 auto |

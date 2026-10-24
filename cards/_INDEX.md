@@ -35,9 +35,9 @@ Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 7, con
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
-## Todos — 8
+## Todos — 10
 
-Status: open 8.
+Status: open 10.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
@@ -45,7 +45,9 @@ Status: open 8.
 | [ci-matrix-laravel-version-constraint-alignment](todos/ci-matrix-laravel-version-constraint-alignment.md) | Align composer.json Laravel constraint with CI testability | ryan | 2026-09-06 | `ci` `composer` `owner-decision` | open |
 | [consider-groups-for-outgoing-request-urls](todos/consider-groups-for-outgoing-request-urls.md) | Consider `groups` for other high-cardinality values — outgoing-request URLs | unassigned | 2026-10-12 | `sampling` `feature` | open |
 | [daemon-signal-handling-implementation](todos/daemon-signal-handling-implementation.md) | Decide and implement process signal handling (SIGINT/SIGTERM) for daywatch:agent | unassigned | 2026-10-21 | `daemon` `signals` `robustness` | open |
+| [daywatch-docs-server-run-as-persistent-process](todos/daywatch-docs-server-run-as-persistent-process.md) | Run the daywatch-docs MCP server as a persistent process | ryan | 2026-10-08 | `mcp` `ops` | open |
 | [docs-corpus-agent-protocol-option-table-refresh](todos/docs-corpus-agent-protocol-option-table-refresh.md) | Refresh docs corpus agent-protocol.md §7 option table with new sensors block and per-sensor sample | ryan | 2026-10-12 | `docs` `corpus` | open |
 | [legacy-host-app-filtering-config-cleanup](todos/legacy-host-app-filtering-config-cleanup.md) | Delete filtering block from published config when host apps upgrade past 1.0.x | unassigned | 2026-10-12 | `config` `cleanup` | open |
+| [mcp-client-reconnect-for-restarted-daywatch-docs-server](todos/mcp-client-reconnect-for-restarted-daywatch-docs-server.md) | Reconnect/restart the MCP client to pick the daywatch-docs server back up | ryan | 2026-10-08 | `mcp` `ops` | open |
 | [release-1.3.0-host-apps-upgrade-and-daemon-restart](todos/release-1.3.0-host-apps-upgrade-and-daemon-restart.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [wire-ignore-query-patterns-queryexecuted-filter](todos/wire-ignore-query-patterns-queryexecuted-filter.md) | Wire ignore_queries and ignore_query_patterns to filter QueryExecuted events | unassigned | 2026-10-05 | `sensor` `filtering` `queue` | open |

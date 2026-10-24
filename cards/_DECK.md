@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `bd5f9eb69` — 2026-10-23
+**As of:** `7d92baf4b` — 2026-10-23
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-24 @ `7d92baf4b` (run #2184):** `src/AgentServiceProvider.php`, `src/Core.php`, `docs/sessions/ryan/2026-10-08-mcp-docs-server-restart.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 1 card(s)
 - **2026-10-23 @ `bd5f9eb69` (run #2032):** `docs/sessions/ryan/2026-10-06-filtering-jobs-and-queries.md`, `.claude/hooks/kimi-config.example.toml`, `docs/sessions/will/2026-09-13-db-env-force-pins.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 5 card(s)
 - **2026-10-23 @ `965dffcc0` (run #1946):** `docs/sessions/ryan/2026-10-05-query-filtering.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 1 card(s)
 - **2026-10-23 @ `40aed7ebf` (run #1897):** `.claude/agents/code-reviewer.md`, `.claude/skills/status-reconcile/SKILL.md`, `docs/sessions/ryan/2026-10-05-query-filtering.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 2 card(s)

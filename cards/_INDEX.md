@@ -1,13 +1,14 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 22
+## Facts — 23
 
-Status: verified 22.
+Status: verified 23.
 
-Tags: architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 4, configuration 3, context 1, core 1, daemon 1, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 1, fluent 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, query-audit 1, queue 1, sampling 5, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, tools 1, uncrashable 2, unresolved 1, wire-contract 2
+Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 4, configuration 3, context 1, core 1, daemon 2, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 1, fluent 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, query-audit 1, queue 1, sampling 5, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, tools 1, uncrashable 2, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
+| [agent-command-package-version-1x](facts/agent-command-package-version-1x.md) | Agent sends User-Agent 'DaywatchAgent/1.x' — the version is a hardcoded literal | `daemon` `agent` | verified 2026-10-25 auto |
 | [agent-issues-no-queries-of-its-own-sensors-pure-event-listeners](facts/agent-issues-no-queries-of-its-own-sensors-pure-event-listeners.md) | Agent issues no queries of its own; sensors are pure event listeners | `architecture` `query-audit` | verified 2026-10-20 auto |
 | [boost-guidelines-sensor-configuration-example](facts/boost-guidelines-sensor-configuration-example.md) | Boost guidelines include per-sensor config examples for enabled, sample, and groups | `docs` `boost` `config` | verified 2026-10-21 auto |
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |

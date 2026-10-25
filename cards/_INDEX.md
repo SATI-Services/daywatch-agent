@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 23
+## Facts — 25
 
-Status: verified 23.
+Status: verified 25.
 
-Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 4, configuration 3, context 1, core 1, daemon 2, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, facade 1, filtering 1, fluent 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, query-audit 1, queue 1, sampling 5, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, tools 1, uncrashable 2, unresolved 1, wire-contract 2
+Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 4, configuration 3, context 1, core 1, daemon 3, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, filtering 1, fluent 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, tools 1, uncrashable 2, unresolved 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -18,6 +18,7 @@ Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, conf
 | [effective-sample-rate-stamped-at-digest-time-in-core](facts/effective-sample-rate-stamped-at-digest-time-in-core.md) | Core.effectiveSampleRate stamps records at digest time; product of head and per-sensor rates | `sampling` `emit` `core` | verified 2026-10-22 auto |
 | [head-sampling-rates-configurable-errors-escape](facts/head-sampling-rates-configurable-errors-escape.md) | Head-sampling rates configurable (default 1.0); errors escape sampled-out traces | `configuration` `sampling` `telemetry` | verified 2026-09-09 auto |
 | [http-middleware-capture-request-entry-point-never-blocks](facts/http-middleware-capture-request-entry-point-never-blocks.md) | Http/Middleware/CaptureRequest starts request execution; exceptions never block the request | `middleware` `entry-point` `uncrashable` | verified 2026-10-22 auto |
+| [ingest-dispatcher-response-contract-agent-protocol-6](facts/ingest-dispatcher-response-contract-agent-protocol-6.md) | IngestDispatcher applies the agent protocol §6 response contract | `daemon` `ingest` `protocol` | verified 2026-10-25 auto |
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose](facts/mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose.md) | daywatch-docs port 8091 is set in four .mcp.json files plus the daywatch-mcp compose file | `mcp` `ops` `config` | verified 2026-10-24 auto |
@@ -27,6 +28,7 @@ Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, conf
 | [per-sensor-record-sampling-seven-high-volume-child-types](facts/per-sensor-record-sampling-seven-high-volume-child-types.md) | Per-sensor record sampling via `sensors.{class}.sample` gates seven high-volume child-record sensor types | `sampling` `config` | verified 2026-10-21 auto |
 | [propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops](facts/propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops.md) | Queue hops adopt sample_rate via hidden daywatch_sample_rate Context key, read validates (0,1] | `sampling` `propagation` `context` | verified 2026-10-22 auto |
 | [queryexecuted-unconditionally-recorded-ignore-queries-reserved](facts/queryexecuted-unconditionally-recorded-ignore-queries-reserved.md) | QuerySensor records every QueryExecuted; ignore_queries config is reserved, not wired | `sensor` `filtering` `queue` `draft-feature` | verified 2026-10-23 auto |
+| [release-1-3-0-exceptions-pi-correction-combined-rate](facts/release-1-3-0-exceptions-pi-correction-combined-rate.md) | Release 1.3.0 commit 2e5e303 π-corrects exception executions' combined rate | `release` `sampling` `exceptions` | verified 2026-10-25 auto |
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |

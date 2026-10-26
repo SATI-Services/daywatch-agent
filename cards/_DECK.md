@@ -1,12 +1,17 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `bd1f2a930` — 2026-10-26
+**As of:** `043dd516d` — 2026-10-26
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-26 @ `043dd516d` (run #2692):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 1 card(s)
+- **2026-10-26 @ `043dd516d` (run #2691):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 1 card(s)
+- **2026-10-26 @ `043dd516d` (run #2690):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 9 card(s)
+- **2026-10-26 @ `043dd516d` (run #2690):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 9 card(s)
+- **2026-10-26 @ `043dd516d` (run #2689):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 3 card(s)
 - **2026-10-26 @ `bd1f2a930` (run #2624):** `docs/sessions/README.md`, `.claude/hooks/kimi-install.sh`, `.claude/skills/version/SKILL.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 8 card(s)
 - **2026-10-26 @ `bd1f2a930` (run #2624):** `docs/sessions/README.md`, `.claude/hooks/kimi-install.sh`, `.claude/skills/version/SKILL.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 9 card(s)
 - **2026-10-26 @ `bd1f2a930` (run #2625):** `docs/sessions/README.md`, `.claude/hooks/kimi-install.sh`, `.claude/skills/version/SKILL.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 9 card(s)

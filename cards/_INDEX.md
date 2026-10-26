@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 32
+## Facts — 42
 
-Status: verified 32.
+Status: verified 42.
 
-Tags: agent 1, architecture 1, auto-wiring 2, backlog 1, boost 1, boot 1, ci 1, cli 1, collaboration 3, config 4, configuration 3, context 1, core 1, daemon 3, diagnostics 1, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, filtering 1, fluent 1, harness 1, hooks 1, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 1, session-logs 5, shared-memory 1, shipped-ticker 1, skill 1, telemetry 1, template 1, tooling 2, tools 1, uncrashable 2, unresolved 1, wire-contract 2
+Tags: agent 1, architecture 1, archive 2, auto-wiring 2, backlog 1, boost 1, boot 1, ci 1, cli 1, collaboration 4, config 4, configuration 3, context 1, core 1, daemon 3, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, harness 6, hooks 2, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 9, shared-memory 1, shipped-ticker 1, skill 1, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -21,6 +21,7 @@ Tags: agent 1, architecture 1, auto-wiring 2, backlog 1, boost 1, boot 1, ci 1, 
 | [http-middleware-capture-request-entry-point-never-blocks](facts/http-middleware-capture-request-entry-point-never-blocks.md) | Http/Middleware/CaptureRequest starts request execution; exceptions never block the request | `middleware` `entry-point` `uncrashable` | verified 2026-10-22 auto |
 | [ingest-dispatcher-response-contract-agent-protocol-6](facts/ingest-dispatcher-response-contract-agent-protocol-6.md) | IngestDispatcher applies the agent protocol §6 response contract | `daemon` `ingest` `protocol` | verified 2026-10-25 auto |
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
+| [kimi-install-hook-installer-idempotent-per-operator](facts/kimi-install-hook-installer-idempotent-per-operator.md) | kimi-install.sh is the per-operator idempotent hook installer | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
 | [kimi-install-manages-session-log-nudge-and-log-commit-hooks](facts/kimi-install-manages-session-log-nudge-and-log-commit-hooks.md) | kimi-install.sh manages session-log-nudge.sh and log-commit.sh per operator, not per project | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose](facts/mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose.md) | daywatch-docs port 8091 is set in four .mcp.json files plus the daywatch-mcp compose file | `mcp` `ops` `config` | verified 2026-10-24 auto |
@@ -34,11 +35,20 @@ Tags: agent 1, architecture 1, auto-wiring 2, backlog 1, boost 1, boot 1, ci 1, 
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |
+| [sessions-author-is-the-person-not-the-harness](facts/sessions-author-is-the-person-not-the-harness.md) | Sessions author is the person, from git identity, not the harness | `session-logs` `collaboration` | verified 2026-10-26 auto |
+| [sessions-dated-logs-never-trimmed-archive-document-why](facts/sessions-dated-logs-never-trimmed-archive-document-why.md) | Dated session logs are the never-trimmed archive, updated as you go | `session-logs` `archive` | verified 2026-10-26 auto |
+| [sessions-logs-document-the-why-not-just-the-what](facts/sessions-logs-document-the-why-not-just-the-what.md) | Session logs capture the why, not just the what git records | `session-logs` `archive` | verified 2026-10-26 auto |
+| [sessions-logs-document-why-not-just-what](facts/sessions-logs-document-why-not-just-what.md) | Session logs document the why, not just the what | `session-logs` `documentation` | verified 2026-10-26 auto |
 | [sessions-notes-inbox-archived-when-actioned](facts/sessions-notes-inbox-archived-when-actioned.md) | notes/ are inbox messages; git mv to notes/archive/ when actioned | `session-logs` `collaboration` `inbox` | verified 2026-10-26 auto |
 | [sessions-shared-md-append-only-cross-cutting-state](facts/sessions-shared-md-append-only-cross-cutting-state.md) | SHARED.md holds only cross-cutting state; append, don't rewrite | `session-logs` `shared-memory` | verified 2026-10-26 auto |
 | [sessions-shipped-ticker-carries-evidence-sha-pr-or-route](facts/sessions-shipped-ticker-carries-evidence-sha-pr-or-route.md) | Shipped entries in status/<author>.md carry sha, PR, or trunk-route evidence | `session-logs` `collaboration` `shipped-ticker` | verified 2026-10-26 auto |
 | [sessions-status-author-schema-in-flight-next-up-follow-ups-shipped](facts/sessions-status-author-schema-in-flight-next-up-follow-ups-shipped.md) | status/<author>.md uses a fixed four-section schema, capped at ~80 lines | `session-logs` `collaboration` `backlog` | verified 2026-10-26 auto |
+| [version-skill-current-version-full-earlier-versions-condensed](facts/version-skill-current-version-full-earlier-versions-condensed.md) | /version renders current version in full; earlier versions condensed | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
+| [version-skill-missing-version-stamp-assumed-version-fallback](facts/version-skill-missing-version-stamp-assumed-version-fallback.md) | Missing VERSION stamp: say the project predates versioning, assume the CHANGELOG's newest version | `harness` `version` `fallback` | verified 2026-10-26 auto |
+| [version-skill-missing-version-stamp-fallback](facts/version-skill-missing-version-stamp-fallback.md) | Missing VERSION stamp means the project predates versioning — fall back to the changelog | `harness` `version` `fallback` | verified 2026-10-26 auto |
 | [version-skill-optional-gh-freshness-check](facts/version-skill-optional-gh-freshness-check.md) | /version freshness check runs gh API only when authenticated and never breaks the core report | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
+| [version-skill-reports-aid-harness-version-and-changelog](facts/version-skill-reports-aid-harness-version-and-changelog.md) | /version reports AID harness version and changelog, read-only | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
+| [version-skill-version-stamp-applied-date-source-sha-notes](facts/version-skill-version-stamp-applied-date-source-sha-notes.md) | VERSION stamp has version, applied date, source repo, source sha, optional notes | `harness` `version` | verified 2026-10-26 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
 ## Todos — 11

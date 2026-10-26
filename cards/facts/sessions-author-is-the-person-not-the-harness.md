@@ -1,0 +1,10 @@
+---
+title: Sessions author is the person, from git identity, not the harness
+tags: [session-logs, collaboration]
+status: verified 2026-10-26 auto
+source: [docs/sessions/README.md]
+as_of: bd1f2a930 2026-10-26
+---
+`status/<author>.md` is owned by the person — `<author>` is the git identity (`will`, `josh`, …), whichever harness or agent drove the work; the work is canonically theirs. Agents identify themselves *inside* the files: the `**Agent:**` field in dated logs, and — when more than one agent works for the same person — a per-agent `## <harness>` section in `status/<author>.md` (same fixed schema inside it); each agent edits only its own section, never another agent's or the operator's. Concurrent agents of the same person should be on Track A2 worktrees: disjoint sections merge cleanly, and that — not per-agent filenames — is what prevents file races.
+
+**Why:** Work stays attributed to the person while concurrent agents of that person merge cleanly without file-level races.

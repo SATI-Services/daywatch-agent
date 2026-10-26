@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 25
+## Facts — 36
 
-Status: verified 25.
+Status: verified 36.
 
-Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, config 4, configuration 3, context 1, core 1, daemon 3, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, filtering 1, fluent 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, skill 1, telemetry 1, tools 1, uncrashable 2, unresolved 1, wire-contract 2
+Tags: agent 1, architecture 1, auto-wiring 2, backlog 1, boost 1, boot 1, ci 1, cli 1, collaboration 4, config 4, configuration 3, context 1, core 1, daemon 3, diagnostics 2, docs 2, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, filtering 1, fluent 1, harness 3, hooks 2, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 6, shared-memory 1, shipped-ticker 1, skill 1, telemetry 1, template 1, tooling 4, tools 1, uncrashable 2, unresolved 1, version 1, wire-contract 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -13,6 +13,7 @@ Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, conf
 | [boost-guidelines-sensor-configuration-example](facts/boost-guidelines-sensor-configuration-example.md) | Boost guidelines include per-sensor config examples for enabled, sample, and groups | `docs` `boost` `config` | verified 2026-10-21 auto |
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
+| [dated-log-template-objective-findings-actions-tested-open](facts/dated-log-template-objective-findings-actions-tested-open.md) | Dated log template: Objective, Key findings, Actions taken, Tested against, Open items | `session-logs` `template` | verified 2026-10-26 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |
 | [daywatch-facade-methods-never-throw-all-eight-fluent](facts/daywatch-facade-methods-never-throw-all-eight-fluent.md) | All eight Daywatch facade methods never throw and stay fluent; swallow all Core failures | `facade` `uncrashable` `fluent` | verified 2026-10-22 auto |
 | [effective-sample-rate-stamped-at-digest-time-in-core](facts/effective-sample-rate-stamped-at-digest-time-in-core.md) | Core.effectiveSampleRate stamps records at digest time; product of head and per-sensor rates | `sampling` `emit` `core` | verified 2026-10-22 auto |
@@ -20,6 +21,8 @@ Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, conf
 | [http-middleware-capture-request-entry-point-never-blocks](facts/http-middleware-capture-request-entry-point-never-blocks.md) | Http/Middleware/CaptureRequest starts request execution; exceptions never block the request | `middleware` `entry-point` `uncrashable` | verified 2026-10-22 auto |
 | [ingest-dispatcher-response-contract-agent-protocol-6](facts/ingest-dispatcher-response-contract-agent-protocol-6.md) | IngestDispatcher applies the agent protocol §6 response contract | `daemon` `ingest` `protocol` | verified 2026-10-25 auto |
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
+| [kimi-install-hook-installer-idempotent-per-operator](facts/kimi-install-hook-installer-idempotent-per-operator.md) | kimi-install.sh is per-operator idempotent hook installer | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
+| [kimi-install-manages-session-log-nudge-and-log-commit-hooks](facts/kimi-install-manages-session-log-nudge-and-log-commit-hooks.md) | kimi-install.sh manages session-log-nudge.sh and log-commit.sh per operator, not per project | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose](facts/mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose.md) | daywatch-docs port 8091 is set in four .mcp.json files plus the daywatch-mcp compose file | `mcp` `ops` `config` | verified 2026-10-24 auto |
 | [mcp-daywatch-docs-server-port-8091](facts/mcp-daywatch-docs-server-port-8091.md) | daywatch-docs MCP server listens on http://localhost:8091/mcp | `mcp` `ops` `config` | verified 2026-10-24 auto |
@@ -32,6 +35,14 @@ Tags: agent 1, architecture 1, auto-wiring 2, boost 1, boot 1, ci 1, cli 1, conf
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |
+| [sessions-author-is-the-person-not-the-harness](facts/sessions-author-is-the-person-not-the-harness.md) | Sessions author is the person, from git identity, not the harness | `session-logs` `collaboration` | verified 2026-10-26 auto |
+| [sessions-notes-inbox-archived-when-actioned](facts/sessions-notes-inbox-archived-when-actioned.md) | notes/ are inbox messages; git mv to notes/archive/ when actioned | `session-logs` `collaboration` `inbox` | verified 2026-10-26 auto |
+| [sessions-shared-md-append-only-cross-cutting-state](facts/sessions-shared-md-append-only-cross-cutting-state.md) | SHARED.md holds only cross-cutting state; append, don't rewrite | `session-logs` `shared-memory` | verified 2026-10-26 auto |
+| [sessions-shipped-ticker-carries-evidence-sha-pr-or-route](facts/sessions-shipped-ticker-carries-evidence-sha-pr-or-route.md) | Shipped entries in status/<author>.md carry sha, PR, or trunk-route evidence | `session-logs` `collaboration` `shipped-ticker` | verified 2026-10-26 auto |
+| [sessions-status-author-schema-in-flight-next-up-follow-ups-shipped](facts/sessions-status-author-schema-in-flight-next-up-follow-ups-shipped.md) | status/<author>.md uses a fixed four-section schema, capped at ~80 lines | `session-logs` `collaboration` `backlog` | verified 2026-10-26 auto |
+| [version-skill-optional-gh-freshness-check](facts/version-skill-optional-gh-freshness-check.md) | /version freshness check runs gh API only when authenticated and never breaks the core report | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
+| [version-skill-reports-aid-harness-version-and-changelog](facts/version-skill-reports-aid-harness-version-and-changelog.md) | /version reports AID harness version and changelog, read-only | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
+| [version-skill-version-stamp-applied-date-source-sha-notes](facts/version-skill-version-stamp-applied-date-source-sha-notes.md) | VERSION stamp has version, applied date, source repo, source sha, optional notes | `harness` `version` | verified 2026-10-26 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
 ## Todos — 11

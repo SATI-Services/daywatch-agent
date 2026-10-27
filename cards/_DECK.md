@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `043dd516d` — 2026-10-26
+**As of:** `28ce500a6` — 2026-10-26
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-27 @ `28ce500a6` (run #2756):** `docs/sessions/ryan/2026-07-03-backfill.md`, `.claude/hooks/kimi-log-commit.sh`, `src/Daemon/AuthProbe.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 4 card(s)
 - **2026-10-26 @ `043dd516d` (run #2692):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 1 card(s)
 - **2026-10-26 @ `043dd516d` (run #2691):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 1 card(s)
 - **2026-10-26 @ `043dd516d` (run #2690):** `docs/sessions/README.md` — moonshot / kimi-k3, round 3 → 9 card(s)

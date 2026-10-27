@@ -1,15 +1,17 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 60
+## Facts — 64
 
-Status: verified 60.
+Status: verified 64.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auto-wiring 2, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, config 4, configuration 3, context 1, core 1, daemon 3, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 2, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, ops 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 2, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, auto-wiring 2, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, config 4, configuration 3, context 1, core 1, daemon 5, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 4, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, ops 2, probe 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, safety 2, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 2, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 2, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
 | [agent-command-package-version-1x](facts/agent-command-package-version-1x.md) | Agent sends User-Agent 'DaywatchAgent/1.x' — the version is a hardcoded literal | `daemon` `agent` | verified 2026-10-25 auto |
 | [agent-issues-no-queries-of-its-own-sensors-pure-event-listeners](facts/agent-issues-no-queries-of-its-own-sensors-pure-event-listeners.md) | Agent issues no queries of its own; sensors are pure event listeners | `architecture` `query-audit` | verified 2026-10-20 auto |
+| [auth-probe-posts-empty-batch-gzipped-or-plain-json](facts/auth-probe-posts-empty-batch-gzipped-or-plain-json.md) | AuthProbe POSTs empty batch gzipped with zlib, plain JSON as fallback | `auth` `daemon` `probe` | verified 2026-10-27 auto |
+| [auth-probe-tenancy-endpoint-best-effort-decoration](facts/auth-probe-tenancy-endpoint-best-effort-decoration.md) | AuthProbe tenancy lookup is best-effort decoration; a 404 there leaves the result unchanged | `auth` `daemon` `probe` | verified 2026-10-27 auto |
 | [boost-guidelines-sensor-configuration-example](facts/boost-guidelines-sensor-configuration-example.md) | Boost guidelines include per-sensor config examples for enabled, sample, and groups | `docs` `boost` `config` | verified 2026-10-21 auto |
 | [ci-matrix-laravel-11-legs-dropped-advisory-blocked](facts/ci-matrix-laravel-11-legs-dropped-advisory-blocked.md) | Laravel 11 legs dropped from CI matrix; advisory-blocked upstream | `ci` `laravel` `unresolved` | verified 2026-09-12 auto *volatile* |
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
@@ -23,6 +25,8 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auto-wiring 2, backlog 2, bo
 | [ingest-uri-defaults-to-127-0-0-1-2408](facts/ingest-uri-defaults-to-127-0-0-1-2408.md) | DAYWATCH_INGEST_URI defaults to 127.0.0.1:2408; use 0.0.0.0:2408 in Docker | `configuration` `env` `daemon` | verified 2026-09-09 auto |
 | [kimi-install-hook-installer-idempotent-per-operator](facts/kimi-install-hook-installer-idempotent-per-operator.md) | kimi-install.sh is the per-operator idempotent hook installer | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
 | [kimi-install-manages-session-log-nudge-and-log-commit-hooks](facts/kimi-install-manages-session-log-nudge-and-log-commit-hooks.md) | kimi-install.sh manages session-log-nudge.sh and log-commit.sh per operator, not per project | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
+| [kimi-log-commit-hook-pushes-only-on-main](facts/kimi-log-commit-hook-pushes-only-on-main.md) | kimi-log-commit.sh pushes only when on main branch | `sessions` `hooks` `safety` | verified 2026-10-27 auto |
+| [kimi-log-commit-hook-stages-only-session-logs](facts/kimi-log-commit-hook-stages-only-session-logs.md) | kimi-log-commit.sh is a per-operator hook staging only the session-log dir | `sessions` `hooks` `safety` | verified 2026-10-27 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose](facts/mcp-daywatch-docs-port-config-four-mcp-json-files-plus-compose.md) | daywatch-docs port 8091 is set in four .mcp.json files plus the daywatch-mcp compose file | `mcp` `ops` `config` | verified 2026-10-24 auto |
 | [mcp-daywatch-docs-server-port-8091](facts/mcp-daywatch-docs-server-port-8091.md) | daywatch-docs MCP server listens on http://localhost:8091/mcp | `mcp` `ops` `config` | verified 2026-10-24 auto |

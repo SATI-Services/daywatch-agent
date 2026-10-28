@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 64
+## Facts — 65
 
-Status: verified 64.
+Status: verified 65.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, auto-wiring 2, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, config 4, configuration 3, context 1, core 1, daemon 5, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 4, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, ops 2, probe 2, propagation 1, protocol 1, query-audit 1, queue 1, release 1, safety 2, sampling 6, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 2, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 2, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, auto-wiring 2, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, config 4, configuration 3, context 1, core 1, daemon 5, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 4, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, ops 2, probe 2, propagation 1, protocol 1, query-audit 1, queue 1, release 2, safety 2, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 2, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 3, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -36,6 +36,7 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, auto-wiring 2, backl
 | [propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops](facts/propagation-hidden-context-key-daywatch-sample-rate-for-queue-hops.md) | Queue hops adopt sample_rate via hidden daywatch_sample_rate Context key, read validates (0,1] | `sampling` `propagation` `context` | verified 2026-10-22 auto |
 | [queryexecuted-unconditionally-recorded-ignore-queries-reserved](facts/queryexecuted-unconditionally-recorded-ignore-queries-reserved.md) | QuerySensor records every QueryExecuted; ignore_queries config is reserved, not wired | `sensor` `filtering` `queue` `draft-feature` | verified 2026-10-23 auto |
 | [release-1-3-0-exceptions-pi-correction-combined-rate](facts/release-1-3-0-exceptions-pi-correction-combined-rate.md) | Release 1.3.0 commit 2e5e303 π-corrects exception executions' combined rate | `release` `sampling` `exceptions` | verified 2026-10-25 auto |
+| [release-1-3-0-tagged-sample-rate-stamping](facts/release-1-3-0-tagged-sample-rate-stamping.md) | Release 1.3.0 tagged with sample_rate stamping commits | `release` `sampling` `wire-contract` | verified 2026-10-28 auto |
 | [sample-rate-wire-stamping-effective-inclusion-probability](facts/sample-rate-wire-stamping-effective-inclusion-probability.md) | Every digested record carries sample_rate stamping its effective inclusion probability | `sampling` `wire-contract` | verified 2026-10-20 auto |
 | [service-provider-and-facade-auto-register-via-discovery](facts/service-provider-and-facade-auto-register-via-discovery.md) | Service provider and Daywatch facade auto-register via package discovery | `installation` `laravel` `auto-wiring` | verified 2026-09-09 auto |
 | [service-provider-prepends-capture-request-middleware](facts/service-provider-prepends-capture-request-middleware.md) | Service provider prependMiddleware(CaptureRequest::class) unless RequestSensor is disabled | `middleware` `boot` `service-provider` | verified 2026-10-22 auto |
@@ -87,7 +88,7 @@ Status: open 12.
 | [docs-corpus-agent-protocol-option-table-refresh](todos/docs-corpus-agent-protocol-option-table-refresh.md) | Refresh docs corpus agent-protocol.md §7 option table with new sensors block and per-sensor sample | ryan | 2026-10-12 | `docs` `corpus` | open |
 | [legacy-host-app-filtering-config-cleanup](todos/legacy-host-app-filtering-config-cleanup.md) | Delete filtering block from published config when host apps upgrade past 1.0.x | unassigned | 2026-10-12 | `config` `cleanup` | open |
 | [mcp-client-reconnect-for-restarted-daywatch-docs-server](todos/mcp-client-reconnect-for-restarted-daywatch-docs-server.md) | Reconnect/restart the MCP client to pick the daywatch-docs server back up | ryan | 2026-10-08 | `mcp` `ops` | open |
-| [release-1-3-0-host-apps-upgrade](todos/release-1-3-0-host-apps-upgrade.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons/workers | unassigned | 2026-10-12 | `release` `deployment` | open |
+| [release-1-3-0-host-apps-upgrade](todos/release-1-3-0-host-apps-upgrade.md) | Upgrade icicle and pingpath to daywatch/agent 1.3.0, then restart daemon and reload workers | operator | 2026-10-12 | `release` `deployment` | open |
 | [release-1-3-0-upgrade-host-apps-and-restart-processes](todos/release-1-3-0-upgrade-host-apps-and-restart-processes.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [release-1.3.0-host-apps-upgrade-and-daemon-restart](todos/release-1.3.0-host-apps-upgrade-and-daemon-restart.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [wire-ignore-query-patterns-queryexecuted-filter](todos/wire-ignore-query-patterns-queryexecuted-filter.md) | Wire ignore_queries and ignore_query_patterns to filter QueryExecuted events | unassigned | 2026-10-05 | `sensor` `filtering` `queue` | open |

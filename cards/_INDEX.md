@@ -73,9 +73,9 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, auto-wiring 2, backl
 | [version-skill-version-stamp-applied-date-source-sha-notes](facts/version-skill-version-stamp-applied-date-source-sha-notes.md) | VERSION stamp has version, applied date, source repo, source sha, optional notes | `harness` `version` | verified 2026-10-26 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
-## Todos — 11
+## Todos — 12
 
-Status: open 11.
+Status: open 12.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
@@ -87,6 +87,7 @@ Status: open 11.
 | [docs-corpus-agent-protocol-option-table-refresh](todos/docs-corpus-agent-protocol-option-table-refresh.md) | Refresh docs corpus agent-protocol.md §7 option table with new sensors block and per-sensor sample | ryan | 2026-10-12 | `docs` `corpus` | open |
 | [legacy-host-app-filtering-config-cleanup](todos/legacy-host-app-filtering-config-cleanup.md) | Delete filtering block from published config when host apps upgrade past 1.0.x | unassigned | 2026-10-12 | `config` `cleanup` | open |
 | [mcp-client-reconnect-for-restarted-daywatch-docs-server](todos/mcp-client-reconnect-for-restarted-daywatch-docs-server.md) | Reconnect/restart the MCP client to pick the daywatch-docs server back up | ryan | 2026-10-08 | `mcp` `ops` | open |
+| [release-1-3-0-host-apps-upgrade](todos/release-1-3-0-host-apps-upgrade.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons/workers | unassigned | 2026-10-12 | `release` `deployment` | open |
 | [release-1-3-0-upgrade-host-apps-and-restart-processes](todos/release-1-3-0-upgrade-host-apps-and-restart-processes.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [release-1.3.0-host-apps-upgrade-and-daemon-restart](todos/release-1.3.0-host-apps-upgrade-and-daemon-restart.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [wire-ignore-query-patterns-queryexecuted-filter](todos/wire-ignore-query-patterns-queryexecuted-filter.md) | Wire ignore_queries and ignore_query_patterns to filter QueryExecuted events | unassigned | 2026-10-05 | `sensor` `filtering` `queue` | open |

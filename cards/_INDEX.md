@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 72
+## Facts — 74
 
-Status: verified 72.
+Status: verified 74.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, commit 1, config 4, configuration 3, context 1, convention 1, core 1, daemon 5, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 11, inbox 1, ingest 1, installation 2, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, propagation 1, protocol 1, query-audit 1, queue 1, release 2, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 9, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 3, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, commit 1, config 4, configuration 3, context 1, convention 1, core 1, daemon 5, diagnostics 3, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, propagation 1, protocol 1, query-audit 1, queue 1, release 2, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 3, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -27,8 +27,10 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wirin
 | [kimi-install-manages-session-log-nudge-and-log-commit-hooks](facts/kimi-install-manages-session-log-nudge-and-log-commit-hooks.md) | kimi-install.sh manages session-log-nudge.sh and log-commit.sh per operator, not per project | `session-logging` `tooling` `hooks` | verified 2026-10-26 auto |
 | [kimi-log-commit-hook-pushes-only-on-main](facts/kimi-log-commit-hook-pushes-only-on-main.md) | kimi-log-commit.sh pushes only when on main branch | `sessions` `hooks` `safety` | verified 2026-10-27 auto |
 | [kimi-log-commit-hook-stages-only-session-logs](facts/kimi-log-commit-hook-stages-only-session-logs.md) | kimi-log-commit.sh is a per-operator hook staging only the session-log dir | `sessions` `hooks` `safety` | verified 2026-10-27 auto |
+| [kimi-session-log-nudge-hook-appends-to-model-context](facts/kimi-session-log-nudge-hook-appends-to-model-context.md) | kimi-session-log-nudge appends [session-log] instructions to the model's context | `sessions` `hooks` `kimi` | verified 2026-10-29 auto |
 | [kimi-session-log-nudge-hook-derives-operator-from-git-identity](facts/kimi-session-log-nudge-hook-derives-operator-from-git-identity.md) | kimi-session-log-nudge hook derives operator name from git user.name | `sessions` `hooks` `operator` | verified 2026-10-29 auto |
 | [kimi-session-log-nudge-hook-detects-harness-convention](facts/kimi-session-log-nudge-hook-detects-harness-convention.md) | kimi-session-log-nudge hook auto-detects AID-harness projects | `sessions` `hooks` `convention` | verified 2026-10-29 auto |
+| [kimi-session-log-nudge-hook-throttles-15-min](facts/kimi-session-log-nudge-hook-throttles-15-min.md) | kimi-session-log-nudge throttles to once per 15 minutes per project | `sessions` `hooks` `throttle` | verified 2026-10-29 auto |
 | [license-is-mit](facts/license-is-mit.md) | License is MIT | `legal` `license` | verified 2026-09-09 auto |
 | [log-commit-hook-appends-to-dated-session-log](facts/log-commit-hook-appends-to-dated-session-log.md) | log-commit.sh appends short sha and subject to dated session log | `sessions` `hooks` `commit` | verified 2026-10-29 auto |
 | [log-commit-hook-commits-only-log-pathspec](facts/log-commit-hook-commits-only-log-pathspec.md) | log-commit.sh commits only the log file by explicit pathspec | `sessions` `hooks` `safety` | verified 2026-10-29 auto |

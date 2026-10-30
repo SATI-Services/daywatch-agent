@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 79
+## Facts — 85
 
-Status: verified 79.
+Status: verified 85.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 10, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, stats 1, status 8, telemetry 1, template 1, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 4, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 10, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, process 6, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 7, stats 1, status 8, telemetry 1, template 1, testing 6, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 4, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -79,6 +79,12 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wirin
 | [sessions-status-shipped-rolling-8-lands-or-14-days](facts/sessions-status-shipped-rolling-8-lands-or-14-days.md) | status ## Shipped is a rolling ticker — ~8 most-recent lands or ~last 14 days, each with evidence | `session-logs` `status` `shipped` | verified 2026-10-26 auto |
 | [sessions-un-archived-notes-signal-handoff-not-landing](facts/sessions-un-archived-notes-signal-handoff-not-landing.md) | Un-archived notes to you are the health signal that a handoff is not landing | `session-logs` `notes` `handoff` | verified 2026-10-26 auto |
 | [sessions-unarchived-notes-are-handoff-health-signal](facts/sessions-unarchived-notes-are-handoff-health-signal.md) | Un-archived notes to you are the cheapest signal a handoff isn't landing | `session-logs` `shared-memory` `collaboration` | verified 2026-10-26 auto |
+| [skill-bench-compare-against-previous-dated-results](facts/skill-bench-compare-against-previous-dated-results.md) | Compare Skill Bench results against the previous dated run before trusting the edit | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-cost-haiku-sonnet-sessions-baseline-doubles](facts/skill-bench-cost-haiku-sonnet-sessions-baseline-doubles.md) | Skill Bench with-skill pass costs ~1 Haiku per eval + 1 Sonnet grading call; --baseline doubles | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-grading-measured-live-handles-repo-drift](facts/skill-bench-grading-measured-live-handles-repo-drift.md) | Skill Bench grades against live ground truth; repo drift is handled, eval premises can rot | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-regression-tests-for-prompt-changes](facts/skill-bench-regression-tests-for-prompt-changes.md) | Run a skill's evals before committing any skill edit — Skill Bench is the only regression test | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-runner-harness-aware-project-agnostic](facts/skill-bench-runner-harness-aware-project-agnostic.md) | Skill Bench runner at .claude/skills-bench/run_bench.py is harness-agnostic | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-runs-evals-on-haiku-not-bigger-models](facts/skill-bench-runs-evals-on-haiku-not-bigger-models.md) | Skill Bench evals run on Haiku by design; do not re-run on bigger models | `process` `skills` `testing` | verified 2026-10-30 auto |
 | [status-command-format-last-flush-at-relative-time](facts/status-command-format-last-flush-at-relative-time.md) | StatusCommand renders last_flush_at as UTC time plus age in seconds | `daemon` `command` `display` | verified 2026-10-29 auto |
 | [version-skill-current-version-full-earlier-versions-condensed](facts/version-skill-current-version-full-earlier-versions-condensed.md) | /version renders current version in full; earlier versions condensed | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
 | [version-skill-missing-version-stamp-assumed-version-fallback](facts/version-skill-missing-version-stamp-assumed-version-fallback.md) | Missing VERSION stamp: say the project predates versioning, assume the CHANGELOG's newest version | `harness` `version` `fallback` | verified 2026-10-26 auto |
@@ -88,9 +94,9 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wirin
 | [version-skill-version-stamp-applied-date-source-sha-notes](facts/version-skill-version-stamp-applied-date-source-sha-notes.md) | VERSION stamp has version, applied date, source repo, source sha, optional notes | `harness` `version` | verified 2026-10-26 auto |
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 
-## Todos — 12
+## Todos — 13
 
-Status: open 12.
+Status: open 13.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
@@ -105,4 +111,5 @@ Status: open 12.
 | [release-1-3-0-host-apps-upgrade](todos/release-1-3-0-host-apps-upgrade.md) | Upgrade icicle and pingpath to daywatch/agent 1.3.0, then restart daemon and reload workers | operator | 2026-10-12 | `release` `deployment` | open |
 | [release-1-3-0-upgrade-host-apps-and-restart-processes](todos/release-1-3-0-upgrade-host-apps-and-restart-processes.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
 | [release-1.3.0-host-apps-upgrade-and-daemon-restart](todos/release-1.3.0-host-apps-upgrade-and-daemon-restart.md) | Upgrade host apps to daywatch/agent 1.3.0 and restart daemons and workers | unassigned | 2026-10-12 | `release` `deploy` | open |
+| [skill-bench-add-evals-for-new-skills-and-failure-modes](todos/skill-bench-add-evals-for-new-skills-and-failure-modes.md) | Add evals to .claude/skills-bench/evals.json for new skills and discovered failure modes | unassigned | 2026-10-30 | `process` `skills` `testing` | open |
 | [wire-ignore-query-patterns-queryexecuted-filter](todos/wire-ignore-query-patterns-queryexecuted-filter.md) | Wire ignore_queries and ignore_query_patterns to filter QueryExecuted events | unassigned | 2026-10-05 | `sensor` `filtering` `queue` | open |

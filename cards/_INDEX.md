@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 85
+## Facts — 86
 
-Status: verified 85.
+Status: verified 86.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 10, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, process 6, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 7, stats 1, status 8, telemetry 1, template 1, testing 6, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 4, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 10, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, process 7, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 8, stats 1, status 8, telemetry 1, template 1, testing 7, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 4, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -85,6 +85,7 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wirin
 | [skill-bench-regression-tests-for-prompt-changes](facts/skill-bench-regression-tests-for-prompt-changes.md) | Run a skill's evals before committing any skill edit — Skill Bench is the only regression test | `process` `skills` `testing` | verified 2026-10-30 auto |
 | [skill-bench-runner-harness-aware-project-agnostic](facts/skill-bench-runner-harness-aware-project-agnostic.md) | Skill Bench runner at .claude/skills-bench/run_bench.py is harness-agnostic | `process` `skills` `testing` | verified 2026-10-30 auto |
 | [skill-bench-runs-evals-on-haiku-not-bigger-models](facts/skill-bench-runs-evals-on-haiku-not-bigger-models.md) | Skill Bench evals run on Haiku by design; do not re-run on bigger models | `process` `skills` `testing` | verified 2026-10-30 auto |
+| [skill-bench-write-evals-use-throwaway-worktrees-never-push](facts/skill-bench-write-evals-use-throwaway-worktrees-never-push.md) | Write-evals run in throwaway git worktrees and are told never to push | `process` `skills` `testing` | verified 2026-10-30 auto |
 | [status-command-format-last-flush-at-relative-time](facts/status-command-format-last-flush-at-relative-time.md) | StatusCommand renders last_flush_at as UTC time plus age in seconds | `daemon` `command` `display` | verified 2026-10-29 auto |
 | [version-skill-current-version-full-earlier-versions-condensed](facts/version-skill-current-version-full-earlier-versions-condensed.md) | /version renders current version in full; earlier versions condensed | `harness` `tooling` `diagnostics` | verified 2026-10-26 auto |
 | [version-skill-missing-version-stamp-assumed-version-fallback](facts/version-skill-missing-version-stamp-assumed-version-fallback.md) | Missing VERSION stamp: say the project predates versioning, assume the CHANGELOG's newest version | `harness` `version` `fallback` | verified 2026-10-26 auto |

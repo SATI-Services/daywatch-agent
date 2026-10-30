@@ -1,10 +1,10 @@
 # Index (generated — do not edit; exported from the AID board)
 
-## Facts — 78
+## Facts — 79
 
-Status: verified 78.
+Status: verified 79.
 
-Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 9, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, status 8, telemetry 1, template 1, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 3, worktrees 2
+Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wiring 2, automation 1, backlog 2, boost 1, boot 1, ci 1, cli 1, collaboration 8, command 2, commit 1, config 4, configuration 3, console 2, context 1, convention 1, core 1, daemon 10, diagnostics 3, display 1, docs 2, documentation 1, draft-feature 1, emit 1, entry-point 1, env 2, exceptions 1, facade 1, fallback 2, filtering 1, fluent 1, git 1, handoff 3, harness 7, hooks 13, inbox 1, ingest 1, installation 2, kimi 1, laravel 4, legal 1, license 1, mcp 3, middleware 2, notes 3, observation 1, operator 1, ops 2, probe 2, propagation 1, protocol 2, query-audit 1, queue 1, release 2, rendering 1, resilience 1, safety 4, sampling 7, secrets 1, sensor 1, service-provider 1, session-logging 2, session-logs 27, sessions 11, sessionstart 1, shared-memory 5, shipped 1, shipped-ticker 1, skill 1, skills 1, stats 1, status 8, telemetry 1, template 1, throttle 1, tooling 5, tools 1, uncrashable 2, unresolved 1, version 3, wire-contract 4, worktrees 2
 
 | Card | Fact | Tags | Status |
 |---|---|---|---|
@@ -17,6 +17,7 @@ Tags: agent 1, agents 2, architecture 1, archive 2, auth 2, author 1, auto-wirin
 | [configuration-env-vars-daywatch-token-base-url-required](facts/configuration-env-vars-daywatch-token-base-url-required.md) | DAYWATCH_TOKEN and DAYWATCH_BASE_URL are required; without them app runs normally collecting nothing | `configuration` `secrets` `env` | verified 2026-09-09 auto |
 | [daemon-console-dashboard-clamps-lines-to-terminal-width](facts/daemon-console-dashboard-clamps-lines-to-terminal-width.md) | ConsoleDashboard clamps each line to terminal width when width is > 0 | `daemon` `console` `rendering` | verified 2026-10-29 auto |
 | [daemon-console-dashboard-refreshes-periodically-and-guarded](facts/daemon-console-dashboard-refreshes-periodically-and-guarded.md) | ConsoleDashboard repaints guarded; rendering failures never crash the loop | `daemon` `console` `resilience` | verified 2026-10-29 auto |
+| [daemon-stats-auth-state-kept-off-toarray-wire-contract](facts/daemon-stats-auth-state-kept-off-toarray-wire-contract.md) | Auth state and auth failures kept off STATS toArray() — frozen wire contract | `daemon` `stats` `wire-contract` | verified 2026-10-30 auto |
 | [daemon-status-command-stats-and-fallback-ping](facts/daemon-status-command-stats-and-fallback-ping.md) | daywatch:status sends a STATS frame; falls back to PING for older daemons or token mismatch | `daemon` `command` `protocol` | verified 2026-10-29 auto |
 | [dated-log-template-objective-findings-actions-tested-open](facts/dated-log-template-objective-findings-actions-tested-open.md) | Dated log template: Objective, Key findings, Actions taken, Tested against, Open items | `session-logs` `template` | verified 2026-10-26 auto |
 | [daywatch-about-section-contributed-to-php-artisan-about](facts/daywatch-about-section-contributed-to-php-artisan-about.md) | Daywatch contributes a section to php artisan about | `laravel` `observation` `cli` | verified 2026-09-09 auto |

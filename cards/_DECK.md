@@ -1,12 +1,15 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `41d44b355` — 2026-10-31
+**As of:** `da814d4f7` — 2026-10-31
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-31 @ `da814d4f7` (run #3902):** `AGENTS.md`, `docs/WORKFLOW.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 9 card(s)
+- **2026-10-31 @ `da814d4f7` (run #3901):** `AGENTS.md`, `docs/WORKFLOW.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 17 card(s)
+- **2026-10-31 @ `da814d4f7` (run #3901):** `AGENTS.md`, `docs/WORKFLOW.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 12 card(s)
 - **2026-10-31 @ `41d44b355` (run #3861):** `AGENTS.md`, `docs/WORKFLOW.md`, `.claude/harness/CHANGELOG.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 40 card(s)
 - **2026-10-31 @ `52f90abb4` (run #3777):** `src/Daemon/AuthProbeResult.php` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 2 card(s)
 - **2026-10-31 @ `fda013bdc` (run #3743):** `.mcp.json`, `src/Buffer/RecordsBuffer.php`, `src/Daemon/AuthProbeResult.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 7 card(s)

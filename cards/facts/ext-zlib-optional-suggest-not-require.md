@@ -7,4 +7,4 @@ as_of: 41d44b355 2026-10-31
 ---
 **`ext-zlib` is a `suggest`, not a `require`** — zlib is near-universal but not guaranteed, so a host missing it still installs and runs (sensors/buffer/socket never touch zlib); only the daemon's gzip upload is affected. `IngestDispatcher` guards `gzencode` with `function_exists` so a missing extension pauses upload (drop + log) instead of fatalling.
 
-**Why:** Zlib is nearly universal but not guaranteed on every server. A host without it should still run and collect records; only compression is lost.
+**Why:** A host without zlib should still install, run and collect records; the only casualty is the daemon's gzip upload, which pauses and drops the batch with a log line rather than crashing.

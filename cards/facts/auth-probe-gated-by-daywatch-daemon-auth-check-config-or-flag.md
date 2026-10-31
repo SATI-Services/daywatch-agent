@@ -5,6 +5,4 @@ status: verified 2026-10-31 auto
 source: [AGENTS.md]
 as_of: 41d44b355 2026-10-31
 ---
-The startup auth check is gated by `daywatch.daemon.auth_check` (env `DAYWATCH_DAEMON_AUTH_CHECK`, default true) / `--no-auth-check`.
-
-**Why:** An operator may want to disable the check for testing or when running the daemon offline.
+The `Daemon/AuthProbe` startup auth check is gated by `daywatch.daemon.auth_check` (env `DAYWATCH_DAEMON_AUTH_CHECK`, default true) / `--no-auth-check`.

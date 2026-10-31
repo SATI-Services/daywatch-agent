@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `fda013bdc` — 2026-10-31
+**As of:** `52f90abb4` — 2026-10-31
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-10-31 @ `52f90abb4` (run #3777):** `src/Daemon/AuthProbeResult.php` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 2 card(s)
 - **2026-10-31 @ `fda013bdc` (run #3743):** `.mcp.json`, `src/Buffer/RecordsBuffer.php`, `src/Daemon/AuthProbeResult.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 7 card(s)
 - **2026-10-31 @ `f03ba15a2` (run #3609):** `docs/sessions/ryan/2026-08-25-backfill.md`, `docs/sessions/ryan/2026-09-15-session.md`, `docs/sessions/ryan/2026-10-06-release-1.0.2.md` — anthropic-haiku / claude-haiku-4-5-20251001 → 3 card(s)
 - **2026-10-30 @ `5520a2242` (run #3552):** `.claude/skills-bench/run_bench.py`, `.claude/skills/skill-bench/SKILL.md` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 1 card(s)

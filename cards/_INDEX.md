@@ -166,12 +166,13 @@ Tags: agent 1, agents 2, architecture 9, archive 2, auth 14, author 1, auto-wiri
 | [wire-contract-is-docs-first-via-payloads-skill](facts/wire-contract-is-docs-first-via-payloads-skill.md) | Wire contract changes are docs-first: the spec lands in the system docs corpus before any emit-side code | `wire-contract` `docs` `skill` | verified 2026-09-12 auto |
 | [worker-octane-state-resets-between-executions-no-worker-loop-noise](facts/worker-octane-state-resets-between-executions-no-worker-loop-noise.md) | Worker/Octane state resets between executions; worker-loop noise is never sampled | `worker` `state` `sampling` | verified 2026-10-31 auto |
 
-## Todos — 14
+## Todos — 15
 
-Status: open 14.
+Status: open 15.
 
 | Card | Work | Owner | Since | Tags | Status |
 |---|---|---|---|---|---|
+| [batch-buffer-measure-payload-efficiency](todos/batch-buffer-measure-payload-efficiency.md) | Verify BatchBuffer.measure() efficiency against pathological payloads | unassigned | 2026-10-31 | `daemon` `testing` `performance` | open |
 | [boost-guidelines-published-to-host-apps](todos/boost-guidelines-published-to-host-apps.md) | Add and ship Boost guidelines to resources/boost/guidelines/core.blade.php | unassigned | 2026-09-09 | `laravel` `boost` `documentation` `installation` | open |
 | [boost-guidelines-shipped-to-host-apps](todos/boost-guidelines-shipped-to-host-apps.md) | Ship Boost guidelines to resources/boost/guidelines/core.blade.php | unassigned | 2026-10-31 | `boost` `docs` `consumer-facing` | open |
 | [ci-matrix-laravel-version-constraint-alignment](todos/ci-matrix-laravel-version-constraint-alignment.md) | Align composer.json Laravel constraint with CI testability | ryan | 2026-09-06 | `ci` `composer` `owner-decision` | open |

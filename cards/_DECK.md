@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `5f4d0423d` — 2026-11-01
+**As of:** `a96ebd137` — 2026-11-01
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-11-02 @ `a96ebd137` (run #4272):** `src/Daemon/ConnectionHandler.php`, `src/Daemon/FrameParser.php`, `src/Daemon/SocketHttpSender.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 12 card(s)
 - **2026-11-01 @ `5f4d0423d` (run #4141):** `src/Daemon/BatchBuffer.php` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 1 card(s)
 - **2026-11-01 @ `2ae2d15e3` (run #4098):** `docs/WORKFLOW.md`, `src/Daemon/BatchBuffer.php`, `src/Daemon/IngestServer.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 6 card(s)
 - **2026-10-31 @ `a914f6c40` (run #3934):** `AGENTS.md` — moonshot / kimi-k3, round 3 → 6 card(s)

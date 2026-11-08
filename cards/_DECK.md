@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `16b149588` — 2026-11-08
+**As of:** `c34aba0b3` — 2026-11-08
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-11-08 @ `c34aba0b3` (run #6220):** `src/Records/JobAttemptRecord.php`, `src/Sensors/JobAttemptSensor.php`, `src/Records/RequestRecord.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 12 card(s)
 - **2026-11-08 @ `16b149588` (run #6116):** `src/Records/Counters.php`, `src/Sensors/ExceptionSensor.php`, `src/Sensors/RequestSensor.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 8 card(s)
 - **2026-11-08 @ `ba25e5cf0` (run #6056):** `src/Records/ExceptionTrace.php` — openrouter / deepseek/deepseek-v4.1-flash, round 2 → 1 card(s)
 - **2026-11-08 @ `2cf41c87a` (run #6019):** `src/Records/CommandRecord.php`, `src/Records/ExceptionTrace.php`, `src/Sensors/CommandSensor.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 9 card(s)

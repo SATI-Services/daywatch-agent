@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `f371ddc0a` — 2026-11-18
+**As of:** `5135f95b1` — 2026-11-18
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-11-19 @ `5135f95b1` (run #8005):** `tests/Sensors/MailSensorTest.php`, `tests/Sensors/NotificationSensorTest.php`, `tests/Sensors/OutgoingRequestSensorTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-18 @ `f371ddc0a` (run #7970):** `tests/Records/RequestRecordTest.php`, `tests/Sensors/JobAttemptSensorTest.php`, `tests/Sensors/LogSensorTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-18 @ `0df8f305b` (run #7937):** `tests/Records/QueryRecordTest.php`, `tests/Sensors/ExceptionSensorTest.php`, `tests/Sensors/QueuedJobSensorTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-17 @ `b4c5db890` (run #7894):** `tests/Pest.php`, `tests/Records/ExceptionTraceTest.php`, `tests/Sensors/CommandSensorTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)

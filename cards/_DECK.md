@@ -1,12 +1,13 @@
 # Daywatch-agent — deck
 
 **Source repo:** `https://github.com/SATI-Services/daywatch-agent.git` (branch `main`)
-**As of:** `6cbe50907` — 2026-11-20
+**As of:** `f4467632c` — 2026-11-21
 **Index:** [`_INDEX.md`](_INDEX.md) (generated)
 **Layout:** `facts/` (durable knowledge, verified) · `todos/` (open work, reconciled)
 
 ## Coverage ledger
 
+- **2026-11-21 @ `f4467632c` (run #8194):** `tests/Support/LegacyPublishedConfig.php`, `tests/Unit/UserResolutionTest.php`, `tests/Unit/GroupTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-21 @ `6cbe50907` (run #8158):** `tests/Support/FrozenClock.php`, `tests/Unit/DaywatchManagerTest.php`, `tests/Unit/RecordsBufferTest.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-20 @ `33fbf81a5` (run #8117):** `tests/Support/FakeScheduler.php`, `tests/TestCase.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
 - **2026-11-20 @ `53f8451d0` (run #8071):** `tests/Sensors/StageSensorTest.php`, `tests/Support/FakeHttpSender.php`, `tests/Support/helpers.php` — anthropic-haiku / claude-haiku-4-5-20251001 → 0 card(s)
